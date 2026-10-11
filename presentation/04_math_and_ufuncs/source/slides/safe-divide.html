@@ -1,0 +1,17 @@
+<section id="safe-divide" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Safe division</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Divide only where it is defined</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">revenue = np.array([100., 0., 90.])<br>units = np.array([2., 0., 3.])<br>unit_price = np.full_like(revenue, np.nan)<br>np.divide(revenue, units, out=unit_price,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;where=units != 0)<br>print(unit_price)<br>np.testing.assert_allclose(unit_price,<br>&#160;&#160;&#160;&#160;[50, np.nan, 30], equal_nan=True)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[50. nan 30.]</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">out= is the buffer</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Fill it first: skipped entries keep that value.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">where= is the mask</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Only True positions are computed, so 0 / 0 never runs.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">NaN means missing</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A floating-point marker for an undefined unit price.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 04 Math and ufuncs</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>Ufuncs such as np.divide accept two useful keyword arguments. where= is a boolean mask: the calculation runs only at True positions. out= is the array the results are written into. Positions the mask skips are never touched, so you must initialise out first; otherwise they contain whatever was there. Here the buffer starts as all NaN, NaN being the floating-point marker for a missing value, so the entry with zero units ends up as nan instead of a warning or a misleading number. Unlike np.where, this genuinely avoids the invalid calculation. Try it: build the buffer with np.zeros_like instead. The middle price becomes 0., which now reads like a real price of zero rather than "undefined", so the missing-value meaning is lost.</aside>
+</section>

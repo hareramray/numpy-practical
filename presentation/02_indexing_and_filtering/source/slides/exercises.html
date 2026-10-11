@@ -1,0 +1,22 @@
+<section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One slice, one filter</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">All rows, last two columns of grid</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">grid = np.arange(20).reshape(4, 5). Expected: [[3, 4], [8, 9], [13, 14], [18, 19]].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">last_columns = grid[:, -2:]</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Prices from 100 to 300, both included</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">prices = [80, 100, 150, 300, 450]. Expected: [100, 150, 300].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">affordable = prices[<br>&#160;&#160;&#160;&#160;(prices &gt;= 100) &amp; (prices &lt;= 300)]</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 02 Indexing and filtering</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>Let the audience attempt both before revealing the code, which matches the reference solutions. In Exercise 1 the first colon keeps every row, and the slice -2: selects the final two columns while preserving both axes, so the result is 4 by 2. Writing grid[:, 3:] works too. In Exercise 2 each comparison builds a mask, and &amp; keeps their intersection; using &gt;= and &lt;= keeps both endpoints, 100 and 300, and rejects 80 and 450. Forgetting the parentheses, or writing and instead of &amp;, raises an error.</aside>
+</section>

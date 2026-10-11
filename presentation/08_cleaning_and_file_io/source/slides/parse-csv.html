@@ -1,0 +1,27 @@
+<section id="parse-csv" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · CSV and NumPy binary formats</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Parse text with gaps</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">from io import StringIO<br>parsed = np.genfromtxt(<br>&#160;&#160;&#160;&#160;StringIO("temperature,humidity\n20,50\n22,\n"),<br>&#160;&#160;&#160;&#160;delimiter=",", skip_header=1)<br>print("Parsed CSV:\n", parsed)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Parsed CSV:<br>&#160;[[20. 50.]<br>&#160;[22. nan]]</p></div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:20px;align-items:center">
+<div style="width:560px;display:flex;flex-direction:column;gap:4px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:24px 32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#9AA3AE;text-decoration:line-through">temperature,humidity</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#13233A">20,50</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#13233A">22,<span style="color:#B5541A">&#160;&#160;← empty field</span></p>
+</div>
+<x-shape kind="arrow-down" style="background:#B5541A;width:48px;height:72px"></x-shape>
+<div style="display:grid;grid-template-columns:160px 160px;gap:12px">
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">50.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">22.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #B5541A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#B5541A">nan</p></div>
+</div>
+<p style="font-size:24px;color:#4A5568;text-align:center">Header skipped; the empty field becomes nan.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>CSV, comma-separated values, is the most common way data arrives. np.genfromtxt parses simple numeric text and, unlike np.loadtxt, tolerates missing entries. StringIO lets us treat a Python string as if it were a file, so the example needs no file on disk. The right side shows what happens to the three lines of text: skip_header=1 drops the header line, delimiter="," splits each line into fields, and the empty field after 22 becomes nan. So genfromtxt hands you a float array with NaN already in place, ready for the detection and imputation steps you just learned.</aside>
+</section>

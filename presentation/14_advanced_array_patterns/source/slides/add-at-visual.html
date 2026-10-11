@@ -1,0 +1,37 @@
+<section id="add-at-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Buffered versus unbuffered</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two hits on index 0</h2>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="font-size:24px;color:#6B7280;width:200px">updates<br>(index, value)</p>
+<div style="width:220px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:3px solid #E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">[0] += 1</p></div>
+<div style="width:220px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:3px solid #E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">[0] += 1</p></div>
+<div style="width:220px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">[2] += 5</p></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">indices = [0, 0, 2]<br>values = [1, 1, 5]</p>
+</div>
+<div style="display:flex;gap:40px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Warning" style="color:#B5541A;width:48px;height:48px"></x-icon><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;font-weight:600;color:#13233A">buffered[indices] += values</p></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Reads all targets once, adds, writes back. The second write to [0] overwrites the first.</p>
+<div style="flex:1"></div>
+<div style="display:flex;gap:12px;align-items:end">
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">[0]</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div></div>
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">[1]</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div></div>
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">[2]</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div></div>
+<p style="font-size:28px;line-height:1.4;color:#B5541A;width:200px">one update lost</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="CheckCircle" style="color:#2F6FB0;width:48px;height:48px"></x-icon><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;font-weight:600;color:#13233A">np.add.at(accumulated, indices, values)</p></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Applies each occurrence in turn: 0 + 1 + 1 = 2. Same as np.bincount with weights.</p>
+<div style="flex:1"></div>
+<div style="display:flex;gap:12px;align-items:end">
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">[0]</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div></div>
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">[1]</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div></div>
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">[2]</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div></div>
+<p style="font-size:28px;line-height:1.4;color:#2F6FB0;width:200px">every hit counted</p>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>Here the three updates are drawn as chips: two of them, outlined in orange, target the same position 0. With buffered fancy indexing, NumPy gathers buffered[[0, 0, 2]] into a temporary array, [0, 0, 0], adds [1, 1, 5] to get [1, 1, 5], and scatters the result back. Position 0 is written twice with the value 1, so the final array is [1, 0, 5]: one of the two increments is lost, and no error is raised. np.add.at does the addition in place for each occurrence, so position 0 goes 0, then 1, then 2, giving [2, 0, 5]. This matters for histograms, group sums and scatter operations, where repeated indices are the normal case, not the exception.</aside>
+</section>

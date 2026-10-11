@@ -1,0 +1,17 @@
+<section id="pairwise" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Pairwise differences</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">A column minus a row: every pair</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">x = np.array([1., 4., 7.])<br>y = np.array([2., 5.])<br>differences = x[:, None] - y[None, :]<br>print(differences)<br>distances = np.abs(differences)<br>assert distances.shape == (3, 2)<br>np.testing.assert_allclose(distances,<br>&#160;&#160;&#160;&#160;[[1, 4], [2, 1], [5, 2]])</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[[-1. -4.]<br>&#160;[&#160;2. -1.]<br>&#160;[&#160;5.&#160; 2.]]</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">x[:, None] is (3, 1)</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The x values become a column.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">y[None, :] is (1, 2)</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The y values become a row.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">The result is (3, 2)</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Row i, column j holds x[i] − y[j]: an outer operation.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 05 Broadcasting</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>Indexing with None inserts a new axis of length 1. x[:, None] turns the three x values into a (3, 1) column and y[None, :] turns the two y values into a (1, 2) row. Aligned from the right, 1 meets 2 and 3 meets 1, so both stretch and the result is (3, 2): one entry for every combination of an x and a y. For example, row 2, column 0 is 7 minus 2, which is 5. Taking np.abs gives distances. This pattern is called an outer operation. Write the shape beside each intermediate before you scale up, because a large column times a large row can need a lot of memory. Try it: make x and y 2D points, for example shapes (3, 2) and (2, 2), compute x[:, None, :] - y[None, :, :] of shape (3, 2, 2), square it, sum over the last axis, and take the square root to get distances of shape (3, 2).</aside>
+</section>

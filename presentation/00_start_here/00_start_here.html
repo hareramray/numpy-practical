@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 00 — Start Here</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 00 — Start Here</h1><span>11 slides · <a href="https://claude.ai/artifact/LUGiKXeo9xGrf1B57B1DYK">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative grid of array cells" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="0" width="132" height="132" rx="16" fill="#E8813A"/><rect x="160" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="480" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="160" width="132" height="132" rx="16" fill="#E8813A"/><rect x="320" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="160" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="0" y="320" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="160" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="320" width="132" height="132" rx="16" fill="#E8813A"/><rect x="480" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="480" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="320" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="480" width="132" height="132" rx="16" fill="#E8813A"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 00</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE">Start here</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2">Jupyter and the Python you need</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Beginner</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">30–50 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: none</p>
+</div>
+<aside>Welcome to the course. This first notebook has no NumPy prerequisites. By the end you can run cells, read an error message, use lists and functions, and check your own answer with an assertion. Every notebook in the course is self-contained: it imports its own libraries and creates its own data.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> Welcome to the course. This first notebook has no NumPy prerequisites. By the end you can run cells, read an error message, use lists and functions, and check your own answer with an assertion. Every notebook in the course is self-contained: it imports its own libraries and creates its own data.</p></div>
+<div class="slide" id="howto"><div class="frame"><section id="howto" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">How to study each notebook</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Five moves, every notebook</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Predict</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Write down the shape and a few values you expect.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Run</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Execute the example and read its output.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Change</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Do the Try it experiment and explain what moved.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">4</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Solve</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Replace None in each exercise and rerun its check.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">5</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Reflect</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, then Restart and Run All.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 00 Start here</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>This routine is the same in all 18 notebooks. Predicting first is the most important habit: when the output surprises you, you have found exactly the thing worth understanding. Untouched exercises print Pending, so Run All succeeds without pretending you solved them. Restarting the kernel and running everything at the end catches work that depends on old variables or out-of-order execution.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> This routine is the same in all 18 notebooks. Predicting first is the most important habit: when the output surprises you, you have found exactly the thing worth understanding. Untouched exercises print Pending, so Run All succeeds without pretending you solved them. Restarting the kernel and running everything at the end catches work that depends on old variables or out-of-order execution.</p></div>
+<div class="slide" id="cells"><div class="frame"><section id="cells" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Your first notebook</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Cells run in order; the kernel remembers</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Shift+Enter runs a cell</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The number beside it records the order cells ran in.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Variables live in the kernel</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The running Python process keeps them, so run top to bottom.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">assert is a check</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">No error means the condition passed.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">name = "NumPy learner"<br>minutes_per_day = 30<br>days = 5<br>print(f"Hello, {name}!")<br>print("Weekly practice minutes:",<br>&#160;&#160;&#160;&#160;&#160;&#160;minutes_per_day * days)<br>assert minutes_per_day * days == 150</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Hello, NumPy learner!<br>Weekly practice minutes: 150</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 00 Start here</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>A notebook mixes text cells and code cells. Ask the audience to predict both printed lines before running. Try it: change days to 7. The print changes to 210, but the assert now fails, because 150 is hard-coded. Update the expected value in the assertion too. Use Kernel, Restart Kernel and Run All Cells to prove your work does not depend on stale variables.</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> A notebook mixes text cells and code cells. Ask the audience to predict both printed lines before running. Try it: change days to 7. The print changes to 210, but the assert now fails, because 150 is hard-coded. Update the expected value in the assertion too. Use Kernel, Restart Kernel and Run All Cells to prove your work does not depend on stale variables.</p></div>
+<div class="slide" id="python"><div class="frame"><section id="python" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Lists, loops, and functions</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Just enough Python to start</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">prices = [10, 20, 30]<br>print("First price:", prices[0])<br>discounted = [p * 0.9 for p in prices]<br><br>def total_with_tax(values, tax_rate=0.05):<br>&#160;&#160;&#160;&#160;return sum(values) * (1 + tax_rate)<br><br>print(discounted)<br>print(total_with_tax(prices))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">First price: 10<br>[9.0, 18.0, 27.0]<br>63.0</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Indexing starts at 0</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">prices[0] is the first item, 10.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Loops repeat work</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The comprehension builds a new list, one price at a time.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Functions name a calculation</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">return sends the result back. Indentation is part of the syntax.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 00 Start here</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>Walk through each line: 60 total times 1.05 tax gives 63.0. Note that the loop inside the list comprehension visits each price once; NumPy will soon let us skip writing that loop entirely. Try it: call total_with_tax(prices, tax_rate=0.10). The result becomes 66.0 because the keyword argument overrides the default of 0.05.</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> Walk through each line: 60 total times 1.05 tax gives 63.0. Note that the loop inside the list comprehension visits each price once; NumPy will soon let us skip writing that loop entirely. Try it: call total_with_tax(prices, tax_rate=0.10). The result becomes 66.0 because the keyword argument overrides the default of 0.05.</p></div>
+<div class="slide" id="list-vs-array"><div class="frame"><section id="list-vs-array" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Meet NumPy</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Same * 2, two different meanings</h2>
+<div style="display:flex;flex-direction:column;gap:48px;flex:1;justify-content:center">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">[10, 20, 30] * 2 <span style="color:#6B7280">→ Python list: repeats the contents</span></p>
+<div style="display:flex;gap:12px">
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">30</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">30</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">np.array([10, 20, 30]) * 2 <span style="color:#6B7280">→ NumPy array: multiplies every element</span></p>
+<div style="display:flex;gap:12px">
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">20</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">40</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">60</p></div>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 00 Start here</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>This is the first big idea of the course. The usual import is import numpy as np. A list times 2 gives a list twice as long: the dashed cells are the repeated copy. An array times 2 keeps the same length and doubles each value. NumPy applies arithmetic elementwise, with no loop written by you. The notebook confirms this with np.testing.assert_array_equal(values * 2, [20, 40, 60]).</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> This is the first big idea of the course. The usual import is import numpy as np. A list times 2 gives a list twice as long: the dashed cells are the repeated copy. An array times 2 keeps the same length and doubles each value. NumPy applies arithmetic elementwise, with no loop written by you. The notebook confirms this with np.testing.assert_array_equal(values * 2, [20, 40, 60]).</p></div>
+<div class="slide" id="errors"><div class="frame"><section id="errors" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Read an error</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Read an error from its last line</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">values = np.array([10, 20, 30])<br>try:<br>&#160;&#160;&#160;&#160;print(values[99])<br>except IndexError as error:<br>&#160;&#160;&#160;&#160;print("Intentional error:", error)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Intentional error: index 99 is out<br>of bounds for axis 0 with size 3</p></div>
+</div>
+<div style="width:640px;display:flex;flex-direction:column;gap:20px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">IndexError</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">What kind of problem happened.</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">index 99</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">What you asked for.</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">size 3</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">What exists: valid indices are 0, 1 and 2.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 00 Start here</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>Errors are learning tools. A traceback can be long, but the last line names the error type and the reason. The notebook catches this intentional error with try and except so that Run All still works. Try it: replace 99 with 2. The largest valid positive index is the size minus one, here 2, which prints 30.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> Errors are learning tools. A traceback can be long, but the last line names the error type and the reason. The notebook catches this intentional error with try and except so that Run All still works. Try it: replace 99 with 2. The largest valid positive index is the size minus one, here 2, which prints 30.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Lists repeat.<br>Arrays compute.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">A NumPy array applies one operation to every element at once. The rest of the course builds on that.</p>
+<aside>Pause here. Everything from notebook 01 onwards (dtypes, broadcasting, statistics, linear algebra) is a variation on this one behaviour: write the operation once, and NumPy applies it across the whole array in fast compiled code.</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> Pause here. Everything from notebook 01 onwards (dtypes, broadcasting, statistics, linear algebra) is a variation on this one behaviour: write the operation once, and NumPy applies it across the whole array in fast compiled code.</p></div>
+<div class="slide" id="checks"><div class="frame"><section id="checks" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · How exercises work</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Every exercise checks itself</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">practice_minutes = None&#160;&#160;# TODO<br><br>if practice_minutes is None:<br>&#160;&#160;&#160;&#160;print("Pending: complete Exercise 1")<br>else:<br>&#160;&#160;&#160;&#160;assert practice_minutes == 150<br>&#160;&#160;&#160;&#160;print("Exercise 1 passed!")</p></div>
+</div>
+<div style="width:600px;display:flex;flex-direction:column;gap:20px">
+<div style="background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:28px 32px;display:flex;gap:24px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#6B7280;width:56px;height:56px" role="img" aria-label="Clock"><circle cx="12" cy="12" r="10"/><polyline points="12 7 12 12 15 14"/></svg><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Still None</h3><p style="font-size:28px;color:#4A5568">Prints Pending</p></div></div>
+<div style="background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:28px 32px;display:flex;gap:24px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#B5541A;width:56px;height:56px" role="img" aria-label="Warning"><path d="M12 3 22 20H2Z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Wrong value</h3><p style="font-size:28px;color:#4A5568">Raises AssertionError</p></div></div>
+<div style="background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:28px 32px;display:flex;gap:24px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:56px;height:56px" role="img" aria-label="CheckCircle"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Right value</h3><p style="font-size:28px;color:#4A5568">Prints passed!</p></div></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 00 Start here</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>Every exercise in the course follows this pattern. You replace None with your answer and rerun the check cell. The check verifies your result, not your method, so any correct approach passes. If an assertion fails, read the expected value and inspect your shape and dtype. For arrays, the checks use np.testing.assert_allclose, which allows tiny floating-point differences.</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> Every exercise in the course follows this pattern. You replace None with your answer and rerun the check cell. The check verifies your result, not your method, so any correct approach passes. If an assertion fails, read the expected value and inspect your shape and dtype. For arrays, the checks use np.testing.assert_allclose, which allows tiny floating-point differences.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two warm-up exercises</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Total minutes for 25 minutes a day over 6 days</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: 150. Plain scalar arithmetic: daily duration times days.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">practice_minutes = 25 * 6</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Convert [0, 10, 20] °C to Fahrenheit</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: [32, 50, 68]. The formula F = C × 9/5 + 32 runs on every element at once.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">fahrenheit = celsius * 9 / 5 + 32</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 00 Start here</p><p style="font-size:24px;color:#6B7280">9</p></div>
+<aside>Ask the audience to attempt both before revealing the code lines, which match the reference solutions. In Exercise 2, celsius is np.array([0., 10., 20.]). Multiplication and division happen before adding 32, and because celsius is an array the formula applies to every element without a loop: the key idea from slide 7 in action.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> Ask the audience to attempt both before revealing the code lines, which match the reference solutions. In Exercise 2, celsius is np.array([0., 10., 20.]). Multiplication and division happen before adding 32, and because celsius is an array the formula applies to every element without a loop: the key idea from slide 7 in action.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Write it yourself, then check it</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">A function that takes a NumPy array of minutes and returns hours</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Test it on [30, 60, 90]. Decide the expected result before you run it.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain the main idea without reading the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a changed input or edge case and explain it</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 00 Start here</p><p style="font-size:24px;color:#6B7280">10</p></div>
+<aside>The challenge has no supplied check: write your own. A good answer divides the array by 60 and should give [0.5, 1.0, 1.5]. Add an assert or np.testing.assert_allclose to prove it. Then restart the kernel and run all cells once more.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> The challenge has no supplied check: write your own. A good answer divides the array by 60 and should give [0.5, 1.0, 1.5]. Add an assert or np.testing.assert_allclose to prove it. Then restart the kernel and run all cells once more.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Cells</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Run top to bottom; restart and run all to verify.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Arrays</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Operations apply to every element.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Errors</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Read the last line first.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Asserts</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Silence means the check passed.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 01</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Arrays and dtypes</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Constructors, dimensions, shapes and numeric types.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 01. Further reading: the official NumPy guide for absolute beginners at numpy.org/doc/stable/user/absolute_beginners.html.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> Recap the four takeaways, then point to notebook 01. Further reading: the official NumPy guide for absolute beginners at numpy.org/doc/stable/user/absolute_beginners.html.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

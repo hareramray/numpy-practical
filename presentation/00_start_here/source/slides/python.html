@@ -1,0 +1,17 @@
+<section id="python" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Lists, loops, and functions</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Just enough Python to start</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">prices = [10, 20, 30]<br>print("First price:", prices[0])<br>discounted = [p * 0.9 for p in prices]<br><br>def total_with_tax(values, tax_rate=0.05):<br>&#160;&#160;&#160;&#160;return sum(values) * (1 + tax_rate)<br><br>print(discounted)<br>print(total_with_tax(prices))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">First price: 10<br>[9.0, 18.0, 27.0]<br>63.0</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Indexing starts at 0</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">prices[0] is the first item, 10.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Loops repeat work</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The comprehension builds a new list, one price at a time.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Functions name a calculation</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">return sends the result back. Indentation is part of the syntax.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 00 Start here</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>Walk through each line: 60 total times 1.05 tax gives 63.0. Note that the loop inside the list comprehension visits each price once; NumPy will soon let us skip writing that loop entirely. Try it: call total_with_tax(prices, tax_rate=0.10). The result becomes 66.0 because the keyword argument overrides the default of 0.05.</aside>
+</section>

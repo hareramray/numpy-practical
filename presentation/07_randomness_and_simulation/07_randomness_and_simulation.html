@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 07 — Randomness and Simulation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 07 — Randomness and Simulation</h1><span>12 slides · <a href="https://claude.ai/artifact/DdTzTP8r4GkR3Cz3SjPFnB">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative pair of dice" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="0" width="292" height="292" rx="32" fill="#22344F"/><circle cx="73" cy="73" r="28" fill="#E8813A"/><circle cx="219" cy="73" r="28" fill="#E8813A"/><circle cx="146" cy="146" r="28" fill="#E8813A"/><circle cx="73" cy="219" r="28" fill="#E8813A"/><circle cx="219" cy="219" r="28" fill="#E8813A"/><rect x="320" y="0" width="132" height="132" rx="16" fill="#E8813A"/><rect x="480" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="480" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="160" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="320" width="292" height="292" rx="32" fill="#2F6FB0"/><circle cx="393" cy="393" r="28" fill="#F6F4EE"/><circle cx="539" cy="393" r="28" fill="#F6F4EE"/><circle cx="393" cy="466" r="28" fill="#F6F4EE"/><circle cx="539" cy="466" r="28" fill="#F6F4EE"/><circle cx="393" cy="539" r="28" fill="#F6F4EE"/><circle cx="539" cy="539" r="28" fill="#F6F4EE"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 07</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE;width:1000px">Randomness and simulation</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2;width:1000px">Seeded generators, Monte Carlo and the bootstrap</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Intermediate</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">30–50 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: notebooks 00–06</p>
+</div>
+<aside>This notebook is about reproducible randomness. You will create a local random Generator, draw samples from common distributions, estimate a probability by simulation, and bootstrap a sample mean. The thread through all of it: a seed makes a random run repeatable, and many random trials, averaged, let you estimate quantities that a single draw cannot tell you. As always, the notebook imports its own libraries and creates its own data.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> This notebook is about reproducible randomness. You will create a local random Generator, draw samples from common distributions, estimate a probability by simulation, and bootstrap a sample mean. The thread through all of it: a seed makes a random run repeatable, and many random trials, averaged, let you estimate quantities that a single draw cannot tell you. As always, the notebook imports its own libraries and creates its own data.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Randomness you can repeat</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Generator</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Create a local, seeded generator with default_rng.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Distributions</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Sample integers, uniform and normal values.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Monte Carlo</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Estimate a probability from many random trials.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">4</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Bootstrap</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Resample data to put an interval around a mean.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 07 Randomness and simulation</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>The notebook promises four skills: use a Generator, sample distributions, simulate uncertainty, and bootstrap a mean. Each one builds on the last. The generator is the source of every random number; distributions describe what kind of numbers it draws; Monte Carlo turns many draws into an estimate; and the bootstrap applies the same idea to data you already observed. Prerequisites are notebooks 00 to 06, especially Boolean masks and reductions along an axis.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> The notebook promises four skills: use a Generator, sample distributions, simulate uncertainty, and bootstrap a mean. Each one builds on the last. The generator is the source of every random number; distributions describe what kind of numbers it draws; Monte Carlo turns many draws into an estimate; and the bootstrap applies the same idea to data you already observed. Prerequisites are notebooks 00 to 06, especially Boolean masks and reductions along an axis.</p></div>
+<div class="slide" id="generator"><div class="frame"><section id="generator" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · A local random generator</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One seeded generator, many draws</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">rng = np.random.default_rng(42)<br>print("Dice:", rng.integers(1, 7, size=12))<br>print("Uniform:", rng.uniform(0, 1, size=4))<br>print("Normal:", rng.normal(loc=170,<br>&#160;&#160;&#160;&#160;&#160;&#160;scale=10, size=4))<br>a = np.random.default_rng(123).integers(0, 100, 5)<br>b = np.random.default_rng(123).integers(0, 100, 5)<br>np.testing.assert_array_equal(a, b)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Dice: [1 5 4 3 3 6 1 5 2 1 4 6]<br>Uniform: [0.7611 0.7861 0.1281 0.4504]<br>Normal: [178.794  177.7779 170.6603 181.2724]</p></div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">default_rng(seed)</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A local generator: the same seed and calls give the same numbers.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">High bound excluded</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">integers(1, 7) draws 1 to 6, like a die.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Draws advance the state</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Each call moves the generator on to new values.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 07 Randomness and simulation</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>np.random.default_rng(seed) creates a Generator object that you pass around, rather than relying on hidden global state. One generator draws from many distributions: integers for dice, uniform for values between 0 and 1, normal for bell-shaped data around a mean of 170 with standard deviation 10. A seed makes the sequence reproducible for the same setup and calls; it does not make a small sample match its theoretical distribution, and exact values are not promised across arbitrary future NumPy versions. The last three lines prove reproducibility: two fresh generators with seed 123 give identical arrays, so the assert passes. Try it: run the rng cell twice, then run only a later sampling line twice. Re-running the whole cell repeats the same numbers because the generator is re-created; re-running one sampling line gives new numbers each time because the generator's state has advanced.</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> np.random.default_rng(seed) creates a Generator object that you pass around, rather than relying on hidden global state. One generator draws from many distributions: integers for dice, uniform for values between 0 and 1, normal for bell-shaped data around a mean of 170 with standard deviation 10. A seed makes the sequence reproducible for the same setup and calls; it does not make a small sample match its theoretical distribution, and exact values are not promised across arbitrary future NumPy versions. The last three lines prove reproducibility: two fresh generators with seed 123 give identical arrays, so the assert passes. Try it: run the rng cell twice, then run only a later sampling line twice. Re-running the whole cell repeats the same numbers because the generator is re-created; re-running one sampling line gives new numbers each time because the generator's state has advanced.</p></div>
+<div class="slide" id="seeds"><div class="frame"><section id="seeds" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · A local random generator</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Same seed, same stream</h2>
+<div style="display:flex;flex-direction:column;gap:40px;flex:1;justify-content:center">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">np.random.default_rng(123).integers(0, 100, 5) <span style="color:#6B7280">→ a</span></p>
+<div style="display:flex;gap:12px">
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">68</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">59</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">5</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">90</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">np.random.default_rng(123).integers(0, 100, 5) <span style="color:#6B7280">→ b: a fresh generator, identical values</span></p>
+<div style="display:flex;gap:12px">
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">68</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">59</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">5</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">90</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">rng.integers(0, 100, 5) <span style="color:#6B7280">→ second call on the same seeded rng: state advanced</span></p>
+<div style="display:flex;gap:12px">
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">22</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">25</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">18</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">33</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">17</p></div>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 07 Randomness and simulation</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>Think of a seeded generator as a long, fixed stream of numbers, and each call reads the next stretch of it. The first two rows are the notebook's a and b: two fresh generators with seed 123 start at the same place in the stream, so both give 1, 68, 59, 5, 90 and assert_array_equal passes. The dashed row is what you get if you keep one generator, rng = np.random.default_rng(123), and call rng.integers(0, 100, 5) a second time: the state has moved on, so you read the next five values instead (values from running this exact code with the course's NumPy 2.5 setup). This is the whole Try it experiment in one picture: re-running the cell that creates rng rewinds to the start; re-running only a sampling line keeps reading forward.</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> Think of a seeded generator as a long, fixed stream of numbers, and each call reads the next stretch of it. The first two rows are the notebook's a and b: two fresh generators with seed 123 start at the same place in the stream, so both give 1, 68, 59, 5, 90 and assert_array_equal passes. The dashed row is what you get if you keep one generator, rng = np.random.default_rng(123), and call rng.integers(0, 100, 5) a second time: the state has moved on, so you read the next five values instead (values from running this exact code with the course's NumPy 2.5 setup). This is the whole Try it experiment in one picture: re-running the cell that creates rng rewinds to the start; re-running only a sampling line keeps reading forward.</p></div>
+<div class="slide" id="monte-carlo"><div class="frame"><section id="monte-carlo" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Monte Carlo probability</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Estimate by repeated trials</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">rng = np.random.default_rng(7)<br>dice = rng.integers(1, 7, size=(50_000, 2))<br>event = dice.sum(axis=1) == 7<br>estimate = event.mean()<br>standard_error = np.sqrt(<br>&#160;&#160;&#160;&#160;estimate * (1 - estimate) / event.size)<br>print("Estimated P(sum=7):", estimate)<br>print("Exact probability:", 6 / 36)<br>print("Estimated standard error:",<br>&#160;&#160;&#160;&#160;&#160;&#160;standard_error)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Estimated P(sum=7): 0.16748<br>Exact probability: 0.16666666666666666<br>Estimated standard error: 0.0016699128695833207</p></div>
+</div>
+<div style="width:520px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">One row, one trial</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">50,000 rows of two dice each.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Mean of a mask</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">True counts as 1, so the mean is the success rate.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Standard error</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Typical sampling wobble, not a guarantee.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 07 Randomness and simulation</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>Monte Carlo estimates a quantity by running many random trials and averaging. Here each row is one trial of rolling two dice. dice.sum(axis=1) adds across each row, and comparing with 7 gives a Boolean event per trial. Because True counts as 1 and False as 0, event.mean() is the fraction of successes, which estimates the probability: 0.16748 against the exact 6/36, about 0.1667. The standard error, the square root of p(1 - p) / n, describes how much such an estimate typically varies from run to run; it is not a promise about any single run. Try it: rerun with 500 and with 50,000 trials. With 100 times fewer trials the standard error is about 10 times larger (with seed 7 and 500 trials the estimate was 0.138, standard error about 0.015), but do not expect every larger sample to land closer to the truth.</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> Monte Carlo estimates a quantity by running many random trials and averaging. Here each row is one trial of rolling two dice. dice.sum(axis=1) adds across each row, and comparing with 7 gives a Boolean event per trial. Because True counts as 1 and False as 0, event.mean() is the fraction of successes, which estimates the probability: 0.16748 against the exact 6/36, about 0.1667. The standard error, the square root of p(1 - p) / n, describes how much such an estimate typically varies from run to run; it is not a promise about any single run. Try it: rerun with 500 and with 50,000 trials. With 100 times fewer trials the standard error is about 10 times larger (with seed 7 and 500 trials the estimate was 0.138, standard error about 0.015), but do not expect every larger sample to land closer to the truth.</p></div>
+<div class="slide" id="trials"><div class="frame"><section id="trials" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Monte Carlo probability</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Trials become a probability</h2>
+<div style="display:flex;flex-direction:column;gap:24px;flex:1;justify-content:center">
+<p style="font-size:28px;color:#4A5568">The first 12 of 50,000 trials from default_rng(7), one column per trial</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;gap:8px;align-items:center">
+<p style="width:260px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">dice[:, 0]</p>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+</div>
+<div style="display:flex;gap:8px;align-items:center">
+<p style="width:260px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">dice[:, 1]</p>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+</div>
+<div style="display:flex;gap:8px;align-items:center">
+<p style="width:260px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">sum(axis=1)</p>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">11</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">9</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">8</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">8</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">7</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">8</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">7</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+</div>
+<div style="display:flex;gap:8px;align-items:center">
+<p style="width:260px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">event (== 7)</p>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="width:96px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#13233A;border-radius:16px;padding:24px 32px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#F2A35E">0.16748</p><p style="font-size:24px;color:#C9D4E2">event.mean() over all 50,000 trials</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:24px 32px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#13233A">6 / 36</p><p style="font-size:24px;color:#4A5568">exact probability, 0.1667</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:24px 32px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#13233A">0.0017</p><p style="font-size:24px;color:#4A5568">estimated standard error</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 07 Randomness and simulation</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>This picture unpacks the Monte Carlo cell. Each column is one trial, one row of the dice array; these are the first 12 rows produced by the notebook's own code with seed 7. Summing along axis 1 collapses the two dice into one total per trial. Comparing with 7 gives the event mask: only trials 7 and 11 hit 7, shown in blue and orange. Read as numbers, the mask is ones and zeros, so averaging it over all 50,000 columns gives the fraction of hits, 0.16748, close to the exact 6/36 and within about one standard error of 0.0017. Note that in these 12 trials the hit rate is 2 out of 12; small samples wobble a lot, which is exactly what the Try it with 500 trials shows.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> This picture unpacks the Monte Carlo cell. Each column is one trial, one row of the dice array; these are the first 12 rows produced by the notebook's own code with seed 7. Summing along axis 1 collapses the two dice into one total per trial. Comparing with 7 gives the event mask: only trials 7 and 11 hit 7, shown in blue and orange. Read as numbers, the mask is ones and zeros, so averaging it over all 50,000 columns gives the fraction of hits, 0.16748, close to the exact 6/36 and within about one standard error of 0.0017. Note that in these 12 trials the hit rate is 2 out of 12; small samples wobble a lot, which is exactly what the Try it with 500 trials shows.</p></div>
+<div class="slide" id="bootstrap"><div class="frame"><section id="bootstrap" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Bootstrap a sample mean</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Bootstrap: resample your own data</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">observed = np.array([12., 14., 9., 15.,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;13., 11., 18., 16.])<br>rng = np.random.default_rng(10)<br>resampled = rng.choice(observed,<br>&#160;&#160;&#160;&#160;size=(2_000, observed.size), replace=True)<br>bootstrap_means = resampled.mean(axis=1)<br>interval = np.quantile(bootstrap_means,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;[0.025, 0.975])<br>print("Observed mean:", observed.mean())<br>print("Illustrative 95% percentile"<br>&#160;&#160;&#160;&#160;&#160;&#160;" interval:", interval)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Observed mean: 13.5<br>Illustrative 95% percentile interval: [11.75  15.375]</p></div>
+</div>
+<div style="width:480px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">With replacement</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A value can be drawn more than once.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Same size rows</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">2,000 new samples of 8 values each.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Quantiles, interval</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The middle 95% of the means.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 07 Randomness and simulation</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>The bootstrap asks: if we could collect this sample again, how much would its mean move? We cannot collect new data, so we resample the data we have, with replacement. rng.choice with size (2000, 8) builds 2,000 new rows, each the same size as the original sample. Taking the mean along axis 1 gives 2,000 bootstrap means, and the 2.5% and 97.5% quantiles of those means give a simple percentile interval: 11.75 to 15.375 around the observed mean of 13.5. This assumes independent, representative observations; resampling cannot repair biased data. Try it: plot bootstrap_means with plt.hist to see the bell-like spread, and try a larger observed sample: with more data, the histogram and the interval get narrower.</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> The bootstrap asks: if we could collect this sample again, how much would its mean move? We cannot collect new data, so we resample the data we have, with replacement. rng.choice with size (2000, 8) builds 2,000 new rows, each the same size as the original sample. Taking the mean along axis 1 gives 2,000 bootstrap means, and the 2.5% and 97.5% quantiles of those means give a simple percentile interval: 11.75 to 15.375 around the observed mean of 13.5. This assumes independent, representative observations; resampling cannot repair biased data. Try it: plot bootstrap_means with plt.hist to see the bell-like spread, and try a larger observed sample: with more data, the histogram and the interval get narrower.</p></div>
+<div class="slide" id="resampling"><div class="frame"><section id="resampling" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Bootstrap a sample mean</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Draw, with replacement, again</h2>
+<div style="display:flex;flex-direction:column;gap:24px;flex:1;justify-content:center">
+<p style="font-size:28px;color:#4A5568">Blue: the 8 observed values. Orange: a value drawn more than once in that row.</p>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">observed</p>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">12</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">14</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">9</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">15</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">13</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">11</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">18</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">16</p></div>
+<p style="width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A"><span style="color:#6B7280">mean</span> 13.5</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;gap:12px;align-items:center">
+<p style="width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">resampled[0]</p>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">18</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">16</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">9</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">14</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">18</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">18</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">13</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">14</p></div>
+<p style="width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A"><span style="color:#6B7280">mean</span> 15.0</p>
+</div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">resampled[1]</p>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">18</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">13</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">14</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">14</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">15</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">11</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">15</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">18</p></div>
+<p style="width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A"><span style="color:#6B7280">mean</span> 14.75</p>
+</div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">resampled[2]</p>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">12</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">15</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">13</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">16</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">14</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">18</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">12</p></div>
+<div style="width:112px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">9</p></div>
+<p style="width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A"><span style="color:#6B7280">mean</span> 13.625</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#6B7280">… 1,997 more rows, 2,000 means in all</p>
+</div>
+<div style="background:#13233A;padding:24px 40px;border-radius:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">np.quantile(bootstrap_means, [0.025, 0.975]) <span style="color:#F2A35E">→ [11.75  15.375]</span></p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 07 Randomness and simulation</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>This is the bootstrap as a picture. The blue row is the observed sample, mean 13.5. Each grey and orange row is one row of resampled: eight draws from the observed values, with replacement. These are the first three rows produced by the notebook's own code with seed 10. Replacement is what makes rows differ: in row 0 the value 18 is drawn three times while 12, 15 and 11 never appear, so its mean rises to 15.0; row 2 draws 12 twice and lands at 13.625. Each row's mean is one plausible value of the sample mean, and 2,000 of them describe how much the mean could move. The 2.5% and 97.5% quantiles of those means give the interval 11.75 to 15.375. Try it: plot the 2,000 means with plt.hist to see their spread around 13.5.</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> This is the bootstrap as a picture. The blue row is the observed sample, mean 13.5. Each grey and orange row is one row of resampled: eight draws from the observed values, with replacement. These are the first three rows produced by the notebook's own code with seed 10. Replacement is what makes rows differ: in row 0 the value 18 is drawn three times while 12, 15 and 11 never appear, so its mean rises to 15.0; row 2 draws 12 twice and lands at 13.625. Each row's mean is one plausible value of the sample mean, and 2,000 of them describe how much the mean could move. The 2.5% and 97.5% quantiles of those means give the interval 11.75 to 15.375. Try it: plot the 2,000 means with plt.hist to see their spread around 13.5.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Seed it. Repeat it.<br>Average it.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">A seeded generator makes a simulation repeatable. Many random trials, averaged, estimate what one draw cannot.</p>
+<aside>Pause here. Everything in this notebook follows one recipe. Create one local generator with a seed so anyone can rerun your work and get the same numbers. Then run many trials as rows of an array and reduce along an axis: a Boolean mean for a probability, a quantile of means for a bootstrap interval. Remember that a seed buys reproducibility, not accuracy; accuracy comes from the number of trials and from representative data.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> Pause here. Everything in this notebook follows one recipe. Create one local generator with a seed so anyone can rerun your work and get the same numbers. Then run many trials as rows of an array and reduce along an axis: a Boolean mean for a probability, a quantile of means for a bootstrap interval. Remember that a seed buys reproducibility, not accuracy; accuracy comes from the number of trials and from representative data.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two simulation exercises</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">100 die rolls from a generator seeded with 99</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: shape (100,), integers 1 to 6, starting 6 4 5 4 2 4 …</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">rolls = np.random.default_rng(99)\<br>&#160;&#160;&#160;&#160;.integers(1, 7, size=100)</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Share of coin trials with at least one head</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: 0.75. Trials [[0,0],[0,1],[1,0],[1,1]], where 1 means heads.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">probability = (coin_trials == 1)\<br>&#160;&#160;&#160;&#160;.any(axis=1).mean()</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 07 Randomness and simulation</p><p style="font-size:24px;color:#6B7280">10</p></div>
+<aside>Let the audience try both before revealing the code, which matches the reference solutions split over two lines. Exercise 1: integers excludes its high bound, so pass 7 to allow a 6; a fresh generator with seed 99 reproduces exactly the sequence the check expects, beginning 6, 4, 5, 4, 2, 4. Exercise 2: any(axis=1) marks each trial that contains a head, giving False, True, True, True; the mean of those Booleans is the fraction of successful trials, 0.75. That is the Monte Carlo pattern from step 2 on a tiny, hand-checkable array.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> Let the audience try both before revealing the code, which matches the reference solutions split over two lines. Exercise 1: integers excludes its high bound, so pass 7 to allow a 6; a fresh generator with seed 99 reproduces exactly the sequence the check expects, beginning 6, 4, 5, 4, 2, 4. Exercise 2: any(axis=1) marks each trial that contains a head, giving False, True, True, True; the mean of those Booleans is the fraction of successful trials, 0.75. That is the Monte Carlo pattern from step 2 on a tiny, hand-checkable array.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Estimate pi with random points</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Sample points in the unit square and count those with x² + y² ≤ 1</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Repeat with several seeds and sample sizes. Decide what the fraction should approach before you run it.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain the main idea without reading the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a changed input or edge case and explain it</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 07 Randomness and simulation</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>The challenge combines every step. Draw an array of shape (n, 2) from rng.uniform(0, 1, ...) so each row is a point in the unit square. The quarter circle x² + y² ≤ 1 covers pi/4 of that square, so the Boolean mean of the inside test estimates pi/4, and 4 times it estimates pi. Repeat with several seeds to see run-to-run variation, and with several sample sizes to see the spread shrink roughly like one over the square root of n. There is no supplied check: write your own, for example asserting the estimate is within a few standard errors of np.pi. Then restart the kernel and run all cells once more.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> The challenge combines every step. Draw an array of shape (n, 2) from rng.uniform(0, 1, ...) so each row is a point in the unit square. The quarter circle x² + y² ≤ 1 covers pi/4 of that square, so the Boolean mean of the inside test estimates pi/4, and 4 times it estimates pi. Repeat with several seeds to see run-to-run variation, and with several sample sizes to see the spread shrink roughly like one over the square root of n. There is no supplied check: write your own, for example asserting the estimate is within a few standard errors of np.pi. Then restart the kernel and run all cells once more.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Generator</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">One local default_rng(seed); each call advances it.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Trials</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">One row per trial; reduce along axis 1.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Mask means</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">The mean of a Boolean event is a probability.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Bootstrap</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Resample with replacement; quantiles give an interval.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 08</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Cleaning and file I/O</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Detect missing values, impute deliberately, and save arrays to disk.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 08, where we deal with messy real data: NaN and infinity, filling missing values with a stated policy, and saving work as CSV, .npy and .npz files. Further reading: the official NumPy documentation for the random Generator at numpy.org/doc/stable/reference/random/generator.html.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> Recap the four takeaways, then point to notebook 08, where we deal with messy real data: NaN and infinity, filling missing values with a stated policy, and saving work as CSV, .npy and .npz files. Further reading: the official NumPy documentation for the random Generator at numpy.org/doc/stable/reference/random/generator.html.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

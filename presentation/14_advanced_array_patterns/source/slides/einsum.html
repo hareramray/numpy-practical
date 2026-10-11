@@ -1,0 +1,17 @@
+<section id="einsum" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Einsum names the axes</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Label axes; repeated ones sum</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">One letter per axis</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">"ij" means A has two axes, called i and j.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Missing from output: summed</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">In ij,jk-&gt;ik, j disappears, so it is summed over.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Check against the familiar</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The asserts compare with A @ B and (A * A).sum(axis=1).</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">A = np.arange(6, dtype=float).reshape(2, 3)<br>B = np.arange(12, dtype=float).reshape(3, 4)<br>product = np.einsum("ij,jk-&gt;ik", A, B,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;optimize=True)<br>row_energy = np.einsum("ij,ij-&gt;i", A, A)<br>print(product)<br>print("Row energy:", row_energy)<br>np.testing.assert_allclose(product, A @ B)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[[20. 23. 26. 29.]<br>&#160;[56. 68. 80. 92.]]<br>Row energy: [ 5. 50.]</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>np.einsum takes a subscript string and the arrays. Each input gets one letter per axis; the part after the arrow lists the axes the output keeps. A letter that appears in the inputs but not in the output is summed over, after multiplying matching elements. So ij,jk-&gt;ik is the matrix product, and ij,ij-&gt;i multiplies A by itself elementwise and sums each row, giving the row energies 5 and 50. Always write the explicit output after the arrow and test against an operation you already trust. optimize=True lets NumPy choose an efficient contraction order. Try it: the dot product of two 1D arrays is np.einsum("i,i-&gt;", a, b), and the trace of a square matrix is np.einsum("ii-&gt;", M).</aside>
+</section>

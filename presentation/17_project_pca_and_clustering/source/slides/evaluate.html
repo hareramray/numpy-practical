@@ -1,0 +1,21 @@
+<section id="evaluate" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Evaluate</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Best of five seeds, then look</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">runs = [kmeans(Z, 3, seed=seed)<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;for seed in range(5)]<br>cluster_centers, labels, inertia, history = min(<br>&#160;&#160;&#160;&#160;runs, key=lambda result: result[2])<br>print("Inertia:", inertia, "cluster sizes:",<br>&#160;&#160;&#160;&#160;&#160;&#160;np.bincount(labels, minlength=3))<br>assert np.all(np.diff(history) &lt;= 1e-9)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Inertia: 14.683571012424357 cluster sizes:<br>[60 60 60]</p></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Tiny test: 4 points, 2 clean pairs, inertia 1.0</p></div>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Duplicate points, k = 3: inertia 0, no crash</p></div>
+</div>
+</div>
+<div style="width:720px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<img src="/_blob/53958687c3a6f4caa804a1ce80c57fea" alt="Notebook scatter plot titled K-means clusters in PCA view: principal component 1 on the x axis, component 2 on the y axis. Three tight, well separated groups of 60 points each: one near (-1.8, -0.5), one near (0.4, 1.5) and one near (1.5, -1.0), each in its own colour." style="width:656px;height:437px;object-fit:contain">
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>Because k-means finds only a local minimum, the notebook runs it from five seeds and keeps the run with the smallest final inertia. The winner splits the 180 observations into three groups of exactly 60, which matches how the data were generated, and the history assertion confirms inertia never rose. Two small tests probe edge cases: four points forming two tight pairs must split into those pairs with inertia exactly 1.0, and four identical points with k equal to 3 must reach inertia 0, which exercises the empty-cluster guard. The plot colours each point by its label in the 2-D PCA view: three compact, well separated groups. Try it: compare k equal to 2, 3 and 4. Inertia keeps falling as k grows, so a lower inertia alone does not prove a better clustering.</aside>
+</section>

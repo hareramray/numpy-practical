@@ -1,0 +1,17 @@
+<section id="shape" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Read the shape</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Ask an array what it is</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">sales = np.array([[12, 15, 18],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;[20, 22, 25]],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;dtype=np.int64)<br>print(sales)<br>print("shape:", sales.shape,<br>&#160;&#160;&#160;&#160;&#160;&#160;"ndim:", sales.ndim, "size:", sales.size)<br>print("dtype:", sales.dtype,<br>&#160;&#160;&#160;&#160;&#160;&#160;"bytes:", sales.nbytes)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[[12 15 18]<br>&#160;[20 22 25]]<br>shape: (2, 3) ndim: 2 size: 6<br>dtype: int64 bytes: 48</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">shape</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The length of each axis: 2 rows, 3 columns.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">ndim and size</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">ndim counts axes; size counts every element.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">dtype and nbytes</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">One type for all values, and the memory they use.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>An array is a rectangular collection of values that all share one dtype. Four attributes tell you almost everything: shape gives the length of each axis, ndim counts the axes, size counts all elements, and dtype names the element type. nbytes is the memory used by the values: 6 elements of 8-byte int64 give 48. The notebook also asserts sales.shape == (2, 3) and sales.size == 6, so the cell proves its own claims. Try it: add one complete row, such as [30, 32, 35]. Predict first: shape becomes (3, 3) and size becomes 9 (and nbytes 72).</aside>
+</section>

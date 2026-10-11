@@ -1,0 +1,32 @@
+<section id="storage" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Dtype affects results</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Bytes per value, by dtype</h2>
+<div style="display:flex;flex-direction:column;gap:28px;flex:1;justify-content:center">
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">int8</p>
+<div style="width:96px;height:72px;background:#E8813A;border-radius:8px"></div>
+<p style="font-size:28px;color:#4A5568"><span style="color:#13233A;font-weight:600">1 byte</span> · only −128 to 127</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">float32</p>
+<div style="width:384px;height:72px;background:#2F6FB0;border-radius:8px"></div>
+<p style="font-size:28px;color:#4A5568"><span style="color:#13233A;font-weight:600">4 bytes</span> · fractions, about 7 digits</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">int64</p>
+<div style="width:768px;height:72px;background:#13233A;border-radius:8px"></div>
+<p style="font-size:28px;color:#4A5568"><span style="color:#13233A;font-weight:600">8 bytes</span> · whole numbers</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">float64</p>
+<div style="width:768px;height:72px;background:#2F6FB0;border-radius:8px"></div>
+<p style="font-size:28px;color:#4A5568"><span style="color:#13233A;font-weight:600">8 bytes</span> · NumPy's default float</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px">
+<x-icon name="Database" style="color:#2F6FB0;width:56px;height:56px"></x-icon>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">nbytes = size × bytes per value. The sales table: <span style="color:#13233A;font-weight:600">6 × 8 = 48 bytes</span> (int64).</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">9</p></div>
+<aside>Each bar is drawn to scale: one byte per 96 pixels. The dtype fixes how many bytes every single value occupies, and nbytes is just size times that number, which is why the 2 by 3 int64 sales table used 48 bytes. Smaller types save memory, but they pay for it: int8 overflows past 127, and float32 keeps fewer significant digits than float64. Choose the smallest type that safely holds your data and its calculations. Try it: compare nbytes for 1,000 values stored as float32 and float64, for example np.zeros(1000, dtype=np.float32).nbytes. Expect 4,000 bytes versus 8,000 bytes: float32 halves the memory.</aside>
+</section>

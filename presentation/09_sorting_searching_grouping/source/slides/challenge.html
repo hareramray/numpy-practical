@@ -1,0 +1,20 @@
+<section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Build a product leaderboard</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Totals, counts, mean sale value and a descending rank per product</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Verify that the grouped totals add up to the raw total. Decide the expected leader before you run it.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain the main idea without reading the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a changed input or edge case and explain it</p></div>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 09 Sort, search and group</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>The challenge chains all three steps. Start with two arrays of equal length: a product label for each sale and its value. Use np.unique with return_inverse=True to get product codes, then np.bincount with weights for totals and without weights for counts; totals divided by counts gives the mean sale value. Rank the products with a stable argsort of the negated totals and apply that one order to products, totals, counts and means so every row stays aligned. There is no supplied check: assert that totals.sum() matches the raw sum with np.testing.assert_allclose, and check that the first-ranked product has the largest total. Then restart the kernel and run all cells once more.</aside>
+</section>

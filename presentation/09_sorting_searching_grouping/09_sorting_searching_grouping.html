@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 09 — Sorting, Searching and Grouping</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 09 — Sorting, Searching and Grouping</h1><span>12 slides · <a href="https://claude.ai/artifact/XMycJxJDHAenmqAHZo5GNv">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative staircase of array cells sorted from short to tall" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="480" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="160" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="320" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="320" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="160" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="480" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="0" width="132" height="132" rx="16" fill="#E8813A"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 09</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE;width:1000px">Sort, search and group</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2;width:1000px">argsort, searchsorted and grouped totals</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Intermediate</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">30–50 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: notebooks 00–08</p>
+</div>
+<aside>This notebook is about putting data in order and summarising it. You will sort related arrays so they stay aligned, find where a value belongs in sorted data, count distinct labels, and compute group totals and means with plain NumPy, no pandas needed. The common thread is working with positions and integer codes rather than with the values themselves.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> This notebook is about putting data in order and summarising it. You will sort related arrays so they stay aligned, find where a value belongs in sorted data, count distinct labels, and compute group totals and means with plain NumPy, no pandas needed. The common thread is working with positions and integer codes rather than with the values themselves.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Order, find, and summarise</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Rank</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">argsort gives positions that reorder related arrays together.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Search</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">searchsorted finds where a value belongs.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Count</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">unique lists distinct labels and how often each occurs.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">4</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Group</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">bincount sums values per group code, no pandas needed.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 09 Sort, search and group</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>The notebook promises three skills: sort related arrays consistently, find insertion points, and reduce by group. We split the middle one in two because np.unique, which counts distinct labels, is also the bridge to grouping. Notice that every tool here returns integers: positions from argsort and searchsorted, codes from unique. Learning to think in positions rather than values is the real lesson. Prerequisites are notebooks 00 to 08.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> The notebook promises three skills: sort related arrays consistently, find insertion points, and reduce by group. We split the middle one in two because np.unique, which counts distinct labels, is also the bridge to grouping. Notice that every tool here returns integers: positions from argsort and searchsorted, codes from unique. Learning to think in positions rather than values is the real lesson. Prerequisites are notebooks 00 to 08.</p></div>
+<div class="slide" id="sorting"><div class="frame"><section id="sorting" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Sort values and positions</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Sort positions, keep rows aligned</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">names = np.array(["Asha", "Ben", "Chen", "Divya"])<br>scores = np.array([82, 95, 82, 70])<br>order = np.argsort(-scores, kind="stable")<br>print(names[order])<br>print(scores[order])<br>np.testing.assert_array_equal(names[order],<br>&#160;&#160;&#160;&#160;["Ben", "Asha", "Chen", "Divya"])</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">['Ben' 'Asha' 'Chen' 'Divya']<br>[95 82 82 70]</p></div>
+</div>
+<div style="width:520px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">sort vs argsort</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">sort returns values; argsort returns the indices that order them.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">One order, many arrays</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Index names and scores with the same order.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Negate for descending</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A stable sort of −scores keeps ties in input order.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 09 Sort, search and group</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>np.sort returns the values in order, but then you lose track of whose score is whose. np.argsort instead returns the positions that would put the array in order, and you can apply those positions to any related array of the same length: here names and scores, so names stay aligned with scores. To sort from highest to lowest we sort the negated scores. A stable sort keeps tied elements in their original input order, so Asha, who comes first in the input, stays ahead of Chen at 82. Reversing an ascending result would also reverse the ties, which is why the notebook negates instead. Try it: sort scores ascending with np.argsort(scores, kind="stable"). The order becomes Divya, Asha, Chen, Ben, and the tied student who appears first is Asha, again in input order.</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> np.sort returns the values in order, but then you lose track of whose score is whose. np.argsort instead returns the positions that would put the array in order, and you can apply those positions to any related array of the same length: here names and scores, so names stay aligned with scores. To sort from highest to lowest we sort the negated scores. A stable sort keeps tied elements in their original input order, so Asha, who comes first in the input, stays ahead of Chen at 82. Reversing an ascending result would also reverse the ties, which is why the notebook negates instead. Try it: sort scores ascending with np.argsort(scores, kind="stable"). The order becomes Divya, Asha, Chen, Ben, and the tied student who appears first is Asha, again in input order.</p></div>
+<div class="slide" id="ranking"><div class="frame"><section id="ranking" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Sort values and positions</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">argsort builds a ranking</h2>
+<div style="display:flex;flex-direction:column;gap:40px;flex:1;justify-content:center">
+<div style="display:flex;gap:32px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">names, scores</p>
+<div style="display:flex;gap:8px"><div style="width:80px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">0</p></div><div style="width:200px;height:80px;display:flex;align-items:center;padding:0px 24px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-size:28px;color:#13233A">Asha</p></div><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">82</p></div></div>
+<div style="display:flex;gap:8px"><div style="width:80px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">1</p></div><div style="width:200px;height:80px;display:flex;align-items:center;padding:0px 24px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-size:28px;color:#13233A">Ben</p></div><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">95</p></div></div>
+<div style="display:flex;gap:8px"><div style="width:80px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">2</p></div><div style="width:200px;height:80px;display:flex;align-items:center;padding:0px 24px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-size:28px;color:#13233A">Chen</p></div><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">82</p></div></div>
+<div style="display:flex;gap:8px"><div style="width:80px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">3</p></div><div style="width:200px;height:80px;display:flex;align-items:center;padding:0px 24px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-size:28px;color:#13233A">Divya</p></div><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">70</p></div></div>
+</div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:80px;height:40px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#B5541A"/></svg>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">order</p>
+<div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0</p></div>
+<div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+<div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">3</p></div>
+</div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:80px;height:40px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#B5541A"/></svg>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">names[order], scores[order]</p>
+<div style="display:flex;gap:8px"><div style="width:200px;height:80px;display:flex;align-items:center;padding:0px 24px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-size:28px;color:#13233A">Ben</p></div><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">95</p></div></div>
+<div style="display:flex;gap:8px"><div style="width:200px;height:80px;display:flex;align-items:center;padding:0px 24px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-size:28px;color:#13233A">Asha</p></div><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">82</p></div></div>
+<div style="display:flex;gap:8px"><div style="width:200px;height:80px;display:flex;align-items:center;padding:0px 24px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-size:28px;color:#13233A">Chen</p></div><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">82</p></div></div>
+<div style="display:flex;gap:8px"><div style="width:200px;height:80px;display:flex;align-items:center;padding:0px 24px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-size:28px;color:#13233A">Divya</p></div><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">70</p></div></div>
+</div>
+</div>
+<div style="display:flex;gap:20px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:24px 32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#B5541A;width:48px;height:48px" role="img" aria-label="Lightbulb"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Orange marks the tie at 82. The stable sort keeps Asha (index 0) ahead of Chen (index 2).</p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 09 Sort, search and group</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>Read the picture left to right. On the left is the original data with each row's index. argsort of the negated scores returns order = [1, 0, 2, 3]: the blue column. Read it as instructions: the first place goes to row 1, then row 0, then row 2, then row 3. Indexing names with order and scores with the same order produces the ranking on the right, Ben 95, Asha 82, Chen 82, Divya 70, which is exactly the printed output, and the name and score in each row still belong together. The two orange cells are the tie: because the sort is stable, the student who came first in the input, Asha at index 0, stays ahead of Chen at index 2. Ask the audience what order = argsort(-scores) would look like if Chen were listed before Asha in the input.</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> Read the picture left to right. On the left is the original data with each row's index. argsort of the negated scores returns order = [1, 0, 2, 3]: the blue column. Read it as instructions: the first place goes to row 1, then row 0, then row 2, then row 3. Indexing names with order and scores with the same order produces the ranking on the right, Ben 95, Asha 82, Chen 82, Divya 70, which is exactly the printed output, and the name and score in each row still belong together. The two orange cells are the tie: because the sort is stable, the student who came first in the input, Asha at index 0, stays ahead of Chen at index 2. Ask the audience what order = argsort(-scores) would look like if Chen were listed before Asha in the input.</p></div>
+<div class="slide" id="searching"><div class="frame"><section id="searching" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Search in sorted data</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Find where a value belongs</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">sorted_values = np.array([10, 20, 20, 30, 40])<br>left = np.searchsorted(sorted_values, 20, side="left")<br>right = np.searchsorted(sorted_values, 20, side="right")<br>print("Insertion range:", left, right, "count:", right - left)<br>labels, counts = np.unique(["tea", "coffee", "tea", "juice"],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;return_counts=True)<br>print(dict(zip(labels, counts)))<br>assert right - left == 2</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Insertion range: 1 3 count: 2<br>{np.str_('coffee'): np.int64(1),<br>&#160;np.str_('juice'): np.int64(1),<br>&#160;np.str_('tea'): np.int64(2)}</p></div>
+</div>
+<div style="width:480px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Input must be sorted</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">searchsorted assumes ascending order.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">left vs right</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Before or after equal values; the gap counts them.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">unique counts labels</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Sorted distinct values, plus how often each occurs.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 09 Sort, search and group</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>np.searchsorted answers the question: if I inserted this value into an ascending sorted array, at which position would it go so the array stays sorted? It uses binary search, so it is fast even on huge arrays, but it silently gives wrong answers if the input is not sorted. With side="left" the new value goes before any equal values, position 1 here; with side="right" it goes after them, position 3. The difference, 2, is the number of 20s in the array. np.unique returns the distinct labels in sorted order, and with return_counts=True it also returns how often each occurs: coffee 1, juice 1, tea 2. The printed dictionary shows NumPy 2's typed scalars, np.str_ and np.int64; the output is wrapped across lines here. Try it: find the insertion point for 25. It is 3, the position of 30, which is why it is not a match: an insertion point says where a value would go, not that it is present.</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> np.searchsorted answers the question: if I inserted this value into an ascending sorted array, at which position would it go so the array stays sorted? It uses binary search, so it is fast even on huge arrays, but it silently gives wrong answers if the input is not sorted. With side="left" the new value goes before any equal values, position 1 here; with side="right" it goes after them, position 3. The difference, 2, is the number of 20s in the array. np.unique returns the distinct labels in sorted order, and with return_counts=True it also returns how often each occurs: coffee 1, juice 1, tea 2. The printed dictionary shows NumPy 2's typed scalars, np.str_ and np.int64; the output is wrapped across lines here. Try it: find the insertion point for 25. It is 3, the position of 30, which is why it is not a match: an insertion point says where a value would go, not that it is present.</p></div>
+<div class="slide" id="insertion"><div class="frame"><section id="insertion" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Search in sorted data</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Insertion points live between cells</h2>
+<div style="display:flex;flex-direction:column;gap:32px;flex:1;justify-content:center;align-items:center">
+<div style="position:relative;width:1232px;height:350px">
+<p style="position:absolute;left:158px;top:0px;width:220px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#B5541A;text-align:center">left = 1</p>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;position:absolute;left:252px;top:48px;width:32px;height:48px;" aria-hidden="true"><polygon points="30,0 30,60 0,60 50,100 100,60 70,60 70,0" fill="#B5541A"/></svg>
+<p style="position:absolute;left:622px;top:0px;width:220px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#B5541A;text-align:center">right = 3</p>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;position:absolute;left:716px;top:48px;width:32px;height:48px;" aria-hidden="true"><polygon points="30,0 30,60 0,60 50,100 100,60 70,60 70,0" fill="#B5541A"/></svg>
+<div style="position:absolute;left:264px;top:100px;width:8px;height:104px;background:#E8813A;border-radius:4px"></div>
+<div style="position:absolute;left:728px;top:100px;width:8px;height:104px;background:#E8813A;border-radius:4px"></div>
+<div style="position:absolute;left:72px;top:104px;width:160px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10</p></div>
+<div style="position:absolute;left:304px;top:104px;width:160px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">20</p></div>
+<div style="position:absolute;left:536px;top:104px;width:160px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">20</p></div>
+<div style="position:absolute;left:768px;top:104px;width:160px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">30</p></div>
+<div style="position:absolute;left:1000px;top:104px;width:160px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">40</p></div>
+<p style="position:absolute;left:0px;top:216px;width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#6B7280;text-align:center">0</p>
+<p style="position:absolute;left:232px;top:216px;width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#B5541A;text-align:center">1</p>
+<p style="position:absolute;left:464px;top:216px;width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#6B7280;text-align:center">2</p>
+<p style="position:absolute;left:696px;top:216px;width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#B5541A;text-align:center">3</p>
+<p style="position:absolute;left:928px;top:216px;width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#6B7280;text-align:center">4</p>
+<p style="position:absolute;left:1160px;top:216px;width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#6B7280;text-align:center">5</p>
+<div style="position:absolute;left:268px;top:264px;width:464px;height:28px;border:3px solid #B5541A;border-top:none"></div>
+<p style="position:absolute;left:268px;top:304px;width:464px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A;text-align:center">right − left = 2 copies of 20</p>
+</div>
+<p style="font-size:28px;color:#4A5568">The numbers under the gaps are insertion positions 0 to 5, one more than the 5 elements.</p>
+<div style="background:#13233A;padding:24px 40px;border-radius:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">np.searchsorted(sorted_values, 25) <span style="color:#F2A35E">→ 3</span> <span style="color:#C9D4E2">· it would sit before 30, so 25 is not present</span></p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 09 Sort, search and group</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>An insertion position is a gap, not a cell. Five elements have six gaps, numbered 0 to 5, shown under the row. To insert another 20 while keeping order, there are two valid gaps: just before the first 20, gap 1, which side="left" returns, and just after the last 20, gap 3, which side="right" returns. Everything between those two gaps is a run of equal values, so right minus left counts the copies of 20: two. That trick counts occurrences in sorted data without scanning. The bottom panel is the Try it: searchsorted for 25 also returns 3, because 25 belongs between 20 and 30. To test membership you must also check that sorted_values at that position equals the value you searched for; here it is 30, so 25 is absent.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> An insertion position is a gap, not a cell. Five elements have six gaps, numbered 0 to 5, shown under the row. To insert another 20 while keeping order, there are two valid gaps: just before the first 20, gap 1, which side="left" returns, and just after the last 20, gap 3, which side="right" returns. Everything between those two gaps is a run of equal values, so right minus left counts the copies of 20: two. That trick counts occurrences in sorted data without scanning. The bottom panel is the Try it: searchsorted for 25 also returns 3, because 25 belongs between 20 and 30. To test membership you must also check that sorted_values at that position equals the value you searched for; here it is 30, so 25 is absent.</p></div>
+<div class="slide" id="grouping"><div class="frame"><section id="grouping" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Group totals without pandas</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Group totals with codes</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">category = np.array(["tea", "coffee", "tea", "juice", "coffee"])<br>revenue = np.array([10., 20., 15., 12., 30.])<br>groups, inverse = np.unique(category, return_inverse=True)<br>totals = np.bincount(inverse, weights=revenue,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;minlength=groups.size)<br>counts = np.bincount(inverse, minlength=groups.size)<br>for group, total, mean in zip(groups, totals,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;totals / counts):<br>&#160;&#160;&#160;&#160;print(group, "total:", total, "mean:", mean)<br>np.testing.assert_allclose(totals.sum(), revenue.sum())</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">coffee total: 50.0 mean: 25.0<br>juice total: 12.0 mean: 12.0<br>tea total: 25.0 mean: 12.5</p></div>
+</div>
+<div style="width:440px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Labels to codes</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">return_inverse gives each label its group number.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">bincount adds</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">With weights it sums values per code; without, it counts.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Means = totals / counts</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">minlength keeps every group.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 09 Sort, search and group</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>This is a group-by in pure NumPy. np.unique with return_inverse=True returns two things: the sorted distinct groups, coffee, juice and tea, and an inverse array that encodes each original label as a nonnegative integer, the position of its group. np.bincount then walks through those codes: with weights=revenue it adds each sale's revenue into its group's slot, giving totals; without weights it simply counts how many sales each group has. Dividing totals by counts gives group means. Weighted bincount always returns floats. minlength guarantees one slot per group even when a code never appears. The final assert proves nothing was lost: the group totals add up to the raw total. Try it: compute each group's share of total revenue with totals / totals.sum(). You get about 0.575 for coffee, 0.138 for juice and 0.287 for tea, and the shares sum to 1.</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> This is a group-by in pure NumPy. np.unique with return_inverse=True returns two things: the sorted distinct groups, coffee, juice and tea, and an inverse array that encodes each original label as a nonnegative integer, the position of its group. np.bincount then walks through those codes: with weights=revenue it adds each sale's revenue into its group's slot, giving totals; without weights it simply counts how many sales each group has. Dividing totals by counts gives group means. Weighted bincount always returns floats. minlength guarantees one slot per group even when a code never appears. The final assert proves nothing was lost: the group totals add up to the raw total. Try it: compute each group's share of total revenue with totals / totals.sum(). You get about 0.575 for coffee, 0.138 for juice and 0.287 for tea, and the shares sum to 1.</p></div>
+<div class="slide" id="buckets"><div class="frame"><section id="buckets" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Group totals without pandas</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Each sale drops into its bucket</h2>
+<div style="display:flex;flex-direction:column;gap:24px;flex:1;justify-content:center">
+<div style="display:flex;gap:24px;justify-content:center">
+<div style="width:200px;display:flex;flex-direction:column;gap:4px;align-items:center;background:#E8813A;border-radius:12px;padding:20px"><p style="font-size:28px;color:#13233A">tea</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10.</p><p style="font-size:24px;color:#13233A">code 2</p></div>
+<div style="width:200px;display:flex;flex-direction:column;gap:4px;align-items:center;background:#13233A;border-radius:12px;padding:20px"><p style="font-size:28px;color:#F6F4EE">coffee</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">20.</p><p style="font-size:24px;color:#C9D4E2">code 0</p></div>
+<div style="width:200px;display:flex;flex-direction:column;gap:4px;align-items:center;background:#E8813A;border-radius:12px;padding:20px"><p style="font-size:28px;color:#13233A">tea</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">15.</p><p style="font-size:24px;color:#13233A">code 2</p></div>
+<div style="width:200px;display:flex;flex-direction:column;gap:4px;align-items:center;background:#2F6FB0;border-radius:12px;padding:20px"><p style="font-size:28px;color:#F6F4EE">juice</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">12.</p><p style="font-size:24px;color:#F6F4EE">code 1</p></div>
+<div style="width:200px;display:flex;flex-direction:column;gap:4px;align-items:center;background:#13233A;border-radius:12px;padding:20px"><p style="font-size:28px;color:#F6F4EE">coffee</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">30.</p><p style="font-size:24px;color:#C9D4E2">code 0</p></div>
+</div>
+<div style="display:flex;gap:24px;align-items:center;justify-content:center">
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:40px;height:64px" aria-hidden="true"><polygon points="30,0 30,60 0,60 50,100 100,60 70,60 70,0" fill="#B5541A"/></svg>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">np.bincount(inverse, weights=revenue, minlength=3)</p>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#13233A;border-radius:16px;padding:24px 32px"><p style="font-size:28px;color:#F6F4EE">coffee · code 0</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#C9D4E2">20. + 30.</p><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#F2A35E">50.0</p><p style="font-size:24px;color:#C9D4E2">count 2 · mean 25.0</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#2F6FB0;border-radius:16px;padding:24px 32px"><p style="font-size:28px;color:#F6F4EE">juice · code 1</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">12.</p><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#F6F4EE">12.0</p><p style="font-size:24px;color:#F6F4EE">count 1 · mean 12.0</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#E8813A;border-radius:16px;padding:24px 32px"><p style="font-size:28px;color:#13233A">tea · code 2</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">10. + 15.</p><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#13233A">25.0</p><p style="font-size:24px;color:#13233A">count 2 · mean 12.5</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 09 Sort, search and group</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>This slide shows what bincount does with the codes. The top row is the five sales in their original order, each tagged with its code from np.unique: inverse is [2, 0, 2, 1, 0], because the sorted groups are coffee at 0, juice at 1 and tea at 2. Colour and label both name the group. bincount creates one slot per code and adds each sale's revenue into its slot: the two coffee sales, 20 and 30, land in slot 0 for 50; the single juice sale gives 12; the two tea sales, 10 and 15, give 25. Running bincount again without weights counts the sales per slot, 2, 1 and 2, and dividing gives the means 25.0, 12.0 and 12.5, matching the printed output. Because the buckets cover every sale exactly once, their totals add back up to the raw total of 87, which the notebook asserts.</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> This slide shows what bincount does with the codes. The top row is the five sales in their original order, each tagged with its code from np.unique: inverse is [2, 0, 2, 1, 0], because the sorted groups are coffee at 0, juice at 1 and tea at 2. Colour and label both name the group. bincount creates one slot per code and adds each sale's revenue into its slot: the two coffee sales, 20 and 30, land in slot 0 for 50; the single juice sale gives 12; the two tea sales, 10 and 15, give 25. Running bincount again without weights counts the sales per slot, 2, 1 and 2, and dividing gives the means 25.0, 12.0 and 12.5, matching the printed output. Because the buckets cover every sale exactly once, their totals add back up to the raw total of 87, which the notebook asserts.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Work with positions,<br>not just values.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">argsort, searchsorted and unique return integers. Reuse them to keep arrays aligned and to reduce by group.</p>
+<aside>Pause here. Every tool in this notebook answers with integers rather than values: argsort gives an order, searchsorted gives a gap number, unique gives group codes. Those integers are reusable. One order reorders every related array, two insertion points count duplicates, and one code array lets bincount total, count and average any column by group. Thinking in positions is what makes NumPy feel like a database without one.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> Pause here. Every tool in this notebook answers with integers rather than values: argsort gives an order, searchsorted gives a gap number, unique gives group codes. Those integers are reusable. One order reorders every related array, two insertion points count duplicates, and one code array lets bincount total, count and average any column by group. Thinking in positions is what makes NumPy feel like a database without one.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Rank and group exercises</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Names of the two highest scorers, best first</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Students A, B, C, D with marks 75, 90, 65, 85. Expected: ["B", "D"].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">top_students = students[<br>&#160;&#160;&#160;&#160;np.argsort(-marks)[:2]]</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Sum amounts by integer group code</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Codes [0, 1, 0, 2, 1], amounts [2, 5, 3, 7, 1]. Expected: [5, 6, 7].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">group_totals = np.bincount(codes,<br>&#160;&#160;&#160;&#160;weights=amounts, minlength=3)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 09 Sort, search and group</p><p style="font-size:24px;color:#6B7280">10</p></div>
+<aside>Let the audience try both before revealing the code, which matches the reference solutions. Exercise 1: sorting the negated marks gives descending indices, here [1, 3, 0, 2]; slicing the first two and indexing students with them keeps names aligned with marks, giving B with 90 and D with 85. Exercise 2: the codes are already integers, so no np.unique step is needed. bincount adds each amount to the slot for its code: code 0 gets 2 plus 3, code 1 gets 5 plus 1, code 2 gets 7, giving [5. 6. 7.]. minlength=3 guarantees all three group positions exist even if a code were missing.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> Let the audience try both before revealing the code, which matches the reference solutions. Exercise 1: sorting the negated marks gives descending indices, here [1, 3, 0, 2]; slicing the first two and indexing students with them keeps names aligned with marks, giving B with 90 and D with 85. Exercise 2: the codes are already integers, so no np.unique step is needed. bincount adds each amount to the slot for its code: code 0 gets 2 plus 3, code 1 gets 5 plus 1, code 2 gets 7, giving [5. 6. 7.]. minlength=3 guarantees all three group positions exist even if a code were missing.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Build a product leaderboard</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Totals, counts, mean sale value and a descending rank per product</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Verify that the grouped totals add up to the raw total. Decide the expected leader before you run it.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain the main idea without reading the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a changed input or edge case and explain it</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 09 Sort, search and group</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>The challenge chains all three steps. Start with two arrays of equal length: a product label for each sale and its value. Use np.unique with return_inverse=True to get product codes, then np.bincount with weights for totals and without weights for counts; totals divided by counts gives the mean sale value. Rank the products with a stable argsort of the negated totals and apply that one order to products, totals, counts and means so every row stays aligned. There is no supplied check: assert that totals.sum() matches the raw sum with np.testing.assert_allclose, and check that the first-ranked product has the largest total. Then restart the kernel and run all cells once more.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> The challenge chains all three steps. Start with two arrays of equal length: a product label for each sale and its value. Use np.unique with return_inverse=True to get product codes, then np.bincount with weights for totals and without weights for counts; totals divided by counts gives the mean sale value. Rank the products with a stable argsort of the negated totals and apply that one order to products, totals, counts and means so every row stays aligned. There is no supplied check: assert that totals.sum() matches the raw sum with np.testing.assert_allclose, and check that the first-ranked product has the largest total. Then restart the kernel and run all cells once more.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">argsort</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">One order reorders every related array.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Stable ties</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Negate for descending; ties keep input order.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">searchsorted</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Gaps, not matches; right − left counts.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">bincount</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Codes from unique; sums and counts per group.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 10</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Linear algebra</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Multiply matrices, solve linear systems, fit a line, and inspect an SVD.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 10, vectors, matrices and least squares. Further reading: the official NumPy documentation on sorting, searching and counting at numpy.org/doc/stable/reference/routines.sort.html, and the numpy.bincount reference at numpy.org/doc/stable/reference/generated/numpy.bincount.html.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> Recap the four takeaways, then point to notebook 10, vectors, matrices and least squares. Further reading: the official NumPy documentation on sorting, searching and counting at numpy.org/doc/stable/reference/routines.sort.html, and the numpy.bincount reference at numpy.org/doc/stable/reference/generated/numpy.bincount.html.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

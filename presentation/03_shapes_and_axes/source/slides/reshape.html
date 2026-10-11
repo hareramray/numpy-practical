@@ -1,0 +1,17 @@
+<section id="reshape" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Reshape preserves the count</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">A shape is a contract</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">values = np.arange(12)<br>table = values.reshape(3, 4)<br>print(table)<br>print("Column shape:", values[:, None].shape)<br>print("Row shape:", values[None, :].shape)<br>assert table.size == values.size</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[[&#160;0&#160; 1&#160; 2&#160; 3]<br>&#160;[&#160;4&#160; 5&#160; 6&#160; 7]<br>&#160;[&#160;8&#160; 9 10 11]]<br>Column shape: (12, 1)<br>Row shape: (1, 12)</p></div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Same values</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">3 × 4 = 12, so reshape(3, 4) is allowed.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">-1 means infer</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">One length may be -1; NumPy computes it.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">None adds an axis</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A 1D vector becomes a column (12, 1) or a row (1, 12).</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>A shape is a contract about how values are arranged; reshape changes the arrangement but never adds or removes values. The product of the new lengths must equal the size: 12 values fit 3 by 4, 2 by 6 or 12 by 1, but not 5 by anything. One length may be -1 and NumPy works it out from the others. A 1D vector has a single axis, with no separate row and column; indexing with None inserts a new axis of length 1, which turns it into an explicit column (12, 1) or row (1, 12). The assert confirms the size is unchanged. Try it: run values.reshape(5, -1) inside try/except. It raises ValueError, because 12 is not divisible by 5, so no whole number of columns works.</aside>
+</section>

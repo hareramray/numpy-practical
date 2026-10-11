@@ -1,0 +1,33 @@
+<section id="filter-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Edit frequencies, get time back</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Remove 40 Hz, keep 5 Hz</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:560px;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-size:24px;color:#6B7280">Spectrum after the cutoff</p>
+<div style="position:relative;width:496px;height:320px">
+<div style="position:absolute;left:88px;top:0px;width:400px;height:260px;background:rgba(232,129,58,0.12)"></div>
+<div style="position:absolute;left:0px;top:259px;width:496px;height:3px;background:#13233A"></div>
+<div style="position:absolute;left:86px;top:0px;width:0px;height:260px;border-left:3px dashed #B5541A"></div>
+<div style="position:absolute;left:45px;top:60px;width:6px;height:200px;background:#2F6FB0"></div>
+<div style="position:absolute;left:36px;top:48px;width:24px;height:24px;border-radius:12px;background:#2F6FB0"></div>
+<div style="position:absolute;left:325px;top:180px;width:0px;height:80px;border-left:3px dashed #B5541A"></div>
+<div style="position:absolute;left:316px;top:168px;width:24px;height:24px;border-radius:12px;border:3px dashed #B5541A"></div>
+<div style="position:absolute;left:319px;top:251px;width:18px;height:18px;border-radius:9px;background:#E8813A"></div>
+<p style="position:absolute;left:104px;top:4px;width:240px;font-size:24px;font-weight:600;color:#B5541A">cutoff 10 Hz</p>
+<p style="position:absolute;left:0px;top:276px;width:40px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">0</p>
+<p style="position:absolute;left:64px;top:276px;width:48px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#4A5568">10</p>
+<p style="position:absolute;left:304px;top:276px;width:48px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#4A5568">40</p>
+<p style="position:absolute;left:396px;top:276px;width:100px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:right;color:#4A5568">60 Hz</p>
+</div>
+<div style="display:flex;gap:16px;align-items:center"><div style="width:24px;height:24px;border-radius:12px;background:#2F6FB0"></div><p style="font-size:28px;line-height:1.4;color:#4A5568">5 Hz, 1.0: kept</p></div>
+<div style="display:flex;gap:16px;align-items:center"><div style="width:24px;height:24px;border-radius:12px;border:3px dashed #B5541A"></div><p style="font-size:28px;line-height:1.4;color:#4A5568">40 Hz, 0.4: set to 0</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:24px"><img src="/_blob/6d6f6bc4172dce83b59220bd89b56261" alt="Plot titled Frequency filtering: the original signal in faint blue and the filtered signal below 10 Hz in orange, a smooth sine with five cycles in one second" style="width:1000px;height:326px;object-fit:contain"></div>
+<div style="display:flex;gap:16px;align-items:center"><x-shape kind="arrow-right" style="width:56px;height:28px;background:#E8813A"></x-shape><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;font-weight:600;color:#13233A">np.fft.irfft(filtered_spectrum, n=signal.size)</p></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">The orange curve is the smooth 5 Hz sine alone: the ripple is gone, and the length is still 256 samples.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 15 Signal processing with FFT</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>On the left is the spectrum as the filter sees it. The dashed line marks the 10 Hz cutoff, and everything in the shaded region to its right is set to zero: the 40 Hz spike, drawn dashed, drops to the orange dot on the axis, while the 5 Hz spike, in blue, is untouched. On the right is the notebook's third plot: the inverse transform of that edited spectrum, in orange, over the original signal in faint blue. The ripple has vanished and only the slow wave remains, exactly the pure 5 Hz sine the assert compares against. This works so cleanly because the two components sit on exact bins far apart; with noise or frequencies between bins, the result is approximate.</aside>
+</section>

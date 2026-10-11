@@ -1,0 +1,36 @@
+<section id="out-buffer" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Reuse buffers</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">out= writes into memory you own</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:780px;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">scratch = np.empty_like(a)<br>np.subtract(a, b, out=scratch)<br>np.square(scratch, out=scratch)<br>buffer_result = scratch.sum()<br>print("Full scratch bytes:", scratch.nbytes)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Full scratch bytes: 160000</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">np.sum((a - b) ** 2)</p>
+<div style="display:flex;gap:16px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A;background:#FFFDF8;border:2px dashed #E8813A;border-radius:12px;padding:12px 20px">a - b</p>
+<p style="font-size:28px;color:#6B7280">→</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A;background:#FFFDF8;border:2px dashed #E8813A;border-radius:12px;padding:12px 20px">(…) ** 2</p>
+<p style="font-size:28px;color:#6B7280">→</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A;background:#E2DED3;border-radius:12px;padding:12px 20px">sum</p>
+</div>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Two new temporaries, each the size of a.</p>
+</div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">out=scratch</p>
+<div style="display:flex;gap:16px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A;background:#E2DED3;border-radius:12px;padding:12px 20px">subtract</p>
+<p style="font-size:28px;color:#6B7280">→</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#F6F4EE;background:#2F6FB0;border-radius:12px;padding:12px 20px">scratch</p>
+<p style="font-size:28px;color:#6B7280">←</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A;background:#E2DED3;border-radius:12px;padding:12px 20px">square</p>
+</div>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">One 160000-byte buffer, allocated once, overwritten in place.</p>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 12 Vectorization</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>Array expressions are convenient, but each intermediate result is a brand-new array. In np.sum((a - b) ** 2), the subtraction allocates one full-size temporary, shown dashed, and squaring allocates another. Ufuncs such as np.subtract and np.square accept an out= argument that writes the result into an array you already own. Here scratch is allocated once with np.empty_like, filled by subtract, then squared in place. The notebook prints its size: 20,000 float64 values times 8 bytes is 160000 bytes. For small arrays this barely matters; for arrays of gigabytes, avoiding extra temporaries can decide whether the code runs at all. Try it: explain why calling np.append inside a loop is slow. Arrays cannot grow in place, so every append allocates a new, larger array and copies all the old data into it, which makes the loop quadratic in total copying.</aside>
+</section>

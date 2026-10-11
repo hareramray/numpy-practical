@@ -1,0 +1,17 @@
+<section id="axis-totals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Reduce the intended axis</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One table, two different totals</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">sales = np.array([[5, 3, 2], [7, 2, 4],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;[4, 6, 3], [8, 4, 5]])<br>products = np.array(["tea", "coffee", "juice"])<br>daily = sales.sum(axis=1)<br>product_totals = sales.sum(axis=0)<br>print("Daily:", daily)<br>print("Product totals:", product_totals)<br>print("Top product:", products[product_totals.argmax()])<br>assert daily.sum() == product_totals.sum()</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Daily: [10 13 13 17]<br>Product totals: [24 15 14]<br>Top product: tea</p></div>
+</div>
+<div style="width:600px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">axis=1: per day</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Reduces the product axis, leaving one total per row.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">axis=0: per product</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Reduces the day axis, leaving one total per column.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">argmax vs max</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">argmax returns a position, 0, which labels the winner: tea.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 06 Statistics and aggregation</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>The table has four days as rows and three products as columns, so its shape is (4, 3). Two different questions use the same data. Totals per day reduce the product axis, axis=1, giving four numbers. Totals per product reduce the day axis, axis=0, giving three numbers. A helpful phrase: the axis you pass is the axis that disappears. max would tell you the largest total, 24; argmax tells you where it is, position 0, which we use to index the product names. The assert confirms both ways of adding give the same grand total. Try it: sales.argmax(axis=0) finds the best day for each product, giving positions [3 2 3], that is, the fourth day for tea and juice and the third day for coffee.</aside>
+</section>

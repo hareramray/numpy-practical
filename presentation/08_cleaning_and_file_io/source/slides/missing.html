@@ -1,0 +1,17 @@
+<section id="missing" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Missing is not zero</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Find what is missing or invalid</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">raw = np.array([[10., np.nan], [12., 20.], [np.inf, 22.]])<br>cleaned = raw.copy()<br>cleaned[~np.isfinite(cleaned)] = np.nan<br>print("Missing mask:\n", np.isnan(cleaned))<br>print("Column means ignoring missing:",<br>&#160;&#160;&#160;&#160;&#160;&#160;np.nanmean(cleaned, axis=0))<br>assert np.isnan(cleaned).sum() == 2</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Missing mask:<br>&#160;[[False&#160;&#160;True]<br>&#160;[False False]<br>&#160;[&#160;True False]]<br>Column means ignoring missing: [11. 21.]</p></div>
+</div>
+<div style="width:480px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">NaN ≠ NaN</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Never test with ==. Use np.isnan.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">isfinite is stricter</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">It rejects NaN and infinities alike.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">nan-functions skip</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">nanmean ignores the holes in each column.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>NaN, not a number, marks a missing or undefined floating-point value. It has a strange property: NaN does not equal itself, so value == np.nan is always False and you must use np.isnan instead. np.isfinite is stricter still: it is False for NaN and for plus or minus infinity. Here we decide, as a data policy rather than a universal rule, that infinity is invalid too, so we copy the data and turn every non-finite entry into NaN. Then np.nanmean computes column means while skipping the holes: 10 and 12 give 11, 20 and 22 give 21. Try it: count missing entries by row and by column with np.isnan(cleaned).sum(axis=1) and sum(axis=0). You should get [1 0 1] for rows and [1 1] for columns.</aside>
+</section>

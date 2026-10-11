@@ -1,0 +1,33 @@
+<section id="ranges" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Choose a constructor</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">arange stops early; linspace doesn't</h2>
+<div style="display:flex;flex-direction:column;gap:48px;flex:1;justify-content:center">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">np.arange(0, 10, 2) <span style="color:#6B7280">→ start, stop, step: stop 10 is excluded</span></p>
+<div style="display:flex;gap:12px;align-items:center">
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">4</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">6</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">8</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#9AA3AE">10</p></div>
+<p style="font-size:24px;color:#6B7280">not included</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">Even numbers: [0 2 4 6 8]</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">np.linspace(0, 1, 5) <span style="color:#6B7280">→ start, stop, count: both ends included</span></p>
+<div style="display:flex;gap:12px;align-items:center">
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0.</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0.25</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0.5</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0.75</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1.</p></div>
+<p style="font-size:24px;color:#6B7280">orange = the two endpoints</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">Five points: [0.&#160;&#160; 0.25 0.5&#160; 0.75 1.&#160; ]</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>Two constructors build sequences, and they disagree about the stop value. arange(start, stop, step) counts up by a step and excludes the stop, exactly like Python's range, so arange(0, 10, 2) ends at 8. linspace(start, stop, num) asks for a count instead of a step, and includes both endpoints by default, so 5 points from 0 to 1 are spaced 0.25 apart. Prefer linspace for floating-point grids: you control the number of points and avoid rounding surprises with a fractional step. Try it: create seven evenly spaced points from -3 to 3 with np.linspace(-3, 3, 7). You get -3, -2, -1, 0, 1, 2, 3 as floats, a spacing of exactly 1.</aside>
+</section>

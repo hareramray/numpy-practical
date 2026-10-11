@@ -1,0 +1,17 @@
+<section id="slicing" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Indexing and slicing</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Row first, then column</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">scores = np.array([[65, 80, 90], [75, 60, 85],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;[95, 88, 92], [50, 70, 68]])<br>print("Last student's last score:", scores[-1, -1])<br>print("First two students:\n", scores[:2])<br>print("Second subject:", scores[:, 1])</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Last student's last score: 68<br>First two students:<br>&#160;[[65 80 90]<br>&#160;[75 60 85]]<br>Second subject: [80 60 88 70]</p></div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">a[row, column]</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">One position per axis, separated by a comma.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">start:stop:step</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">stop is excluded; a missing start or stop means the edge.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Negative indices</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Count from the end: -1 is the last row or column.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 02 Indexing and filtering</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>scores is a table of 4 students (rows, axis 0) by 3 subjects (columns, axis 1). For a 2D array, write one index per axis inside a single pair of brackets: scores[-1, -1] is the last row and last column, 68. scores[:2] gives only a row slice, so all columns come along: rows 0 and 1, because the stop 2 is excluded. scores[:, 1] means every row, column 1, the second subject. Try it: select the last two students and the first two subjects with scores[-2:, :2]. Expect [[95 88] [50 70]], shape (2, 2).</aside>
+</section>

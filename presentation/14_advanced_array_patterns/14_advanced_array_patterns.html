@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 14 — Advanced Array Patterns</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 14 — Advanced Array Patterns</h1><span>12 slides · <a href="https://claude.ai/artifact/6ZcT1MhUFY3S4aMxYnBpiX">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative grid of array cells with sliding windows" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="160" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="320" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="480" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="160" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="320" y="160" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="480" y="160" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="0" y="320" width="132" height="132" rx="16" fill="#E8813A"/><rect x="160" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="320" width="132" height="132" rx="16" fill="#E8813A"/><rect x="480" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="480" width="132" height="132" rx="16" fill="#E8813A"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 14</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE">Advanced array<br>patterns</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2">Einsum, rolling windows, repeated indices</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Expert practice</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">30–50 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: notebooks 00–13</p>
+</div>
+<aside>Welcome to notebook 14. It introduces three patterns that experienced NumPy users reach for: einsum, which writes sums of products by naming axes; sliding_window_view, which gives overlapping windows without copying data; and np.add.at, which accumulates correctly when the same index appears more than once. Each solves a problem that is awkward or subtly wrong with the basic tools. As always, the notebook imports its own libraries and creates its own data.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> Welcome to notebook 14. It introduces three patterns that experienced NumPy users reach for: einsum, which writes sums of products by naming axes; sliding_window_view, which gives overlapping windows without copying data; and np.add.at, which accumulates correctly when the same index appears more than once. Each solves a problem that is awkward or subtly wrong with the basic tools. As always, the notebook imports its own libraries and creates its own data.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Three patterns beyond the basics</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Tensor contractions</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Write sums of products with einsum by naming each axis.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Rolling features</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Compute moving statistics from overlapping windows that share memory.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Repeated indices</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Accumulate every occurrence with np.add.at or bincount.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>The notebook's goal: express tensor contractions, calculate rolling features, and accumulate repeated indices. All three build on earlier notebooks: einsum generalizes the matrix product from notebook 10, sliding windows rely on the views and strides from notebook 11, and np.add.at fixes a trap in the fancy indexing from notebook 02. For each one, the notebook checks the new tool against a familiar operation, which is a good habit whenever you adopt something more powerful.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> The notebook's goal: express tensor contractions, calculate rolling features, and accumulate repeated indices. All three build on earlier notebooks: einsum generalizes the matrix product from notebook 10, sliding windows rely on the views and strides from notebook 11, and np.add.at fixes a trap in the fancy indexing from notebook 02. For each one, the notebook checks the new tool against a familiar operation, which is a good habit whenever you adopt something more powerful.</p></div>
+<div class="slide" id="einsum"><div class="frame"><section id="einsum" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Einsum names the axes</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Label axes; repeated ones sum</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">One letter per axis</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">"ij" means A has two axes, called i and j.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Missing from output: summed</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">In ij,jk-&gt;ik, j disappears, so it is summed over.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Check against the familiar</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The asserts compare with A @ B and (A * A).sum(axis=1).</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">A = np.arange(6, dtype=float).reshape(2, 3)<br>B = np.arange(12, dtype=float).reshape(3, 4)<br>product = np.einsum("ij,jk-&gt;ik", A, B,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;optimize=True)<br>row_energy = np.einsum("ij,ij-&gt;i", A, A)<br>print(product)<br>print("Row energy:", row_energy)<br>np.testing.assert_allclose(product, A @ B)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[[20. 23. 26. 29.]<br>&#160;[56. 68. 80. 92.]]<br>Row energy: [ 5. 50.]</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>np.einsum takes a subscript string and the arrays. Each input gets one letter per axis; the part after the arrow lists the axes the output keeps. A letter that appears in the inputs but not in the output is summed over, after multiplying matching elements. So ij,jk-&gt;ik is the matrix product, and ij,ij-&gt;i multiplies A by itself elementwise and sums each row, giving the row energies 5 and 50. Always write the explicit output after the arrow and test against an operation you already trust. optimize=True lets NumPy choose an efficient contraction order. Try it: the dot product of two 1D arrays is np.einsum("i,i-&gt;", a, b), and the trace of a square matrix is np.einsum("ii-&gt;", M).</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> np.einsum takes a subscript string and the arrays. Each input gets one letter per axis; the part after the arrow lists the axes the output keeps. A letter that appears in the inputs but not in the output is summed over, after multiplying matching elements. So ij,jk-&gt;ik is the matrix product, and ij,ij-&gt;i multiplies A by itself elementwise and sums each row, giving the row energies 5 and 50. Always write the explicit output after the arrow and test against an operation you already trust. optimize=True lets NumPy choose an efficient contraction order. Try it: the dot product of two 1D arrays is np.einsum("i,i-&gt;", a, b), and the trace of a square matrix is np.einsum("ii-&gt;", M).</p></div>
+<div class="slide" id="einsum-visual"><div class="frame"><section id="einsum-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Subscripts to shapes</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Reading "ij,jk-&gt;ik"</h2>
+<div style="display:flex;gap:56px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:64px;font-weight:600;line-height:1.1;color:#13233A;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:16px 40px"><span style="color:#2F6FB0">i</span><span style="color:#B5541A">j</span>,<span style="color:#B5541A">j</span>k-&gt;<span style="color:#2F6FB0">i</span>k</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-size:28px;line-height:1.4;color:#4A5568"><span style="color:#2F6FB0">i</span> and k appear in the output, so they survive as axes.</p>
+<p style="font-size:28px;line-height:1.4;color:#4A5568"><span style="color:#B5541A">j</span> is shared by both inputs and dropped, so it is summed.</p>
+</div>
+</div>
+<div style="display:flex;gap:40px;align-items:end">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;color:#6B7280">A · shape (2, 3) · ij</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;gap:8px">
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+</div>
+<div style="display:flex;gap:8px">
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+</div>
+</div>
+</div>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#6B7280">@</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;color:#6B7280">B · shape (3, 4) · jk</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;gap:8px">
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+</div>
+<div style="display:flex;gap:8px">
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">4</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">7</p></div>
+</div>
+<div style="display:flex;gap:8px">
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">8</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">9</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">11</p></div>
+</div>
+</div>
+</div>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#6B7280">=</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;color:#6B7280">product · shape (2, 4) · ik</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;gap:8px">
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">23</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">26</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">29</p></div>
+</div>
+<div style="display:flex;gap:8px">
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">56</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">68</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">80</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">92</p></div>
+</div>
+</div>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Row i = 0 of A meets column k = 0 of B, summed over j: 0·0 + 1·4 + 2·8 = <span style="color:#B5541A">20</span>.</p>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>Map each letter to an axis length. In A, i has length 2 and j has length 3; in B, j has length 3 and k has length 4. The shared letter j must have the same length in both, just like the inner dimensions of a matrix product. The output keeps i and k, so its shape is (2, 4). Each output element multiplies along j and adds: for product[0, 0], the blue row of A, 0, 1, 2, meets the blue column of B, 0, 4, 8, giving 0 + 4 + 16 = 20, the first value the notebook printed. Changing the output letters changes the operation: ij,jk-&gt;ki would give the transposed product, and ij,jk-&gt; with nothing after the arrow would sum everything to one number.</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> Map each letter to an axis length. In A, i has length 2 and j has length 3; in B, j has length 3 and k has length 4. The shared letter j must have the same length in both, just like the inner dimensions of a matrix product. The output keeps i and k, so its shape is (2, 4). Each output element multiplies along j and adds: for product[0, 0], the blue row of A, 0, 1, 2, meets the blue column of B, 0, 4, 8, giving 0 + 4 + 16 = 20, the first value the notebook printed. Changing the output letters changes the operation: ij,jk-&gt;ki would give the transposed product, and ij,jk-&gt; with nothing after the arrow would sum everything to one number.</p></div>
+<div class="slide" id="windows"><div class="frame"><section id="windows" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Rolling windows as views</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Overlapping windows, no copies</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:1040px;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">from numpy.lib.stride_tricks import sliding_window_view<br>signal = np.array([1., 2., 3., 4., 5., 6.])<br>windows = sliding_window_view(signal, window_shape=3)<br>rolling_mean = windows.mean(axis=-1)<br>print(windows)<br>print("Rolling means:", rolling_mean)<br>assert not windows.flags.writeable<br>assert np.shares_memory(signal, windows)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[[1. 2. 3.]<br>&#160;[2. 3. 4.]<br>&#160;[3. 4. 5.]<br>&#160;[4. 5. 6.]]<br>Rolling means: [2. 3. 4. 5.]</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">n − w + 1 windows</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">6 values, width 3: shape (4, 3).</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A read-only view</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">It shares memory with signal; windows overlap, so writes are blocked.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Reduce the last axis</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">mean(axis=-1) gives one value per window.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>sliding_window_view returns a new array whose last axis runs along each window. A window of width w over n values gives n - w + 1 complete windows, here 6 - 3 + 1 = 4, so the shape is (4, 3). It is a view built with strides, as in notebook 11: no window is copied, which the shares_memory assert confirms. Because the windows overlap, one element appears in several windows, so NumPy makes the view read-only to stop a write from changing several windows at once. Reducing still touches every window entry, so for long rolling sums a cumulative-sum trick can be cheaper. Try it: compute windows.min(axis=-1) and windows.max(axis=-1), giving [1, 2, 3, 4] and [3, 4, 5, 6]; each result belongs at the last index of its window, positions 2 to 5 of signal.</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> sliding_window_view returns a new array whose last axis runs along each window. A window of width w over n values gives n - w + 1 complete windows, here 6 - 3 + 1 = 4, so the shape is (4, 3). It is a view built with strides, as in notebook 11: no window is copied, which the shares_memory assert confirms. Because the windows overlap, one element appears in several windows, so NumPy makes the view read-only to stop a write from changing several windows at once. Reducing still touches every window entry, so for long rolling sums a cumulative-sum trick can be cheaper. Try it: compute windows.min(axis=-1) and windows.max(axis=-1), giving [1, 2, 3, 4] and [3, 4, 5, 6]; each result belongs at the last index of its window, positions 2 to 5 of signal.</p></div>
+<div class="slide" id="windows-visual"><div class="frame"><section id="windows-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Windows slide one step</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Four windows over six values</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;gap:8px;align-items:center">
+<p style="font-size:24px;color:#6B7280;width:176px">signal</p>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+<p style="font-size:24px;color:#6B7280;width:200px;text-align:center">mean</p>
+</div>
+<div style="display:flex;gap:8px;align-items:center">
+<p style="font-size:24px;color:#6B7280;width:176px">windows[0]</p>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">3</p></div>
+<div style="width:88px;height:64px"></div>
+<div style="width:88px;height:64px"></div>
+<div style="width:88px;height:64px"></div>
+<div style="width:200px;display:flex;justify-content:center"><div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div></div>
+</div>
+<div style="display:flex;gap:8px;align-items:center">
+<p style="font-size:24px;color:#6B7280;width:176px">windows[1]</p>
+<div style="width:88px;height:64px"></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">3</p></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">4</p></div>
+<div style="width:88px;height:64px"></div>
+<div style="width:88px;height:64px"></div>
+<div style="width:200px;display:flex;justify-content:center"><div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div></div>
+</div>
+<div style="display:flex;gap:8px;align-items:center">
+<p style="font-size:24px;color:#6B7280;width:176px">windows[2]</p>
+<div style="width:88px;height:64px"></div>
+<div style="width:88px;height:64px"></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">3</p></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">4</p></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">5</p></div>
+<div style="width:88px;height:64px"></div>
+<div style="width:200px;display:flex;justify-content:center"><div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div></div>
+</div>
+<div style="display:flex;gap:8px;align-items:center">
+<p style="font-size:24px;color:#6B7280;width:176px">windows[3]</p>
+<div style="width:88px;height:64px"></div>
+<div style="width:88px;height:64px"></div>
+<div style="width:88px;height:64px"></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">4</p></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">5</p></div>
+<div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">6</p></div>
+<div style="width:200px;display:flex;justify-content:center"><div style="width:88px;height:64px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div></div>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">shape (4, 3)</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">6 − 3 + 1 = 4 windows of width 3.</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Same memory</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Each value is stored once, seen by up to 3 windows.</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Read-only</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">flags.writeable is False.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>Each row is one window: the blue cells are the three signal values it sees, shifted one step to the right each time. The staircase shows the overlap: the value 3 belongs to three windows, yet it is stored only once in memory, because every window is a view into the same six numbers. Averaging along the last axis turns each blue row into one orange mean, 2, 3, 4 and 5, exactly the notebook's rolling means. Only complete windows are produced, so the result is shorter than the signal by w - 1 values. If you need an output aligned with the original, pad the front with NaN or align each mean with the last index of its window.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> Each row is one window: the blue cells are the three signal values it sees, shifted one step to the right each time. The staircase shows the overlap: the value 3 belongs to three windows, yet it is stored only once in memory, because every window is a view into the same six numbers. Averaging along the last axis turns each blue row into one orange mean, 2, 3, 4 and 5, exactly the notebook's rolling means. Only complete windows are produced, so the result is shorter than the signal by w - 1 values. If you need an output aligned with the original, pad the front with NaN or align each mean with the last index of its window.</p></div>
+<div class="slide" id="add-at"><div class="frame"><section id="add-at" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Repeated indices</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">+= can miss repeated indices</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">a[index] += value is buffered</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A repeated position may be updated only once.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">np.add.at is unbuffered</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">It applies every occurrence, one at a time.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">bincount for integer codes</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">With weights=values it gives the same sums, often faster.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">indices = np.array([0, 0, 2])<br>values = np.array([1., 1., 5.])<br>buffered = np.zeros(3)<br>buffered[indices] += values<br>accumulated = np.zeros(3)<br>np.add.at(accumulated, indices, values)<br>print("Buffered:", buffered)<br>print("Accumulated:", accumulated)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Buffered: [1. 0. 5.]<br>Accumulated: [2. 0. 5.]</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>Fancy-index assignment with += is shorthand for: read buffered[indices], add values, write the result back to buffered[indices]. The read happens once for all indices, so both occurrences of index 0 read the original 0 and add 1, and the second write simply overwrites the first. The result at position 0 is 1, not 2: an update is silently lost. np.add.at is the unbuffered version of the same ufunc and applies each occurrence in turn, giving 2. For sums over nonnegative integer codes, np.bincount(indices, weights=values, minlength=3) is a simpler and often faster equivalent, and the notebook asserts that it matches. Try it: use np.maximum.at(out, groups, values) with out starting as np.full(number_of_groups, -np.inf) to get the largest value per group.</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> Fancy-index assignment with += is shorthand for: read buffered[indices], add values, write the result back to buffered[indices]. The read happens once for all indices, so both occurrences of index 0 read the original 0 and add 1, and the second write simply overwrites the first. The result at position 0 is 1, not 2: an update is silently lost. np.add.at is the unbuffered version of the same ufunc and applies each occurrence in turn, giving 2. For sums over nonnegative integer codes, np.bincount(indices, weights=values, minlength=3) is a simpler and often faster equivalent, and the notebook asserts that it matches. Try it: use np.maximum.at(out, groups, values) with out starting as np.full(number_of_groups, -np.inf) to get the largest value per group.</p></div>
+<div class="slide" id="add-at-visual"><div class="frame"><section id="add-at-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Buffered versus unbuffered</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two hits on index 0</h2>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="font-size:24px;color:#6B7280;width:200px">updates<br>(index, value)</p>
+<div style="width:220px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:3px solid #E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">[0] += 1</p></div>
+<div style="width:220px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:3px solid #E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">[0] += 1</p></div>
+<div style="width:220px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">[2] += 5</p></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">indices = [0, 0, 2]<br>values = [1, 1, 5]</p>
+</div>
+<div style="display:flex;gap:40px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#B5541A;width:48px;height:48px" role="img" aria-label="Warning"><path d="M12 3 22 20H2Z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;font-weight:600;color:#13233A">buffered[indices] += values</p></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Reads all targets once, adds, writes back. The second write to [0] overwrites the first.</p>
+<div style="flex:1"></div>
+<div style="display:flex;gap:12px;align-items:end">
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">[0]</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div></div>
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">[1]</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div></div>
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">[2]</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div></div>
+<p style="font-size:28px;line-height:1.4;color:#B5541A;width:200px">one update lost</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:48px;height:48px" role="img" aria-label="CheckCircle"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;font-weight:600;color:#13233A">np.add.at(accumulated, indices, values)</p></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Applies each occurrence in turn: 0 + 1 + 1 = 2. Same as np.bincount with weights.</p>
+<div style="flex:1"></div>
+<div style="display:flex;gap:12px;align-items:end">
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">[0]</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div></div>
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">[1]</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div></div>
+<div style="display:flex;flex-direction:column;gap:6px;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">[2]</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div></div>
+<p style="font-size:28px;line-height:1.4;color:#2F6FB0;width:200px">every hit counted</p>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>Here the three updates are drawn as chips: two of them, outlined in orange, target the same position 0. With buffered fancy indexing, NumPy gathers buffered[[0, 0, 2]] into a temporary array, [0, 0, 0], adds [1, 1, 5] to get [1, 1, 5], and scatters the result back. Position 0 is written twice with the value 1, so the final array is [1, 0, 5]: one of the two increments is lost, and no error is raised. np.add.at does the addition in place for each occurrence, so position 0 goes 0, then 1, then 2, giving [2, 0, 5]. This matters for histograms, group sums and scatter operations, where repeated indices are the normal case, not the exception.</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> Here the three updates are drawn as chips: two of them, outlined in orange, target the same position 0. With buffered fancy indexing, NumPy gathers buffered[[0, 0, 2]] into a temporary array, [0, 0, 0], adds [1, 1, 5] to get [1, 1, 5], and scatters the result back. Position 0 is written twice with the value 1, so the final array is [1, 0, 5]: one of the two increments is lost, and no error is raised. np.add.at does the addition in place for each occurrence, so position 0 goes 0, then 1, then 2, giving [2, 0, 5]. This matters for histograms, group sums and scatter operations, where repeated indices are the normal case, not the exception.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Name the axes.<br>View, don't copy.<br>Count every repeat.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">einsum says which axes survive and which are summed; windows are views; np.add.at applies every repeated index.</p>
+<aside>Pause here. The three tools share a theme: say precisely what you mean, and NumPy does the work without hidden surprises. einsum makes every axis explicit, so a contraction reads like its formula. sliding_window_view reuses memory instead of copying overlapping data. np.add.at removes the silent data loss of buffered fancy-index updates. In each case the notebook verified the new tool against a familiar one, and that habit is the real lesson.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> Pause here. The three tools share a theme: say precisely what you mean, and NumPy does the work without hidden surprises. einsum makes every axis explicit, so a contraction reads like its formula. sliding_window_view reuses memory instead of copying overlapping data. np.add.at removes the silent data loss of buffered fancy-index updates. In each case the notebook verified the new tool against a familiar one, and that habit is the real lesson.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two exercises on the patterns</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">One dot product per pair of matching rows, with einsum</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">left = [[1, 2], [3, 4]], right = [[5, 6], [7, 8]]. Expected: [17, 53].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">row_dots = np.einsum("ij,ij-&gt;i",<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;left, right)</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Valid rolling means with window width 2</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">series = [2, 4, 8, 10]. Expected: [3, 6, 9], one mean per complete pair.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">rolling = sliding_window_view(<br>&#160;&#160;&#160;&#160;series, 2).mean(axis=-1)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">10</p></div>
+<aside>Ask the audience to attempt both before revealing the code lines, which match the reference solutions. Exercise 1: the label i survives as the row axis, and the repeated j label is summed, giving a dot product for each corresponding row pair: 1·5 + 2·6 = 17 and 3·7 + 4·8 = 53. The reference run prints [17. 53.]. Exercise 2: the window view exposes adjacent pairs, (2, 4), (4, 8) and (8, 10), and averaging the final axis gives one mean per complete pair; the reference run prints [3. 6. 9.]. Four values with width 2 give 4 - 2 + 1 = 3 windows.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> Ask the audience to attempt both before revealing the code lines, which match the reference solutions. Exercise 1: the label i survives as the row axis, and the repeated j label is summed, giving a dot product for each corresponding row pair: 1·5 + 2·6 = 17 and 3·7 + 4·8 = 53. The reference run prints [17. 53.]. Exercise 2: the window view exposes adjacent pairs, (2, 4), (4, 8) and (8, 10), and averaging the final axis gives one mean per complete pair; the reference run prints [3. 6. 9.]. Four values with width 2 give 4 - 2 + 1 = 3 windows.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">A batch of Gram matrices</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">For a batch shaped (4, 3, 2), compute each member's 2 × 2 Gram matrix two ways</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Use data.swapaxes(-1, -2) @ data, then einsum. Predict the result shape, then compare.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain the main idea without reading the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a changed input or edge case and explain it</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>The challenge has no supplied check: write your own. A Gram matrix of a 3 × 2 matrix X is X transposed times X, which is 2 × 2. For a batch, swapaxes(-1, -2) transposes only the last two axes, and @ broadcasts over the leading batch axis, so the result has shape (4, 2, 2). The einsum version names every axis: "bij,bik-&gt;bjk" keeps the batch axis b, sums over the shared row axis i, and keeps j and k. Compare the two with np.testing.assert_allclose. Each Gram matrix should also be symmetric, which is a second check worth adding. Then restart the kernel and run all cells.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> The challenge has no supplied check: write your own. A Gram matrix of a 3 × 2 matrix X is X transposed times X, which is 2 × 2. For a batch, swapaxes(-1, -2) transposes only the last two axes, and @ broadcasts over the leading batch axis, so the result has shape (4, 2, 2). The einsum version names every axis: "bij,bik-&gt;bjk" keeps the batch axis b, sums over the shared row axis i, and keeps j and k. Compare the two with np.testing.assert_allclose. Each Gram matrix should also be symmetric, which is a second check worth adding. Then restart the kernel and run all cells.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">einsum</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Output letters survive; dropped letters are summed.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Windows</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">n − w + 1 overlapping, read-only views.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">np.add.at</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Counts every repeated index; += may not.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Verify</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Test new tools against familiar ones.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 15</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Signal processing with FFT</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Build a sampled signal, find its frequency peaks, and filter it.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 15, which explores signals with NumPy's FFT. Further reading: the official NumPy documentation for numpy.einsum at numpy.org/doc/stable/reference/generated/numpy.einsum.html, for numpy.lib.stride_tricks.sliding_window_view at numpy.org/doc/stable/reference/generated/numpy.lib.stride_tricks.sliding_window_view.html, and for numpy.ufunc.at at numpy.org/doc/stable/reference/generated/numpy.ufunc.at.html.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> Recap the four takeaways, then point to notebook 15, which explores signals with NumPy's FFT. Further reading: the official NumPy documentation for numpy.einsum at numpy.org/doc/stable/reference/generated/numpy.einsum.html, for numpy.lib.stride_tricks.sliding_window_view at numpy.org/doc/stable/reference/generated/numpy.lib.stride_tricks.sliding_window_view.html, and for numpy.ufunc.at at numpy.org/doc/stable/reference/generated/numpy.ufunc.at.html.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

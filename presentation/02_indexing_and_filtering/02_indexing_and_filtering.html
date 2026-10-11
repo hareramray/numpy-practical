@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 02 — Indexing and filtering</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 02 — Indexing and filtering</h1><span>13 slides · <a href="https://claude.ai/artifact/SrVmZs1ffsiPYYYvySTZwz">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative grid of array cells with one column and a few cells selected" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="320" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="0" width="132" height="132" rx="16" fill="#E8813A"/><rect x="0" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="160" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="320" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="320" width="132" height="132" rx="16" fill="#E8813A"/><rect x="160" y="320" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="320" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="480" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="320" y="480" width="132" height="132" rx="16" fill="#E8813A"/><rect x="480" y="480" width="132" height="132" rx="16" fill="#22344F"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 02</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE">Indexing and<br>filtering</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2">Select, slice, and filter data</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Beginner</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">30–50 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: Notebooks 00–01</p>
+</div>
+<aside>Welcome to notebook 02. In notebook 01 we learned to read an array's shape. Now we use that shape to pick data out: single values, ranges of rows and columns, values that meet a condition, and specific combinations of rows and columns. The motif on this slide shows the two big ideas: a blue column selected by a slice, and scattered orange cells selected by a condition.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> Welcome to notebook 02. In notebook 01 we learned to read an array's shape. Now we use that shape to pick data out: single values, ranges of rows and columns, values that meet a condition, and specific combinations of rows and columns. The motif on this slide shows the two big ideas: a blue column selected by a slice, and scattered orange cells selected by a condition.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Three ways to choose data</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">By position</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Pick single values and slice blocks of rows and columns with a[row, column] and start:stop:step.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">By condition</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Build Boolean masks and combine them with &amp;, | and ~.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">By lists of indices</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Paired coordinates versus a rectangle with np.ix_, and assigning through a selection.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 02 Indexing and filtering</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>The notebook's goal is to select individual values, slice tables, and combine Boolean conditions. Each card is one step. Position-based selection uses integers and slices. Condition-based selection uses a Boolean array of the same shape. Index lists let you pick arbitrary rows and columns, and they come with a trap we will draw out on a grid: two lists pair up coordinates rather than forming a rectangle.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> The notebook's goal is to select individual values, slice tables, and combine Boolean conditions. Each card is one step. Position-based selection uses integers and slices. Condition-based selection uses a Boolean array of the same shape. Index lists let you pick arbitrary rows and columns, and they come with a trap we will draw out on a grid: two lists pair up coordinates rather than forming a rectangle.</p></div>
+<div class="slide" id="slicing"><div class="frame"><section id="slicing" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Indexing and slicing</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Row first, then column</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">scores = np.array([[65, 80, 90], [75, 60, 85],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;[95, 88, 92], [50, 70, 68]])<br>print("Last student's last score:", scores[-1, -1])<br>print("First two students:\n", scores[:2])<br>print("Second subject:", scores[:, 1])</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Last student's last score: 68<br>First two students:<br>&#160;[[65 80 90]<br>&#160;[75 60 85]]<br>Second subject: [80 60 88 70]</p></div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">a[row, column]</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">One position per axis, separated by a comma.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">start:stop:step</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">stop is excluded; a missing start or stop means the edge.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Negative indices</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Count from the end: -1 is the last row or column.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 02 Indexing and filtering</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>scores is a table of 4 students (rows, axis 0) by 3 subjects (columns, axis 1). For a 2D array, write one index per axis inside a single pair of brackets: scores[-1, -1] is the last row and last column, 68. scores[:2] gives only a row slice, so all columns come along: rows 0 and 1, because the stop 2 is excluded. scores[:, 1] means every row, column 1, the second subject. Try it: select the last two students and the first two subjects with scores[-2:, :2]. Expect [[95 88] [50 70]], shape (2, 2).</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> scores is a table of 4 students (rows, axis 0) by 3 subjects (columns, axis 1). For a 2D array, write one index per axis inside a single pair of brackets: scores[-1, -1] is the last row and last column, 68. scores[:2] gives only a row slice, so all columns come along: rows 0 and 1, because the stop 2 is excluded. scores[:, 1] means every row, column 1, the second subject. Try it: select the last two students and the first two subjects with scores[-2:, :2]. Expect [[95 88] [50 70]], shape (2, 2).</p></div>
+<div class="slide" id="slice-grid"><div class="frame"><section id="slice-grid" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Indexing and slicing</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Four selections on one table</h2>
+<div style="display:flex;justify-content:space-between;flex:1;align-items:center">
+<div style="width:304px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">scores[-1, -1]</p>
+<div style="display:grid;grid-template-columns:repeat(3, 96px);gap:8px">
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">65</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">80</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">90</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">75</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">60</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">85</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">95</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">88</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">92</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">50</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">70</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">68</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">→ 68</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Last row, last column: negatives count from the end.</p>
+</div>
+<div style="width:304px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">scores[:2]</p>
+<div style="display:grid;grid-template-columns:repeat(3, 96px);gap:8px">
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">65</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">80</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">90</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">75</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">60</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">85</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">95</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">88</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">92</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">50</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">70</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">68</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">→ rows 0 and 1</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">A row slice; stop 2 is excluded, all columns come along.</p>
+</div>
+<div style="width:304px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">scores[:, 1]</p>
+<div style="display:grid;grid-template-columns:repeat(3, 96px);gap:8px">
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">65</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">80</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">90</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">75</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">60</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">85</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">95</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">88</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">92</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">50</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">70</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">68</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">→ [80 60 88 70]</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Every row, column 1: the second subject.</p>
+</div>
+<div style="width:304px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">scores[::2]</p>
+<div style="display:grid;grid-template-columns:repeat(3, 96px);gap:8px">
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">65</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">80</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">90</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">75</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">60</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">85</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">95</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">88</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">92</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">50</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">70</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">68</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">→ rows 0 and 2</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Step 2 along axis 0: every other student.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 02 Indexing and filtering</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>The same 4 by 3 scores table four times; blue cells are the ones each expression selects. A single pair of integers picks one cell. A slice in the row position picks a band of rows and keeps every column. A colon in the row position with an integer column picks a vertical strip. A step of 2 skips every other row: the notebook prints rows [65 80 90] and [95 88 92]. Ask the audience to point at the cells before revealing each grid. Try it: shade scores[-2:, :2] yourself: the bottom two rows, left two columns, giving [[95 88] [50 70]].</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> The same 4 by 3 scores table four times; blue cells are the ones each expression selects. A single pair of integers picks one cell. A slice in the row position picks a band of rows and keeps every column. A colon in the row position with an integer column picks a vertical strip. A step of 2 skips every other row: the notebook prints rows [65 80 90] and [95 88 92]. Ask the audience to point at the cells before revealing each grid. Try it: shade scores[-2:, :2] yourself: the bottom two rows, left two columns, giving [[95 88] [50 70]].</p></div>
+<div class="slide" id="axis-drop"><div class="frame"><section id="axis-drop" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Indexing and slicing</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Integers drop axes; slices keep them</h2>
+<div style="display:flex;gap:80px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">scores[:, 1] <span style="color:#6B7280">→ integer column</span></p>
+<div style="display:flex;gap:12px">
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">80</p></div>
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">60</p></div>
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">88</p></div>
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">70</p></div>
+</div>
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#B5541A">shape (4,)</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">One axis left. A 1D array has no rows or columns, so NumPy prints it flat.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">scores[:, 1:2] <span style="color:#6B7280">→ slice of width 1</span></p>
+<div style="display:flex;gap:40px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">80</p></div>
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">60</p></div>
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">88</p></div>
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">70</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#B5541A">shape (4, 1)</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Both axes kept: 4 rows and 1 column. Still a table.</p>
+</div>
+</div>
+</div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">Shapes: (4,) (4, 1)</p>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 02 Indexing and filtering</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>Both expressions select the same four values, the second subject's scores, but they return different shapes, as the notebook's output line Shapes: (4,) (4, 1) proves. A single integer in an axis position removes that axis entirely, so scores[:, 1] is a 1D array with shape (4,). A slice, even one of width 1 like 1:2, preserves the axis, so scores[:, 1:2] is still 2D with shape (4, 1): a column. This matters later when you combine arrays, because a (4,) array and a (4, 1) array broadcast differently. Rule: use an integer when you want a value or a lower-dimensional result, and a slice when you want to keep the table shape.</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> Both expressions select the same four values, the second subject's scores, but they return different shapes, as the notebook's output line Shapes: (4,) (4, 1) proves. A single integer in an axis position removes that axis entirely, so scores[:, 1] is a 1D array with shape (4,). A slice, even one of width 1 like 1:2, preserves the axis, so scores[:, 1:2] is still 2D with shape (4, 1): a column. This matters later when you combine arrays, because a (4,) array and a (4, 1) array broadcast differently. Rule: use an integer when you want a value or a lower-dimensional result, and a slice when you want to keep the table shape.</p></div>
+<div class="slide" id="masks"><div class="frame"><section id="masks" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Boolean masks</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">A comparison makes a mask</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">marks = np.array([45, 62, 78, 90, 55, 84])<br>mask = (marks &gt;= 60) &amp; (marks &lt; 85)<br>print("Mask:", mask)<br>print("Selected:", marks[mask])<br>print("Positions:", np.flatnonzero(mask))<br>assert np.count_nonzero(mask) == 3</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Mask: [False&#160; True&#160; True False False&#160; True]<br>Selected: [62 78 84]<br>Positions: [1 2 5]</p></div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">&amp;  |  ~</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">and, or, not, applied element by element.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Parentheses first</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">&amp; binds tighter than &gt;=, so wrap each comparison.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#B5541A">Not and / or</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Python's and cannot combine arrays elementwise.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 02 Indexing and filtering</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>A comparison such as marks &gt;= 60 does not return one True or False: it returns a Boolean array with one answer per element. Indexing with that mask keeps the entries where it is True. To combine conditions use &amp; for and, | for or, and ~ for not, and put each comparison in parentheses, because &amp; has higher precedence than the comparison operators. Python's and keyword tries to turn the whole array into a single truth value and raises an error. np.flatnonzero reports where the True values are, and np.count_nonzero counts them, here 3. Try it: select marks below 50 or at least 85 with marks[(marks &lt; 50) | (marks &gt;= 85)]. Expect [45 90].</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> A comparison such as marks &gt;= 60 does not return one True or False: it returns a Boolean array with one answer per element. Indexing with that mask keeps the entries where it is True. To combine conditions use &amp; for and, | for or, and ~ for not, and put each comparison in parentheses, because &amp; has higher precedence than the comparison operators. Python's and keyword tries to turn the whole array into a single truth value and raises an error. np.flatnonzero reports where the True values are, and np.count_nonzero counts them, here 3. Try it: select marks below 50 or at least 85 with marks[(marks &lt; 50) | (marks &gt;= 85)]. Expect [45 90].</p></div>
+<div class="slide" id="mask-grid"><div class="frame"><section id="mask-grid" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Boolean masks</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two conditions, one mask</h2>
+<div style="display:flex;flex-direction:column;gap:16px;flex:1;justify-content:center">
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:380px;font-size:24px;color:#6B7280">position</p>
+<div style="display:flex;gap:12px">
+<p style="width:140px;text-align:center;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">0</p>
+<p style="width:140px;text-align:center;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">1</p>
+<p style="width:140px;text-align:center;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">2</p>
+<p style="width:140px;text-align:center;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">3</p>
+<p style="width:140px;text-align:center;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">4</p>
+<p style="width:140px;text-align:center;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">5</p>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:380px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">marks</p>
+<div style="display:flex;gap:12px">
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">45</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">62</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">78</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">90</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">55</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">84</p></div>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:380px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">(marks &gt;= 60)</p>
+<div style="display:flex;gap:12px">
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#4A5568">False</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#2F6FB0">True</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#2F6FB0">True</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#2F6FB0">True</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#4A5568">False</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#2F6FB0">True</p></div>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:380px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">(marks &lt; 85)</p>
+<div style="display:flex;gap:12px">
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#2F6FB0">True</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#2F6FB0">True</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#2F6FB0">True</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#4A5568">False</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#2F6FB0">True</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#2F6FB0">True</p></div>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:380px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;font-weight:600;color:#13233A">mask = both, &amp;</p>
+<div style="display:flex;gap:12px">
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#4A5568">False</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#F6F4EE">True</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#F6F4EE">True</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#4A5568">False</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#4A5568">False</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#F6F4EE">True</p></div>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:380px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;font-weight:600;color:#13233A">marks[mask]</p>
+<div style="display:flex;gap:12px">
+<div style="width:140px;height:72px;background:#F6F4EE;border:2px dashed #D6D1C4;border-radius:12px"></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">62</p></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">78</p></div>
+<div style="width:140px;height:72px;background:#F6F4EE;border:2px dashed #D6D1C4;border-radius:12px"></div>
+<div style="width:140px;height:72px;background:#F6F4EE;border:2px dashed #D6D1C4;border-radius:12px"></div>
+<div style="width:140px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">84</p></div>
+</div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">Selected: [62 78 84] · Positions: [1 2 5]</p>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 02 Indexing and filtering</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>Read this slide top to bottom, one column at a time. Each comparison produces its own row of True and False, one per mark. The &amp; operator combines them position by position: the result is True only where both rows are True, which happens at positions 1, 2 and 5. 90 fails the second condition and 45 and 55 fail the first. Indexing marks with the mask keeps exactly the orange values, 62, 78 and 84, and drops the rest; the result is a new, shorter 1D array. Try it: redraw the bottom rows for (marks &lt; 50) | (marks &gt;= 85). With or, a position needs only one True: positions 0 and 3, giving [45 90].</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> Read this slide top to bottom, one column at a time. Each comparison produces its own row of True and False, one per mark. The &amp; operator combines them position by position: the result is True only where both rows are True, which happens at positions 1, 2 and 5. 90 fails the second condition and 45 and 55 fail the first. Indexing marks with the mask keeps exactly the orange values, 62, 78 and 84, and drops the rest; the result is a new, shorter 1D array. Try it: redraw the bottom rows for (marks &lt; 50) | (marks &gt;= 85). With or, a position needs only one True: positions 0 and 3, giving [45 90].</p></div>
+<div class="slide" id="paired-rect"><div class="frame"><section id="paired-rect" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Choose rows and columns</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Paired points versus a rectangle</h2>
+<div style="display:flex;gap:96px;flex:1;align-items:center">
+<div style="width:640px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">table[[0, 2], [1, 3]]</p>
+<div style="display:grid;grid-template-columns:48px repeat(4, 110px);gap:10px">
+<p style="font-size:24px;color:#6B7280"></p>
+<p style="text-align:center;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">0</p>
+<p style="text-align:center;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">1</p>
+<p style="text-align:center;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">2</p>
+<p style="text-align:center;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">3</p>
+<div style="height:72px;display:flex;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">0</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">0</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">2</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">3</p></div>
+<div style="height:72px;display:flex;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">1</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">4</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">6</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">7</p></div>
+<div style="height:72px;display:flex;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">2</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">8</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">9</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">10</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">11</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.4;color:#B5541A">Paired: [&#160;1 11]</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Pairs (0, 1) and (2, 3): one value per pair, a 1D result.</p>
+</div>
+<div style="width:640px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">table[np.ix_([0, 2], [1, 3])]</p>
+<div style="display:grid;grid-template-columns:48px repeat(4, 110px);gap:10px">
+<p style="font-size:24px;color:#6B7280"></p>
+<p style="text-align:center;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">0</p>
+<p style="text-align:center;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">1</p>
+<p style="text-align:center;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">2</p>
+<p style="text-align:center;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">3</p>
+<div style="height:72px;display:flex;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">0</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">0</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">2</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">3</p></div>
+<div style="height:72px;display:flex;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">1</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">4</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">6</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">7</p></div>
+<div style="height:72px;display:flex;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">2</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">8</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">9</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">10</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">11</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.4;color:#B5541A">Rectangle:<br>&#160;[[&#160;1&#160; 3]<br>&#160;[&#160;9 11]]</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Rows 0 and 2 × columns 1 and 3: every combination, a 2 × 2 block.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 02 Indexing and filtering</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>table is np.arange(12).reshape(3, 4), so each cell's value is also its position in reading order; the grey numbers are row and column indices. When you pass two integer lists, NumPy zips them into coordinate pairs: row 0 with column 1, and row 2 with column 3. You get two values, 1 and 11, not a block. To ask for every combination of some rows and some columns, wrap the lists in np.ix_, which builds a grid of indices: rows 0 and 2 crossed with columns 1 and 3 give the 2 by 2 block [[1 3] [9 11]], printed over two lines in the notebook. Ask: how many values would table[[0, 1, 2], [0, 1, 2]] return? Three, the diagonal 0, 5, 10.</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> table is np.arange(12).reshape(3, 4), so each cell's value is also its position in reading order; the grey numbers are row and column indices. When you pass two integer lists, NumPy zips them into coordinate pairs: row 0 with column 1, and row 2 with column 3. You get two values, 1 and 11, not a block. To ask for every combination of some rows and some columns, wrap the lists in np.ix_, which builds a grid of indices: rows 0 and 2 crossed with columns 1 and 3 give the 2 by 2 block [[1 3] [9 11]], printed over two lines in the notebook. Ask: how many values would table[[0, 1, 2], [0, 1, 2]] return? Three, the diagonal 0, 5, 10.</p></div>
+<div class="slide" id="assign"><div class="frame"><section id="assign" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Choose rows and columns</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Change values through a selection</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">table = np.arange(12).reshape(3, 4)<br>adjusted = table.copy()<br>adjusted[adjusted &lt; 4] = -1<br>print("Adjusted:\n", adjusted)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Adjusted:<br>&#160;[[-1 -1 -1 -1]<br>&#160;[&#160;4&#160; 5&#160; 6&#160; 7]<br>&#160;[&#160;8&#160; 9 10 11]]</p></div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Mask on the left of =</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Every True position receives -1. The rest stay as they were.</p></div>
+<div style="display:grid;grid-template-columns:repeat(4, 110px);gap:10px">
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">-1</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">-1</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">-1</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">-1</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">4</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">6</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">7</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">8</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">9</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">10</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#4A5568">11</p></div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">copy() first, so table itself keeps 0 to 3.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 02 Indexing and filtering</p><p style="font-size:24px;color:#6B7280">9</p></div>
+<aside>Selections also work on the left side of an assignment. adjusted &lt; 4 is True for the values 0, 1, 2 and 3, which all sit in row 0, so those four cells, shown in orange, become -1 while every other value stays put. Assign through one indexing expression, as here, to change the original array; the notebook works on adjusted, a copy, so that table itself is left unchanged for later cells. Notebook 11 studies copies and views in detail. Try it: select the middle row in reverse order with table[1, ::-1]. Expect [7 6 5 4]: row 1 is [4 5 6 7], and a step of -1 walks it backwards.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> Selections also work on the left side of an assignment. adjusted &lt; 4 is True for the values 0, 1, 2 and 3, which all sit in row 0, so those four cells, shown in orange, become -1 while every other value stays put. Assign through one indexing expression, as here, to change the original array; the notebook works on adjusted, a copy, so that table itself is left unchanged for later cells. Notebook 11 studies copies and views in detail. Try it: select the middle row in reverse order with table[1, ::-1]. Expect [7 6 5 4]: row 1 is [4 5 6 7], and a step of -1 walks it backwards.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Slices keep shape.<br>Masks pick values.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">Select by position with integers and slices, by condition with Boolean masks joined by &amp;, | and ~.</p>
+<aside>Pause here. Every selection in NumPy is one of these two kinds. Position-based selection, with integers and slices, follows the shape: slices keep the axes, integers remove them. Condition-based selection, with a Boolean mask, asks a question of every element and keeps the ones that answer True, returning a flat 1D result. Knowing which kind you are writing tells you the shape of the answer before you run it.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> Pause here. Every selection in NumPy is one of these two kinds. Position-based selection, with integers and slices, follows the shape: slices keep the axes, integers remove them. Condition-based selection, with a Boolean mask, asks a question of every element and keeps the ones that answer True, returning a flat 1D result. Knowing which kind you are writing tells you the shape of the answer before you run it.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One slice, one filter</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">All rows, last two columns of grid</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">grid = np.arange(20).reshape(4, 5). Expected: [[3, 4], [8, 9], [13, 14], [18, 19]].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">last_columns = grid[:, -2:]</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Prices from 100 to 300, both included</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">prices = [80, 100, 150, 300, 450]. Expected: [100, 150, 300].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">affordable = prices[<br>&#160;&#160;&#160;&#160;(prices &gt;= 100) &amp; (prices &lt;= 300)]</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 02 Indexing and filtering</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>Let the audience attempt both before revealing the code, which matches the reference solutions. In Exercise 1 the first colon keeps every row, and the slice -2: selects the final two columns while preserving both axes, so the result is 4 by 2. Writing grid[:, 3:] works too. In Exercise 2 each comparison builds a mask, and &amp; keeps their intersection; using &gt;= and &lt;= keeps both endpoints, 100 and 300, and rejects 80 and 450. Forgetting the parentheses, or writing and instead of &amp;, raises an error.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> Let the audience attempt both before revealing the code, which matches the reference solutions. In Exercise 1 the first colon keeps every row, and the slice -2: selects the final two columns while preserving both axes, so the result is 4 by 2. Writing grid[:, 3:] works too. In Exercise 2 each comparison builds a mask, and &amp; keeps their intersection; using &gt;= and &lt;= keeps both endpoints, 100 and 300, and rejects 80 and 450. Forgetting the parentheses, or writing and instead of &amp;, raises an error.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Filter rows, then clean a copy</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Create a 5 × 3 score table</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Select the students whose first subject is at least 70. Then, on a copy, set every score below 40 to 40. Predict both results before you run them.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain slices versus masks without the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a mask that matches nothing and explain it</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 02 Indexing and filtering</p><p style="font-size:24px;color:#6B7280">12</p></div>
+<aside>The challenge has no supplied check: write your own. Selecting students is a row filter: build the mask from the first column, table[:, 0] &gt;= 70, and use it in the row position, table[mask], which keeps whole rows and all three subjects. For the second part, copy first, then assign through a mask: cleaned = table.copy(); cleaned[cleaned &lt; 40] = 40. Assert that the original table still contains its low scores, and that cleaned.min() is at least 40. A mask that matches nothing returns an empty array with shape (0, 3), not an error.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> The challenge has no supplied check: write your own. Selecting students is a row filter: build the mask from the first column, table[:, 0] &gt;= 70, and use it in the row position, table[mask], which keeps whole rows and all three subjects. For the second part, copy first, then assign through a mask: cleaned = table.copy(); cleaned[cleaned &lt; 40] = 40. Assert that the original table still contains its low scores, and that cleaned.min() is at least 40. A mask that matches nothing returns an empty array with shape (0, 3), not an error.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Slices</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">start:stop:step; stop excluded, axes kept.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Integers</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">An integer index removes its axis.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Masks</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Combine with &amp;, | and ~, in parentheses.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Index lists</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Lists pair up; np.ix_ makes a rectangle.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 03</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Shapes and axes</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Reshape, transpose, join and split arrays, and reduce along an axis.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 03, where we change shapes on purpose and use axes to compute totals per row and per column. Further reading: the official NumPy indexing guide at numpy.org/doc/stable/user/basics.indexing.html.</aside>
+</section>
+</div><p class="notes"><b>Notes · 13</b> Recap the four takeaways, then point to notebook 03, where we change shapes on purpose and use axes to compute totals per row and per column. Further reading: the official NumPy indexing guide at numpy.org/doc/stable/user/basics.indexing.html.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

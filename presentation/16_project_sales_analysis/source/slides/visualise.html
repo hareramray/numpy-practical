@@ -1,0 +1,17 @@
+<section id="visualise" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Visualise</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">A trend line and store bars</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:600px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A 7-day window</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">30 days give 24 full windows, so the smooth line starts on day 7.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Two views</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Lines show change over time; bars compare totals.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Label units</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Each y-axis says Revenue (currency units).</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">weekly_trend = sliding_window_view(<br>&#160;&#160;&#160;&#160;daily_revenue, 7).mean(axis=-1)<br>fig, axes = plt.subplots(1, 2, figsize=(11, 3.5))<br>axes[0].plot(np.arange(1, 31), daily_revenue,<br>&#160;&#160;&#160;&#160;alpha=0.5, label="Daily")<br>axes[0].plot(np.arange(7, 31), weekly_trend,<br>&#160;&#160;&#160;&#160;linewidth=2, label="7-day mean")<br>axes[1].bar(stores, store_revenue)<br>print("Best day:", daily_revenue.argmax() + 1)<br>print("Estimated total revenue:",<br>&#160;&#160;&#160;&#160;round(revenue.sum(), 2))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Best day: 9<br>Estimated total revenue: 91119.66</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">10</p></div>
+<aside>sliding_window_view from notebook 14 returns a (24, 7) view of the 30 daily totals with no copying; averaging the last axis gives the rolling mean. The x values for the smooth line start at 7 because the first full window ends on day 7: the initial incomplete windows are omitted, not padded. The code is trimmed here; the notebook also sets axis labels, titles and a legend, then calls plt.tight_layout and plt.show. Note the word Estimated in the total: it includes the imputed counts. Try it: write three findings that each quote a number, plus one limitation caused by the missing data, for example that 584.66 of the total rests on two imputed counts.</aside>
+</section>

@@ -1,0 +1,17 @@
+<section id="centering" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Center columns and rows</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Subtract the mean, keep the axis</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">data = np.array([[1., 10.], [3., 20.], [5., 30.]])<br>centered_columns = data - data.mean(axis=0, keepdims=True)<br>centered_rows = data - data.mean(axis=1, keepdims=True)<br>print(centered_columns)<br>print(centered_rows)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[[&#160;-2. -10.]<br>&#160;[&#160;&#160;0.&#160;&#160;&#160;0.]<br>&#160;[&#160;&#160;2.&#160;&#160;10.]]<br>[[&#160;-4.5&#160;&#160;&#160;4.5]<br>&#160;[&#160;-8.5&#160;&#160;&#160;8.5]<br>&#160;[-12.5&#160;&#160;12.5]]</p></div>
+</div>
+<div style="width:520px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">axis=0: per column</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Means have shape (1, 2) and stretch down the rows.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">axis=1: per row</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Means have shape (3, 1) and stretch across the columns.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">keepdims=True</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Keeps the reduced axis as length 1, so alignment is explicit.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 05 Broadcasting</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>Centering means subtracting a mean so the result averages to zero. Column means, axis=0, are 3 and 20; subtracting them centres each feature, giving the first printed table. Row means, axis=1, are 5.5, 11.5 and 17.5; subtracting them gives the second table, where every row is now symmetric around zero. keepdims=True leaves the reduced axis in place with length 1, so the means come back as (1, 2) or (3, 1) and line up with the (3, 2) data. The notebook then asserts that the new column and row means are zero within 1e-12. Try it: remove keepdims from the row calculation. The row means become shape (3,), which aligns against the last axis of length 2, and the subtraction fails. That is the next slide.</aside>
+</section>

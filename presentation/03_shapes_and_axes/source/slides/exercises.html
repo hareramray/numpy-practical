@@ -1,0 +1,22 @@
+<section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One reshape, one reduction</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">24 readings as 2 days × 3 sensors × 4 measurements</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">readings = np.arange(24). Expected: shape (2, 3, 4), and cube.ravel() gives readings back in order.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">cube = readings.reshape(2, 3, 4)</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">One total per row, keeping shape (3, 1)</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">counts = [[1, 2], [3, 4], [5, 6]]. Expected: [[3], [7], [11]].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">row_totals = counts.sum(axis=1,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;keepdims=True)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>Let the audience attempt both before revealing the code, which matches the reference solutions. In Exercise 1 the dimensions multiply to 2 times 3 times 4, 24, matching the number of readings, so reshape only changes how they are interpreted; the reference prints two blocks, the first running 0 to 11 and the second 12 to 23. In Exercise 2, reducing axis 1 adds the columns within each row, 1+2, 3+4 and 5+6, and keepdims=True retains the reduced axis with length 1, so the shape is (3, 1) instead of (3,). Without keepdims the check on shape fails even though the numbers are right.</aside>
+</section>

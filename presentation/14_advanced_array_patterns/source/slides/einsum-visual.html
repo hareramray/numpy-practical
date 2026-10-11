@@ -1,0 +1,73 @@
+<section id="einsum-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Subscripts to shapes</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Reading "ij,jk-&gt;ik"</h2>
+<div style="display:flex;gap:56px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:64px;font-weight:600;line-height:1.1;color:#13233A;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:16px 40px"><span style="color:#2F6FB0">i</span><span style="color:#B5541A">j</span>,<span style="color:#B5541A">j</span>k-&gt;<span style="color:#2F6FB0">i</span>k</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-size:28px;line-height:1.4;color:#4A5568"><span style="color:#2F6FB0">i</span> and k appear in the output, so they survive as axes.</p>
+<p style="font-size:28px;line-height:1.4;color:#4A5568"><span style="color:#B5541A">j</span> is shared by both inputs and dropped, so it is summed.</p>
+</div>
+</div>
+<div style="display:flex;gap:40px;align-items:end">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;color:#6B7280">A · shape (2, 3) · ij</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;gap:8px">
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+</div>
+<div style="display:flex;gap:8px">
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+</div>
+</div>
+</div>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#6B7280">@</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;color:#6B7280">B · shape (3, 4) · jk</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;gap:8px">
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+</div>
+<div style="display:flex;gap:8px">
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">4</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">7</p></div>
+</div>
+<div style="display:flex;gap:8px">
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">8</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">9</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">11</p></div>
+</div>
+</div>
+</div>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#6B7280">=</p>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;color:#6B7280">product · shape (2, 4) · ik</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;gap:8px">
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">23</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">26</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">29</p></div>
+</div>
+<div style="display:flex;gap:8px">
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">56</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">68</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">80</p></div>
+<div style="width:88px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">92</p></div>
+</div>
+</div>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Row i = 0 of A meets column k = 0 of B, summed over j: 0·0 + 1·4 + 2·8 = <span style="color:#B5541A">20</span>.</p>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>Map each letter to an axis length. In A, i has length 2 and j has length 3; in B, j has length 3 and k has length 4. The shared letter j must have the same length in both, just like the inner dimensions of a matrix product. The output keeps i and k, so its shape is (2, 4). Each output element multiplies along j and adds: for product[0, 0], the blue row of A, 0, 1, 2, meets the blue column of B, 0, 4, 8, giving 0 + 4 + 16 = 20, the first value the notebook printed. Changing the output letters changes the operation: ij,jk-&gt;ki would give the transposed product, and ij,jk-&gt; with nothing after the arrow would sum everything to one number.</aside>
+</section>

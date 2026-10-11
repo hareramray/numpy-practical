@@ -1,0 +1,27 @@
+<section id="cumsum-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Picture it</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Each bar adds one day on top</h2>
+<div style="display:flex;gap:56px;flex:1;align-items:center">
+<div style="position:relative;width:1000px;height:560px">
+<svg aria-label="Stacked bars of the running total of daily sales: 100, 250, 370 and 550. Each bar is the previous total in blue with that day's sales stacked on top in orange." width="1000" height="520" viewBox="0 0 1000 520" style="position:absolute;left:0px;top:0px;width:1000px;height:520px"><rect x="60" y="430" width="160" height="80" fill="#E8813A" stroke="#F6F4EE" stroke-width="2"/><rect x="300" y="430" width="160" height="80" fill="#2F6FB0" stroke="#F6F4EE" stroke-width="2"/><rect x="300" y="310" width="160" height="120" fill="#E8813A" stroke="#F6F4EE" stroke-width="2"/><rect x="540" y="310" width="160" height="200" fill="#2F6FB0" stroke="#F6F4EE" stroke-width="2"/><rect x="540" y="214" width="160" height="96" fill="#E8813A" stroke="#F6F4EE" stroke-width="2"/><rect x="780" y="214" width="160" height="296" fill="#2F6FB0" stroke="#F6F4EE" stroke-width="2"/><rect x="780" y="70" width="160" height="144" fill="#E8813A" stroke="#F6F4EE" stroke-width="2"/><line x1="20" y1="510" x2="980" y2="510" stroke="#13233A" stroke-width="3"/></svg>
+<p style="position:absolute;left:60px;top:374px;width:160px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;text-align:center;color:#13233A">100</p>
+<p style="position:absolute;left:300px;top:254px;width:160px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;text-align:center;color:#13233A">250</p>
+<p style="position:absolute;left:540px;top:158px;width:160px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;text-align:center;color:#13233A">370</p>
+<p style="position:absolute;left:780px;top:14px;width:160px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;text-align:center;color:#13233A">550</p>
+<p style="position:absolute;left:40px;top:524px;width:200px;font-size:24px;text-align:center;color:#4A5568">day 1: +100</p>
+<p style="position:absolute;left:280px;top:524px;width:200px;font-size:24px;text-align:center;color:#4A5568">day 2: +150</p>
+<p style="position:absolute;left:520px;top:524px;width:200px;font-size:24px;text-align:center;color:#4A5568">day 3: +120</p>
+<p style="position:absolute;left:760px;top:524px;width:200px;font-size:24px;text-align:center;color:#4A5568">day 4: +180</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">np.diff: the steps</h3>
+<div style="display:flex;gap:16px;align-items:center"><p style="width:220px;font-size:28px;color:#4A5568">day 1 → 2</p><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">50.</p></div></div>
+<div style="display:flex;gap:16px;align-items:center"><p style="width:220px;font-size:28px;color:#4A5568">day 2 → 3</p><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:3px solid #E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">-30.</p></div></div>
+<div style="display:flex;gap:16px;align-items:center"><p style="width:220px;font-size:28px;color:#4A5568">day 3 → 4</p><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">60.</p></div></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">4 days give 3 changes; the dip is the outlined −30.</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Bars: blue = total so far, orange = that day's sales</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 06 Statistics and aggregation</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>Each bar is one entry of np.cumsum(daily_sales). The blue part is the running total carried over from the previous day, and the orange part is the new day's sales stacked on top, so the bar heights climb 100, 250, 370, 550. A cumulative sum never goes down while the inputs are positive; that is why it suits running revenue. np.diff answers the opposite question, how much each day differs from the one before: 150 minus 100 is 50, 120 minus 150 is −30, 180 minus 120 is 60. Notice diff of the cumulative sum gives back the daily sales from day two onwards: the two operations undo each other.</aside>
+</section>

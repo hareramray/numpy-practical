@@ -1,0 +1,17 @@
+<section id="sorting" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Sort values and positions</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Sort positions, keep rows aligned</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">names = np.array(["Asha", "Ben", "Chen", "Divya"])<br>scores = np.array([82, 95, 82, 70])<br>order = np.argsort(-scores, kind="stable")<br>print(names[order])<br>print(scores[order])<br>np.testing.assert_array_equal(names[order],<br>&#160;&#160;&#160;&#160;["Ben", "Asha", "Chen", "Divya"])</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">['Ben' 'Asha' 'Chen' 'Divya']<br>[95 82 82 70]</p></div>
+</div>
+<div style="width:520px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">sort vs argsort</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">sort returns values; argsort returns the indices that order them.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">One order, many arrays</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Index names and scores with the same order.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Negate for descending</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A stable sort of −scores keeps ties in input order.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 09 Sort, search and group</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>np.sort returns the values in order, but then you lose track of whose score is whose. np.argsort instead returns the positions that would put the array in order, and you can apply those positions to any related array of the same length: here names and scores, so names stay aligned with scores. To sort from highest to lowest we sort the negated scores. A stable sort keeps tied elements in their original input order, so Asha, who comes first in the input, stays ahead of Chen at 82. Reversing an ascending result would also reverse the ties, which is why the notebook negates instead. Try it: sort scores ascending with np.argsort(scores, kind="stable"). The order becomes Divya, Asha, Chen, Ben, and the tied student who appears first is Asha, again in input order.</aside>
+</section>

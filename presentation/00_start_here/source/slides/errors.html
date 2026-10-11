@@ -1,0 +1,17 @@
+<section id="errors" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Read an error</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Read an error from its last line</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">values = np.array([10, 20, 30])<br>try:<br>&#160;&#160;&#160;&#160;print(values[99])<br>except IndexError as error:<br>&#160;&#160;&#160;&#160;print("Intentional error:", error)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Intentional error: index 99 is out<br>of bounds for axis 0 with size 3</p></div>
+</div>
+<div style="width:640px;display:flex;flex-direction:column;gap:20px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">IndexError</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">What kind of problem happened.</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">index 99</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">What you asked for.</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">size 3</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">What exists: valid indices are 0, 1 and 2.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 00 Start here</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>Errors are learning tools. A traceback can be long, but the last line names the error type and the reason. The notebook catches this intentional error with try and except so that Run All still works. Try it: replace 99 with 2. The largest valid positive index is the size minus one, here 2, which prints 30.</aside>
+</section>

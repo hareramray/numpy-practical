@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 03 — Shapes and axes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 03 — Shapes and axes</h1><span>13 slides · <a href="https://claude.ai/artifact/LqBmxowcsoqkqnvodpx8y4">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative grid of array cells with the first row and first column marking the two axes" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="0" width="132" height="132" rx="16" fill="#E8813A"/><rect x="160" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="320" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="480" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="0" y="160" width="132" height="132" rx="16" fill="#E8813A"/><rect x="160" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="320" width="132" height="132" rx="16" fill="#E8813A"/><rect x="160" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="480" width="132" height="132" rx="16" fill="#E8813A"/><rect x="160" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="480" width="132" height="132" rx="16" fill="#22344F"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 03</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE">Shapes and<br>axes</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2">Reshape, combine, and understand axes</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Beginner</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">30–50 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: Notebooks 00–02</p>
+</div>
+<aside>Welcome to notebook 03. Notebook 01 taught us to read a shape and notebook 02 to select along it. Now we change shapes on purpose: reshape without changing the number of values, transpose to swap axes, reduce along a chosen axis, and join or split arrays. The motif shows the two axes of a table: the orange column runs along axis 0, down the rows, and the blue row runs along axis 1, across the columns.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> Welcome to notebook 03. Notebook 01 taught us to read a shape and notebook 02 to select along it. Now we change shapes on purpose: reshape without changing the number of values, transpose to swap axes, reduce along a chosen axis, and join or split arrays. The motif shows the two axes of a table: the orange column runs along axis 0, down the rows, and the blue row runs along axis 1, across the columns.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Change the shape, keep the data</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Reshape</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Rearrange values without changing how many there are.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Transpose</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Swap rows and columns with .T.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Reduce an axis</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Totals per column with axis=0, per row with axis=1.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">4</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Join and split</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">concatenate, stack and array_split.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>The notebook's goal: reshape without changing the element count, transpose, and join and split arrays. Along the way it introduces the single most important idea for the rest of the course, the axis argument. Step 1 covers reshape, step 2 covers transpose and reductions, and step 3 covers concatenate, stack and split. Most slides here have a picture: shapes are easier to see than to read.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> The notebook's goal: reshape without changing the element count, transpose, and join and split arrays. Along the way it introduces the single most important idea for the rest of the course, the axis argument. Step 1 covers reshape, step 2 covers transpose and reductions, and step 3 covers concatenate, stack and split. Most slides here have a picture: shapes are easier to see than to read.</p></div>
+<div class="slide" id="reshape"><div class="frame"><section id="reshape" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Reshape preserves the count</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">A shape is a contract</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">values = np.arange(12)<br>table = values.reshape(3, 4)<br>print(table)<br>print("Column shape:", values[:, None].shape)<br>print("Row shape:", values[None, :].shape)<br>assert table.size == values.size</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[[&#160;0&#160; 1&#160; 2&#160; 3]<br>&#160;[&#160;4&#160; 5&#160; 6&#160; 7]<br>&#160;[&#160;8&#160; 9 10 11]]<br>Column shape: (12, 1)<br>Row shape: (1, 12)</p></div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Same values</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">3 × 4 = 12, so reshape(3, 4) is allowed.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">-1 means infer</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">One length may be -1; NumPy computes it.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">None adds an axis</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A 1D vector becomes a column (12, 1) or a row (1, 12).</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>A shape is a contract about how values are arranged; reshape changes the arrangement but never adds or removes values. The product of the new lengths must equal the size: 12 values fit 3 by 4, 2 by 6 or 12 by 1, but not 5 by anything. One length may be -1 and NumPy works it out from the others. A 1D vector has a single axis, with no separate row and column; indexing with None inserts a new axis of length 1, which turns it into an explicit column (12, 1) or row (1, 12). The assert confirms the size is unchanged. Try it: run values.reshape(5, -1) inside try/except. It raises ValueError, because 12 is not divisible by 5, so no whole number of columns works.</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> A shape is a contract about how values are arranged; reshape changes the arrangement but never adds or removes values. The product of the new lengths must equal the size: 12 values fit 3 by 4, 2 by 6 or 12 by 1, but not 5 by anything. One length may be -1 and NumPy works it out from the others. A 1D vector has a single axis, with no separate row and column; indexing with None inserts a new axis of length 1, which turns it into an explicit column (12, 1) or row (1, 12). The assert confirms the size is unchanged. Try it: run values.reshape(5, -1) inside try/except. It raises ValueError, because 12 is not divisible by 5, so no whole number of columns works.</p></div>
+<div class="slide" id="reshape-grid"><div class="frame"><section id="reshape-grid" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Reshape preserves the count</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Same 12 values, new layouts</h2>
+<div style="display:flex;flex-direction:column;gap:48px;flex:1;justify-content:center">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">np.arange(12) <span style="color:#6B7280">→ shape (12,), one axis</span></p>
+<div style="display:flex;gap:8px">
+<div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">0</p></div>
+<div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">1</p></div>
+<div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">2</p></div>
+<div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">3</p></div>
+<div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">4</p></div>
+<div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">5</p></div>
+<div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">6</p></div>
+<div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">7</p></div>
+<div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">8</p></div>
+<div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">9</p></div>
+<div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">10</p></div>
+<div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">11</p></div>
+</div>
+</div>
+<div style="display:flex;gap:120px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">.reshape(3, 4) <span style="color:#6B7280">→ (3, 4)</span></p>
+<div style="display:grid;grid-template-columns:repeat(4, 96px);gap:8px">
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">0</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">1</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">2</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">3</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">4</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">6</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">7</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">8</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">9</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">10</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">11</p></div>
+</div>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Each row takes the next 4 values.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">.reshape(2, -1) <span style="color:#6B7280">→ (2, 6)</span></p>
+<div style="display:grid;grid-template-columns:repeat(6, 96px);gap:8px">
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">0</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">1</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">2</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">3</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">4</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">6</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">7</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">8</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">9</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">10</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">11</p></div>
+</div>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">-1 is inferred: 12 ÷ 2 = 6 columns. Reading order never changes.</p>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>The colours follow the values, not the positions: 0 to 3 are blue, 4 to 7 orange, 8 to 11 navy. In the 3 by 4 layout each colour fills exactly one row. In the 2 by 6 layout, the notebook's Infer columns output, the same values are poured row by row into longer rows, so the orange group is split across the row boundary. That is the key mental model: reshape keeps the reading order, left to right and top to bottom, and only changes where the line breaks fall. Ask: what would reshape(4, 3) look like? Rows [0 1 2], [3 4 5], [6 7 8], [9 10 11].</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> The colours follow the values, not the positions: 0 to 3 are blue, 4 to 7 orange, 8 to 11 navy. In the 3 by 4 layout each colour fills exactly one row. In the 2 by 6 layout, the notebook's Infer columns output, the same values are poured row by row into longer rows, so the orange group is split across the row boundary. That is the key mental model: reshape keeps the reading order, left to right and top to bottom, and only changes where the line breaks fall. Ask: what would reshape(4, 3) look like? Rows [0 1 2], [3 4 5], [6 7 8], [9 10 11].</p></div>
+<div class="slide" id="transpose"><div class="frame"><section id="transpose" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Transpose and reductions</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">.T swaps rows and columns</h2>
+<div style="display:flex;gap:56px;flex:1;align-items:center">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">points <span style="color:#6B7280">(2, 3)</span></p>
+<div style="display:grid;grid-template-columns:repeat(3, 110px);gap:12px">
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">3</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+</div>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Row 0 blue, row 1 orange</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#B5541A">.T →</p>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">points.T <span style="color:#6B7280">(3, 2)</span></p>
+<div style="display:grid;grid-template-columns:repeat(2, 110px);gap:12px">
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">3</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+</div>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Old rows are now columns</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">points = np.array([[1, 2, 3],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;[4, 5, 6]])<br>print("Transposed:\n", points.T)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Transposed:<br>&#160;[[1 4]<br>&#160;[2 5]<br>&#160;[3 6]]</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>Transpose rearranges axes. For a 2D table, .T exchanges them: the element at row i, column j moves to row j, column i, so a (2, 3) array becomes (3, 2). Follow the colours: the blue first row 1, 2, 3 becomes the first column, and the orange second row becomes the second column. Unlike reshape, transpose changes the reading order: reading points.T row by row gives 1, 4, 2, 5, 3, 6. That is why reshape(3, 2) and .T give different results even though both have shape (3, 2). Ask the audience to predict points.reshape(3, 2): [[1 2] [3 4] [5 6]].</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> Transpose rearranges axes. For a 2D table, .T exchanges them: the element at row i, column j moves to row j, column i, so a (2, 3) array becomes (3, 2). Follow the colours: the blue first row 1, 2, 3 becomes the first column, and the orange second row becomes the second column. Unlike reshape, transpose changes the reading order: reading points.T row by row gives 1, 4, 2, 5, 3, 6. That is why reshape(3, 2) and .T give different results even though both have shape (3, 2). Ask the audience to predict points.reshape(3, 2): [[1 2] [3 4] [5 6]].</p></div>
+<div class="slide" id="reduce"><div class="frame"><section id="reduce" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Transpose and reductions</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">A reduction collapses one axis</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">points = np.array([[1, 2, 3], [4, 5, 6]])<br>print("Per-column totals:", points.sum(axis=0))<br>print("Per-row totals:", points.sum(axis=1))<br>print("Keep the reduced axis:",<br>&#160;&#160;&#160;&#160;&#160;&#160;points.sum(axis=1, keepdims=True).shape)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Per-column totals: [5 7 9]<br>Per-row totals: [&#160;6 15]<br>Keep the reduced axis: (2, 1)</p></div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">axis=0</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Adds down the rows: one total per column, shape (3,).</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">axis=1</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Adds across the columns: one total per row, shape (2,).</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">keepdims=True</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Keeps the collapsed axis with length 1: (2, 1).</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>A reduction such as sum, mean or max combines many values into fewer. The axis argument names the axis that gets collapsed, not the one that survives. For shape (students, subjects), summing axis 0 combines all students, leaving one result per subject; summing axis 1 combines all subjects, leaving one result per student. Here (2, 3) summed over axis 0 becomes (3,), and over axis 1 becomes (2,). keepdims=True leaves the collapsed axis in place with length 1, giving (2, 1), which is handy when you later divide each row by its own total. The notebook checks points.sum(axis=0) against [5, 7, 9] with np.testing.assert_array_equal.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> A reduction such as sum, mean or max combines many values into fewer. The axis argument names the axis that gets collapsed, not the one that survives. For shape (students, subjects), summing axis 0 combines all students, leaving one result per subject; summing axis 1 combines all subjects, leaving one result per student. Here (2, 3) summed over axis 0 becomes (3,), and over axis 1 becomes (2,). keepdims=True leaves the collapsed axis in place with length 1, giving (2, 1), which is handy when you later divide each row by its own total. The notebook checks points.sum(axis=0) against [5, 7, 9] with np.testing.assert_array_equal.</p></div>
+<div class="slide" id="axis-sums"><div class="frame"><section id="axis-sums" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Transpose and reductions</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">The axis you name is the one that goes</h2>
+<div style="display:flex;gap:120px;flex:1;align-items:center">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">points.sum(axis=0)</p>
+<div style="display:grid;grid-template-columns:repeat(3, 110px);gap:12px">
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+<p style="text-align:center;font-size:40px;line-height:1;color:#B5541A">↓</p>
+<p style="text-align:center;font-size:40px;line-height:1;color:#B5541A">↓</p>
+<p style="text-align:center;font-size:40px;line-height:1;color:#B5541A">↓</p>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">7</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">9</p></div>
+</div>
+<p style="width:354px;font-size:24px;line-height:1.4;color:#4A5568">Rows are combined: one total per column, shape (2, 3) → (3,).</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">points.sum(axis=1)</p>
+<div style="display:grid;grid-template-columns:repeat(3, 110px) 72px 110px;gap:12px">
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center"><p style="font-size:40px;color:#2F6FB0">→</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">6</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center"><p style="font-size:40px;color:#2F6FB0">→</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">15</p></div>
+</div>
+<p style="width:560px;font-size:24px;line-height:1.4;color:#4A5568">Columns are combined: one total per row, shape (2, 3) → (2,). With keepdims=True the result stays a column, (2, 1).</p>
+</div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">Per-column totals: [5 7 9] · Per-row totals: [&#160;6 15]</p>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>This is the picture to keep in your head for every reduction in the course. On the left, axis=0 runs down the rows, so each column's two values are added: 1+4, 2+5, 3+6 give the orange [5 7 9]. On the right, axis=1 runs across the columns, so each row's three values are added: 1+2+3 and 4+5+6 give the blue [6 15]. In both cases the axis you name disappears from the shape: (2, 3) loses axis 0 to become (3,), or loses axis 1 to become (2,). Try it, as the notebook suggests: draw a 2 by 3 grid on paper and label which entries contribute to each of the five totals.</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> This is the picture to keep in your head for every reduction in the course. On the left, axis=0 runs down the rows, so each column's two values are added: 1+4, 2+5, 3+6 give the orange [5 7 9]. On the right, axis=1 runs across the columns, so each row's three values are added: 1+2+3 and 4+5+6 give the blue [6 15]. In both cases the axis you name disappears from the shape: (2, 3) loses axis 0 to become (3,), or loses axis 1 to become (2,). Try it, as the notebook suggests: draw a 2 by 3 grid on paper and label which entries contribute to each of the five totals.</p></div>
+<div class="slide" id="stack"><div class="frame"><section id="stack" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Concatenate versus stack</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two ways to join arrays</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">a, b = np.array([1, 2, 3]), np.array([4, 5, 6])<br>print("Concatenate:", np.concatenate([a, b]))<br>print("Stack rows:\n", np.stack([a, b], axis=0))<br>print("Stack columns:\n", np.stack([a, b], axis=1))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Concatenate: [1 2 3 4 5 6]<br>Stack rows:<br>&#160;[[1 2 3]<br>&#160;[4 5 6]]<br>Stack columns:<br>&#160;[[1 4]<br>&#160;[2 5]<br>&#160;[3 6]]</p></div>
+</div>
+<div style="width:520px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">concatenate</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Joins along an existing axis. Other axis lengths must match.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">stack</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Adds a new axis. Inputs must have equal shapes.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">array_split</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Splits into uneven pieces; split needs equal ones.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>The notebook defines a and b on two lines; they are combined here to save space. concatenate joins arrays along an axis they already have: two length-3 vectors placed end to end give one length-6 vector, so no dimension is added. stack creates a brand-new axis and places the inputs along it: axis=0 makes each input a row, giving shape (2, 3), and axis=1 makes each input a column, giving shape (3, 2). Because stack lines the inputs up element by element, they must have exactly the same shape. Try it: stack three length-4 arrays. Predict first: axis=0 gives shape (3, 4) and axis=1 gives shape (4, 3).</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> The notebook defines a and b on two lines; they are combined here to save space. concatenate joins arrays along an axis they already have: two length-3 vectors placed end to end give one length-6 vector, so no dimension is added. stack creates a brand-new axis and places the inputs along it: axis=0 makes each input a row, giving shape (2, 3), and axis=1 makes each input a column, giving shape (3, 2). Because stack lines the inputs up element by element, they must have exactly the same shape. Try it: stack three length-4 arrays. Predict first: axis=0 gives shape (3, 4) and axis=1 gives shape (4, 3).</p></div>
+<div class="slide" id="stack-grid"><div class="frame"><section id="stack-grid" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Concatenate versus stack</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Join along an axis, or add one</h2>
+<div style="display:flex;flex-direction:column;gap:48px;flex:1;justify-content:center">
+<div style="display:flex;gap:80px;align-items:start">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">concatenate</p>
+<div style="display:flex;gap:8px">
+<div style="width:80px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="width:80px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+<div style="width:80px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">3</p></div>
+<div style="width:80px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="width:80px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="width:80px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">shape (6,): end to end</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">stack(axis=0)</p>
+<div style="display:grid;grid-template-columns:repeat(3, 80px);gap:8px">
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">3</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">shape (2, 3): rows</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">stack(axis=1)</p>
+<div style="display:grid;grid-template-columns:repeat(2, 80px);gap:8px">
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">3</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">shape (3, 2): columns</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">np.array_split(np.arange(7), 3) <span style="color:#6B7280">→ 3 pieces, sizes 3, 2, 2</span></p>
+<div style="display:flex;gap:40px">
+<div style="display:flex;gap:8px">
+<div style="width:80px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0</p></div>
+<div style="width:80px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="width:80px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+</div>
+<div style="display:flex;gap:8px">
+<div style="width:80px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+<div style="width:80px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+</div>
+<div style="display:flex;gap:8px">
+<div style="width:80px;height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">5</p></div>
+<div style="width:80px;height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">6</p></div>
+</div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">Uneven pieces: [array([0, 1, 2]), array([3, 4]), array([5, 6])]</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">9</p></div>
+<aside>Blue cells come from a and orange cells from b. concatenate puts them end to end on their existing single axis, so the result is still 1D, now of length 6. stack adds a new axis: with axis=0 the new axis comes first, so a and b become the two rows; with axis=1 the new axis comes last, so they become the two columns, which is the same as stacking rows and then transposing. The bottom row shows splitting, the reverse operation: array_split divides 7 values into 3 pieces as evenly as it can, giving sizes 3, 2 and 2. np.split(np.arange(7), 3) would raise an error, because 7 does not divide into 3 equal pieces.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> Blue cells come from a and orange cells from b. concatenate puts them end to end on their existing single axis, so the result is still 1D, now of length 6. stack adds a new axis: with axis=0 the new axis comes first, so a and b become the two rows; with axis=1 the new axis comes last, so they become the two columns, which is the same as stacking rows and then transposing. The bottom row shows splitting, the reverse operation: array_split divides 7 values into 3 pieces as evenly as it can, giving sizes 3, 2 and 2. np.split(np.arange(7), 3) would raise an error, because 7 does not divide into 3 equal pieces.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Name the axis<br>that disappears.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">reshape keeps every value, .T swaps the axes, and a reduction collapses exactly the axis you name.</p>
+<aside>Pause here. From notebook 04 onwards almost every function takes an axis argument: sum, mean, max, sort, concatenate and more. The rule is always the same: the axis you pass is the one the operation runs along, and for reductions it is the axis that disappears from the shape. When unsure, write the shape tuple down and cross out the axis you are naming; what remains is the shape of the answer.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> Pause here. From notebook 04 onwards almost every function takes an axis argument: sum, mean, max, sort, concatenate and more. The rule is always the same: the axis you pass is the one the operation runs along, and for reductions it is the axis that disappears from the shape. When unsure, write the shape tuple down and cross out the axis you are naming; what remains is the shape of the answer.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One reshape, one reduction</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">24 readings as 2 days × 3 sensors × 4 measurements</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">readings = np.arange(24). Expected: shape (2, 3, 4), and cube.ravel() gives readings back in order.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">cube = readings.reshape(2, 3, 4)</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">One total per row, keeping shape (3, 1)</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">counts = [[1, 2], [3, 4], [5, 6]]. Expected: [[3], [7], [11]].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">row_totals = counts.sum(axis=1,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;keepdims=True)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>Let the audience attempt both before revealing the code, which matches the reference solutions. In Exercise 1 the dimensions multiply to 2 times 3 times 4, 24, matching the number of readings, so reshape only changes how they are interpreted; the reference prints two blocks, the first running 0 to 11 and the second 12 to 23. In Exercise 2, reducing axis 1 adds the columns within each row, 1+2, 3+4 and 5+6, and keepdims=True retains the reduced axis with length 1, so the shape is (3, 1) instead of (3,). Without keepdims the check on shape fails even though the numbers are right.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> Let the audience attempt both before revealing the code, which matches the reference solutions. In Exercise 1 the dimensions multiply to 2 times 3 times 4, 24, matching the number of readings, so reshape only changes how they are interpreted; the reference prints two blocks, the first running 0 to 11 and the second 12 to 23. In Exercise 2, reducing axis 1 adds the columns within each row, 1+2, 3+4 and 5+6, and keepdims=True retains the reduced axis with length 1, so the shape is (3, 1) instead of (3,). Without keepdims the check on shape fails even though the numbers are right.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Totals along every axis</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">An array shaped (2 stores, 7 days, 3 products)</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Compute totals per store, per day, and per product. Explain each axis tuple you pass, and predict each result's shape first.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain axis=0 versus axis=1 without the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a reshape that fails and explain why</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">12</p></div>
+<aside>The challenge has no supplied check: write your own. With shape (2, 7, 3), a total per store keeps axis 0 and collapses the other two, so pass axis=(1, 2) and expect shape (2,). A total per day keeps axis 1: axis=(0, 2), shape (7,). A total per product keeps axis 2: axis=(0, 1), shape (3,). A good self-check: all three results must add up to the same grand total, sales.sum(). Then restart the kernel and run all cells once more.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> The challenge has no supplied check: write your own. With shape (2, 7, 3), a total per store keeps axis 0 and collapses the other two, so pass axis=(1, 2) and expect shape (2,). A total per day keeps axis 1: axis=(0, 2), shape (7,). A total per product keeps axis 2: axis=(0, 1), shape (3,). A good self-check: all three results must add up to the same grand total, sales.sum(). Then restart the kernel and run all cells once more.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Reshape</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Same values and order; -1 is inferred.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Transpose</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">.T turns rows into columns.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Axis</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">A reduction removes the axis you name.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Join</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">concatenate extends; stack adds an axis.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 04</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Math and ufuncs</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Elementwise arithmetic, universal functions, and deliberate division.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 04, where elementwise arithmetic and universal functions take the axis argument you learned today. Further reading: the official NumPy array manipulation routines at numpy.org/doc/stable/reference/routines.array-manipulation.html.</aside>
+</section>
+</div><p class="notes"><b>Notes · 13</b> Recap the four takeaways, then point to notebook 04, where elementwise arithmetic and universal functions take the axis argument you learned today. Further reading: the official NumPy array manipulation routines at numpy.org/doc/stable/reference/routines.array-manipulation.html.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

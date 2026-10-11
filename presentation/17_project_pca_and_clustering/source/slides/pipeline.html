@@ -1,0 +1,41 @@
+<section id="pipeline" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">The workflow</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">From 3 features to 3 clusters</h2>
+<div style="display:flex;gap:8px;align-items:center">
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 20px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Scale</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Standardise: each feature to mean 0, std 1</p>
+</div>
+<x-shape kind="arrow-right" style="background:#2F6FB0;width:32px;height:16px"></x-shape>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 20px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">SVD</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Covariance directions as rows of Vt</p>
+</div>
+<x-shape kind="arrow-right" style="background:#2F6FB0;width:32px;height:16px"></x-shape>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 20px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Project</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Keep two directions: shape (180, 2)</p>
+</div>
+<x-shape kind="arrow-right" style="background:#2F6FB0;width:32px;height:16px"></x-shape>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 20px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">K-means</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Assign, update, repeat until stable</p>
+</div>
+<x-shape kind="arrow-right" style="background:#2F6FB0;width:32px;height:16px"></x-shape>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 20px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Evaluate</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Best of 5 seeds, sizes, tests, plot</p>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px">
+<x-icon name="CheckCircle" style="color:#2F6FB0;width:56px;height:56px"></x-icon>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Each stage asserts an invariant: mean 0 and std 1, exact SVD reconstruction, orthonormal directions, a non-increasing objective.</p>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>This is the map for the session. The data are 180 observations with three numeric features, drawn around three hidden centres. Stage one standardises the features. Stage two takes the SVD of the standardised table; its right singular vectors are the eigenvectors of the covariance matrix, so this is the same PCA you may have seen defined through covariance, computed more stably. Stage three keeps the first two directions, giving a 2-D view. Stage four runs k-means, and stage five chooses the best run, reports cluster sizes, runs edge-case tests and plots the clusters in the PCA view. In the notebook, k-means clusters the standardised 3-D table Z; the 2-D projection is used for the picture.</aside>
+</section>

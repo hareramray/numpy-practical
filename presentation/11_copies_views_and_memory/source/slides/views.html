@@ -1,0 +1,17 @@
+<section id="views" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Basic slicing shares data</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Writing to a view edits the original</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">original = np.arange(6)<br>view = original[1:4]<br>independent = original[1:4].copy()<br>view[0] = 99<br>print("Original:", original)<br>print("Independent copy:", independent)<br>assert np.shares_memory(original, view)<br>assert not np.shares_memory(original, independent)<br>assert original[1] == 99</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Original: [ 0 99&#160; 2&#160; 3&#160; 4&#160; 5]<br>Independent copy: [1 2 3]</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A slice is a view</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">original[1:4] points into the same data buffer.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">.copy() is independent</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">New storage, so later writes do not leak across.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">shares_memory checks</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">True when two arrays overlap in memory.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 11 Copies and views</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>A view is a new array object that refers to an existing data buffer. Basic slicing with start, stop and step normally produces a view, so view[0] = 99 writes into the same memory as original[1], and printing original shows 99 in position 1. The .copy() call allocates new storage, so independent still holds [1 2 3]. np.shares_memory answers the question directly and is the right tool when you are unsure. Try it: modify independent, for example independent[0] = -1, and confirm that original stays unchanged.</aside>
+</section>

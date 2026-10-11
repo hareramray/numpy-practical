@@ -1,0 +1,23 @@
+<section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Three patterns beyond the basics</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Tensor contractions</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Write sums of products with einsum by naming each axis.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Rolling features</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Compute moving statistics from overlapping windows that share memory.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Repeated indices</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Accumulate every occurrence with np.add.at or bincount.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>The notebook's goal: express tensor contractions, calculate rolling features, and accumulate repeated indices. All three build on earlier notebooks: einsum generalizes the matrix product from notebook 10, sliding windows rely on the views and strides from notebook 11, and np.add.at fixes a trap in the fancy indexing from notebook 02. For each one, the notebook checks the new tool against a familiar operation, which is a good habit whenever you adopt something more powerful.</aside>
+</section>

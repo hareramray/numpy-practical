@@ -1,0 +1,31 @@
+<section id="memmap-chunks" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Work in slices</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Touch only the slice you need</h2>
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Database" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;color:#13233A">values.npy on disk · np.arange(1000) as float64</p></div>
+<div style="display:flex;gap:8px">
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#13233A">0–99</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">100–199</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">200–299</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">300–399</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">400–499</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">500–599</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">600–699</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">700–799</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">800–899</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">900–999</p></div>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="width:148px;display:flex;justify-content:center"><x-shape kind="arrow-down" style="background:#E8813A;width:40px;height:72px"></x-shape></div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">mapped[:100].mean() → <b>49.5</b></p>
+<p style="font-size:28px;color:#4A5568">The other nine blocks are never read.</p>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#13233A">memmap</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Behaves like an ndarray, but its storage is the file.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Try it · ten chunks</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Average the ten chunk means and compare with the full mean.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Outputs allocate</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A full-size operation makes a full-size array in memory.</p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 11 Copies and views</p><p style="font-size:24px;color:#6B7280">9</p></div>
+<aside>Picture the file as ten blocks of 100 values each. A memory map gives you an array that covers all of them, but the operating system only reads the parts you actually touch. Taking mapped[:100] reads the orange block, and its mean is 49.5. This is how NumPy can work with files larger than your RAM. The catch is in the third card: operations still allocate full-size outputs, so mapped * 2 on a huge file would try to build a huge in-memory array. When data is large, process it slice by slice. Try it: loop over ten chunks of 100, collect each chunk's mean, and average them. Because all chunks are the same size, the average of the chunk means equals the full-array mean, 499.5.</aside>
+</section>

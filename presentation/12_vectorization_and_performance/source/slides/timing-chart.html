@@ -1,0 +1,21 @@
+<section id="timing-chart" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Read the measurement</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Loop vs NumPy: measured, not assumed</h2>
+<div style="display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-size:28px;font-weight:600;color:#13233A">Python loop</p>
+<div style="display:flex;gap:24px;align-items:center"><div style="width:1200px;height:72px;background:#13233A;border-radius:0px 8px 8px 0px"></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">0.006254 seconds/call</p></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-size:28px;font-weight:600;color:#13233A">NumPy <span style="color:#6B7280">(bar drawn to the same scale)</span></p>
+<div style="display:flex;gap:24px;align-items:center"><div style="width:4px;height:72px;background:#E8813A"></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#B5541A">0.000018 seconds/call</p></div>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">350.0x</p><p style="font-size:28px;line-height:1.4;color:#4A5568">Observed ratio on this run, from the unrounded timings.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#13233A">(20000,) float64</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Input shape and dtype, reported with the timing.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Not an assertion</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Hardware, dtype, layout and builds change the numbers.</p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 12 Vectorization</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>This chart draws the two real timings from the notebook's reference run on one linear scale. The Python loop took 0.006254 seconds per call on 20,000 values; the NumPy expression took 0.000018 seconds, so its bar is only about 4 pixels wide. The printed ratio, 350.0x, comes from the unrounded timings, which is why it is not exactly 0.006254 divided by 0.000018. The speed-up comes from moving the per-element work out of the Python interpreter, where every step involves object handling and dispatch, into a compiled loop over contiguous float64 values. Treat the number as an observation of this machine and this run, never as a constant. Try it: rerun with 10 values and with 100,000 values and compare the ratios. With 10 values the fixed call overhead dominates and NumPy's advantage nearly disappears.</aside>
+</section>

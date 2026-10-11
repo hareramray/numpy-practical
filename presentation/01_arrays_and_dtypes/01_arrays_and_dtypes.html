@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 01 — Arrays and dtypes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 01 — Arrays and dtypes</h1><span>13 slides · <a href="https://claude.ai/artifact/V8Hbj3zaqqkaX4otFcqYo4">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative grid of array cells, one row highlighted" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="160" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="320" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="480" y="0" width="132" height="132" rx="16" fill="#E8813A"/><rect x="0" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="160" width="132" height="132" rx="16" fill="#E8813A"/><rect x="0" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="320" width="132" height="132" rx="16" fill="#E8813A"/><rect x="0" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="480" width="132" height="132" rx="16" fill="#E8813A"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 01</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE">Arrays and<br>dtypes</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2">Create arrays and understand data types</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Beginner</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">30–50 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: Notebook 00</p>
+</div>
+<aside>Welcome to notebook 01. Notebook 00 showed that arrays apply one operation to every element. Now we look inside an array: its shape, its number of dimensions, its size, and its dtype, the single data type every element shares. We also meet the constructors you will use in every later notebook. As always, the notebook imports NumPy itself and creates its own data, so it runs on its own.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> Welcome to notebook 01. Notebook 00 showed that arrays apply one operation to every element. Now we look inside an array: its shape, its number of dimensions, its size, and its dtype, the single data type every element shares. We also meet the constructors you will use in every later notebook. As always, the notebook imports NumPy itself and creates its own data, so it runs on its own.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Four skills for every array</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Read the shape</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">shape, ndim and size describe the grid of values.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Create arrays</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">arange, linspace, zeros, full and empty.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Inspect the dtype</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">One type for every element, and it changes results.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">4</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Choose storage</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Integers or floats, and how many bytes each value uses.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>This notebook has three steps and they map onto these four skills. Step 1 reads the shape of a small sales table. Step 2 tours the constructors that build arrays from scratch. Step 3 shows that the dtype is not a detail: it decides whether a fraction survives and how much memory the array takes. Keep the routine from notebook 00: predict, run, change, solve, reflect.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> This notebook has three steps and they map onto these four skills. Step 1 reads the shape of a small sales table. Step 2 tours the constructors that build arrays from scratch. Step 3 shows that the dtype is not a detail: it decides whether a fraction survives and how much memory the array takes. Keep the routine from notebook 00: predict, run, change, solve, reflect.</p></div>
+<div class="slide" id="shape"><div class="frame"><section id="shape" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Read the shape</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Ask an array what it is</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">sales = np.array([[12, 15, 18],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;[20, 22, 25]],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;dtype=np.int64)<br>print(sales)<br>print("shape:", sales.shape,<br>&#160;&#160;&#160;&#160;&#160;&#160;"ndim:", sales.ndim, "size:", sales.size)<br>print("dtype:", sales.dtype,<br>&#160;&#160;&#160;&#160;&#160;&#160;"bytes:", sales.nbytes)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[[12 15 18]<br>&#160;[20 22 25]]<br>shape: (2, 3) ndim: 2 size: 6<br>dtype: int64 bytes: 48</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">shape</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The length of each axis: 2 rows, 3 columns.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">ndim and size</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">ndim counts axes; size counts every element.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">dtype and nbytes</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">One type for all values, and the memory they use.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>An array is a rectangular collection of values that all share one dtype. Four attributes tell you almost everything: shape gives the length of each axis, ndim counts the axes, size counts all elements, and dtype names the element type. nbytes is the memory used by the values: 6 elements of 8-byte int64 give 48. The notebook also asserts sales.shape == (2, 3) and sales.size == 6, so the cell proves its own claims. Try it: add one complete row, such as [30, 32, 35]. Predict first: shape becomes (3, 3) and size becomes 9 (and nbytes 72).</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> An array is a rectangular collection of values that all share one dtype. Four attributes tell you almost everything: shape gives the length of each axis, ndim counts the axes, size counts all elements, and dtype names the element type. nbytes is the memory used by the values: 6 elements of 8-byte int64 give 48. The notebook also asserts sales.shape == (2, 3) and sales.size == 6, so the cell proves its own claims. Try it: add one complete row, such as [30, 32, 35]. Predict first: shape becomes (3, 3) and size becomes 9 (and nbytes 72).</p></div>
+<div class="slide" id="shape-grid"><div class="frame"><section id="shape-grid" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Read the shape</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Shape (2, 3): rows first, then columns</h2>
+<div style="display:flex;gap:80px;flex:1;align-items:center">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;gap:16px;align-items:center">
+<div style="width:200px"></div>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#2F6FB0">axis 1 · 3 columns →</p>
+</div>
+<div style="display:flex;gap:16px;align-items:center">
+<div style="width:200px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">axis 0</p>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">2 rows ↓</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3, 150px);gap:12px">
+<div style="height:110px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">12</p></div>
+<div style="height:110px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">15</p></div>
+<div style="height:110px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">18</p></div>
+<div style="height:110px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20</p></div>
+<div style="height:110px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">22</p></div>
+<div style="height:110px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">25</p></div>
+</div>
+</div>
+<div style="display:flex;gap:16px">
+<div style="width:200px"></div>
+<p style="font-size:24px;color:#6B7280">Blue = row 0, beige = row 1</p>
+</div>
+</div>
+<div style="flex:1;display:grid;grid-template-columns:repeat(2, 1fr);gap:24px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:8px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#13233A">(2, 3)</p><p style="font-size:24px;color:#4A5568">shape: length of each axis</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:8px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#13233A">2</p><p style="font-size:24px;color:#4A5568">ndim: number of axes</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:8px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#13233A">6</p><p style="font-size:24px;color:#4A5568">size: 2 × 3 elements</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:8px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">48</p><p style="font-size:24px;color:#4A5568">nbytes: 6 values × 8 bytes</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>This is the sales table from the previous slide drawn as a grid. For a table, axis 0 runs down through the rows and axis 1 runs across through the columns, and the shape lists them in that order: (2, 3) means 2 along axis 0 and 3 along axis 1. ndim is simply the number of entries in the shape tuple, and size is their product, 2 times 3 equals 6. Because every element is int64, which uses 8 bytes, nbytes is 6 times 8, 48. Ask the audience: if we add a row, which number in the shape changes? Only the first, giving (3, 3).</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> This is the sales table from the previous slide drawn as a grid. For a table, axis 0 runs down through the rows and axis 1 runs across through the columns, and the shape lists them in that order: (2, 3) means 2 along axis 0 and 3 along axis 1. ndim is simply the number of entries in the shape tuple, and size is their product, 2 times 3 equals 6. Because every element is int64, which uses 8 bytes, nbytes is 6 times 8, 48. Ask the audience: if we add a row, which number in the shape changes? Only the first, giving (3, 3).</p></div>
+<div class="slide" id="ranges"><div class="frame"><section id="ranges" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Choose a constructor</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">arange stops early; linspace doesn't</h2>
+<div style="display:flex;flex-direction:column;gap:48px;flex:1;justify-content:center">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">np.arange(0, 10, 2) <span style="color:#6B7280">→ start, stop, step: stop 10 is excluded</span></p>
+<div style="display:flex;gap:12px;align-items:center">
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">4</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">6</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">8</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#9AA3AE">10</p></div>
+<p style="font-size:24px;color:#6B7280">not included</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">Even numbers: [0 2 4 6 8]</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">np.linspace(0, 1, 5) <span style="color:#6B7280">→ start, stop, count: both ends included</span></p>
+<div style="display:flex;gap:12px;align-items:center">
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0.</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0.25</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0.5</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0.75</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1.</p></div>
+<p style="font-size:24px;color:#6B7280">orange = the two endpoints</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">Five points: [0.&#160;&#160; 0.25 0.5&#160; 0.75 1.&#160; ]</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>Two constructors build sequences, and they disagree about the stop value. arange(start, stop, step) counts up by a step and excludes the stop, exactly like Python's range, so arange(0, 10, 2) ends at 8. linspace(start, stop, num) asks for a count instead of a step, and includes both endpoints by default, so 5 points from 0 to 1 are spaced 0.25 apart. Prefer linspace for floating-point grids: you control the number of points and avoid rounding surprises with a fractional step. Try it: create seven evenly spaced points from -3 to 3 with np.linspace(-3, 3, 7). You get -3, -2, -1, 0, 1, 2, 3 as floats, a spacing of exactly 1.</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> Two constructors build sequences, and they disagree about the stop value. arange(start, stop, step) counts up by a step and excludes the stop, exactly like Python's range, so arange(0, 10, 2) ends at 8. linspace(start, stop, num) asks for a count instead of a step, and includes both endpoints by default, so 5 points from 0 to 1 are spaced 0.25 apart. Prefer linspace for floating-point grids: you control the number of points and avoid rounding surprises with a fractional step. Try it: create seven evenly spaced points from -3 to 3 with np.linspace(-3, 3, 7). You get -3, -2, -1, 0, 1, 2, 3 as floats, a spacing of exactly 1.</p></div>
+<div class="slide" id="fill"><div class="frame"><section id="fill" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Choose a constructor</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Start from known values</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">print("Zeros:\n", np.zeros((2, 3)))<br>print("Full:\n", np.full((2, 2), 7))<br>buffer = np.empty(3)<br>buffer[:] = 4.5<br>print("Filled buffer:", buffer)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Zeros:<br>&#160;[[0. 0. 0.]<br>&#160;[0. 0. 0.]]<br>Full:<br>&#160;[[7 7]<br>&#160;[7 7]]<br>Filled buffer: [4.5 4.5 4.5]</p></div>
+</div>
+<div style="width:640px;display:flex;flex-direction:column;gap:20px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">zeros and ones</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Pass a shape tuple. The default dtype is float64, hence 0.</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">full</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Any fill value. An integer 7 gives an integer array.</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#B5541A">empty</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Storage only, no set values. Fill every entry before reading.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>zeros, ones and full create arrays whose every value is known in advance. Their first argument is the shape, written as a tuple, so (2, 3) means 2 rows and 3 columns. Notice the dots in the zeros output: zeros and ones default to float64. full infers the dtype from the fill value, so 7 gives integers. empty is different: it allocates memory without initialising it, so the contents are whatever bytes happened to be there. That is only safe when you overwrite every entry before reading, as buffer[:] = 4.5 does here. Ask: what would print if we removed the assignment? Unpredictable values, which is the point.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> zeros, ones and full create arrays whose every value is known in advance. Their first argument is the shape, written as a tuple, so (2, 3) means 2 rows and 3 columns. Notice the dots in the zeros output: zeros and ones default to float64. full infers the dtype from the fill value, so 7 gives integers. empty is different: it allocates memory without initialising it, so the contents are whatever bytes happened to be there. That is only safe when you overwrite every entry before reading, as buffer[:] = 4.5 does here. Ask: what would print if we removed the assignment? Unpredictable values, which is the point.</p></div>
+<div class="slide" id="dtype"><div class="frame"><section id="dtype" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Dtype affects results</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">The dtype decides what fits</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">prices = np.array([1, 2, 3], dtype=np.int64)<br>prices[0] = 1.9<br>print("After integer assignment:", prices)<br>floating = prices.astype(np.float64)<br>floating[0] = 1.9<br>print("Floating version:", floating)<br>print("int8 limits:", np.iinfo(np.int8).min,<br>&#160;&#160;&#160;&#160;&#160;&#160;np.iinfo(np.int8).max)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">After integer assignment: [1 2 3]<br>Floating version: [1.9 2.&#160; 3. ]<br>int8 limits: -128 127</p></div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Integers drop fractions</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">1.9 in an int64 array is stored as 1, silently.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">astype converts</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">It returns a new array with the dtype you ask for.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Small types, small ranges</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">int8 holds only −128 to 127. Check np.iinfo first.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>Every array has exactly one dtype, and assigning into it converts the new value to that dtype. An integer cannot hold a fractional part, so assigning 1.9 into an int64 array truncates toward zero and stores 1, with no warning. astype(np.float64) builds a new floating-point array; the same assignment then keeps 1.9. Small integer types save memory but have narrow ranges: np.iinfo(np.int8) reports -128 to 127. The notebook asserts floating.dtype == np.float64 to confirm the conversion. Rule of thumb: use explicit floating-point arrays whenever the calculation needs fractions.</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> Every array has exactly one dtype, and assigning into it converts the new value to that dtype. An integer cannot hold a fractional part, so assigning 1.9 into an int64 array truncates toward zero and stores 1, with no warning. astype(np.float64) builds a new floating-point array; the same assignment then keeps 1.9. Small integer types save memory but have narrow ranges: np.iinfo(np.int8) reports -128 to 127. The notebook asserts floating.dtype == np.float64 to confirm the conversion. Rule of thumb: use explicit floating-point arrays whenever the calculation needs fractions.</p></div>
+<div class="slide" id="truncate"><div class="frame"><section id="truncate" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Dtype affects results</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Same assignment, two dtypes</h2>
+<div style="display:flex;flex-direction:column;gap:48px;flex:1;justify-content:center">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">prices[0] = 1.9 <span style="color:#6B7280">→ int64: the fraction is cut off</span></p>
+<div style="display:flex;gap:12px;align-items:center">
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+<div style="width:24px"></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">1.9 was stored as 1: truncated toward zero, no warning</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">After integer assignment: [1 2 3]</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">floating[0] = 1.9 <span style="color:#6B7280">→ float64 after astype: the fraction is kept</span></p>
+<div style="display:flex;gap:12px;align-items:center">
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1.9</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2.</p></div>
+<div style="width:150px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3.</p></div>
+<div style="width:24px"></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">The dot marks a float: 2. means 2.0</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">Floating version: [1.9 2.&#160; 3. ]</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>The same line of code gives two different arrays because the target dtype differs. In the int64 array, the orange cell received 1.9 but can only hold whole numbers, so NumPy truncated toward zero and stored 1. Truncation is not rounding: 1.9 becomes 1, not 2, and -1.9 would become -1. After astype(np.float64), the blue cell keeps 1.9, and the other values print with a trailing dot to show they are floats. This silent conversion is a common source of bugs, so check .dtype whenever a result looks too round.</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> The same line of code gives two different arrays because the target dtype differs. In the int64 array, the orange cell received 1.9 but can only hold whole numbers, so NumPy truncated toward zero and stored 1. Truncation is not rounding: 1.9 becomes 1, not 2, and -1.9 would become -1. After astype(np.float64), the blue cell keeps 1.9, and the other values print with a trailing dot to show they are floats. This silent conversion is a common source of bugs, so check .dtype whenever a result looks too round.</p></div>
+<div class="slide" id="storage"><div class="frame"><section id="storage" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Dtype affects results</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Bytes per value, by dtype</h2>
+<div style="display:flex;flex-direction:column;gap:28px;flex:1;justify-content:center">
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">int8</p>
+<div style="width:96px;height:72px;background:#E8813A;border-radius:8px"></div>
+<p style="font-size:28px;color:#4A5568"><span style="color:#13233A;font-weight:600">1 byte</span> · only −128 to 127</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">float32</p>
+<div style="width:384px;height:72px;background:#2F6FB0;border-radius:8px"></div>
+<p style="font-size:28px;color:#4A5568"><span style="color:#13233A;font-weight:600">4 bytes</span> · fractions, about 7 digits</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">int64</p>
+<div style="width:768px;height:72px;background:#13233A;border-radius:8px"></div>
+<p style="font-size:28px;color:#4A5568"><span style="color:#13233A;font-weight:600">8 bytes</span> · whole numbers</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="width:200px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">float64</p>
+<div style="width:768px;height:72px;background:#2F6FB0;border-radius:8px"></div>
+<p style="font-size:28px;color:#4A5568"><span style="color:#13233A;font-weight:600">8 bytes</span> · NumPy's default float</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:56px;height:56px" role="img" aria-label="Database"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">nbytes = size × bytes per value. The sales table: <span style="color:#13233A;font-weight:600">6 × 8 = 48 bytes</span> (int64).</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">9</p></div>
+<aside>Each bar is drawn to scale: one byte per 96 pixels. The dtype fixes how many bytes every single value occupies, and nbytes is just size times that number, which is why the 2 by 3 int64 sales table used 48 bytes. Smaller types save memory, but they pay for it: int8 overflows past 127, and float32 keeps fewer significant digits than float64. Choose the smallest type that safely holds your data and its calculations. Try it: compare nbytes for 1,000 values stored as float32 and float64, for example np.zeros(1000, dtype=np.float32).nbytes. Expect 4,000 bytes versus 8,000 bytes: float32 halves the memory.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> Each bar is drawn to scale: one byte per 96 pixels. The dtype fixes how many bytes every single value occupies, and nbytes is just size times that number, which is why the 2 by 3 int64 sales table used 48 bytes. Smaller types save memory, but they pay for it: int8 overflows past 127, and float32 keeps fewer significant digits than float64. Choose the smallest type that safely holds your data and its calculations. Try it: compare nbytes for 1,000 values stored as float32 and float64, for example np.zeros(1000, dtype=np.float32).nbytes. Expect 4,000 bytes versus 8,000 bytes: float32 halves the memory.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Shape says where.<br>Dtype says what.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">Every array is a rectangular grid of one type. Check .shape and .dtype before you trust a result.</p>
+<aside>Pause here. When a result surprises you in any later notebook, the first two questions are almost always: what is the shape, and what is the dtype? The shape tells you how values are arranged along each axis; the dtype tells you what each value can hold and how much memory it takes. Indexing in notebook 02 and axes in notebook 03 both build directly on reading the shape.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> Pause here. When a result surprises you in any later notebook, the first two questions are almost always: what is the shape, and what is the dtype? The shape tells you how values are arranged along each axis; the dtype tells you what each value can hold and how much memory it takes. Indexing in notebook 02 and axes in notebook 03 both build directly on reading the shape.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two constructor exercises</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">A 3 × 4 array filled with 2.5, using float64</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: shape (3, 4), dtype float64, every value 2.5. full takes the shape and the fill value.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">filled = np.full((3, 4), 2.5,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;dtype=np.float64)</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">An integer array of 5, 10, 15, 20, 25</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: [5, 10, 15, 20, 25] with an integer dtype. arange excludes its stop, so stop at 26 to include 25.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">multiples = np.arange(5, 26, 5)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>Let the audience attempt both before revealing the code, which matches the reference solutions. Exercise 1's check asserts shape (3, 4), dtype float64 and every value close to 2.5; writing the dtype explicitly guarantees the fractional part is preserved. Exercise 2's check compares the values and uses np.issubdtype(multiples.dtype, np.integer), so any integer dtype passes. A common mistake is np.arange(5, 25, 5), which stops at 20 because the stop value is excluded. np.array([5, 10, 15, 20, 25]) would also pass: the check verifies the result, not the method.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> Let the audience attempt both before revealing the code, which matches the reference solutions. Exercise 1's check asserts shape (3, 4), dtype float64 and every value close to 2.5; writing the dtype explicitly guarantees the fractional part is preserved. Exercise 2's check compares the values and uses np.issubdtype(multiples.dtype, np.integer), so any integer dtype passes. A common mistake is np.arange(5, 25, 5), which stops at 20 because the stop value is excluded. np.array([5, 10, 15, 20, 25]) would also pass: the check verifies the result, not the method.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Describe a score table yourself</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Represent the scores of 4 students in 3 subjects</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Print a sentence explaining each dimension, then compute the storage in bytes. Decide the expected shape and byte count before you run it.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain shape, ndim, size and dtype in your own words</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a changed dtype and explain the new result</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">12</p></div>
+<aside>The challenge has no supplied check: write your own. A natural layout puts students on axis 0 and subjects on axis 1, giving shape (4, 3), ndim 2 and size 12. With the default int64 dtype that is 12 times 8, 96 bytes; stored as float64 it is also 96, and as int8 it would be 12 bytes, if every score fits in -128 to 127. Add asserts for the shape and nbytes you predicted. Then restart the kernel and run all cells once more.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> The challenge has no supplied check: write your own. A natural layout puts students on axis 0 and subjects on axis 1, giving shape (4, 3), ndim 2 and size 12. With the default int64 dtype that is 12 times 8, 96 bytes; stored as float64 it is also 96, and as int8 it would be 12 bytes, if every score fits in -128 to 127. Add asserts for the shape and nbytes you predicted. Then restart the kernel and run all cells once more.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Shape</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Axis 0 is rows, axis 1 is columns.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Constructors</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">arange excludes stop; linspace includes it.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Dtype</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Integers silently drop fractions.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Storage</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">nbytes = size × bytes per value.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 02</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Indexing and filtering</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Select values, slice tables and filter with Boolean masks.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 02, where the shape you learned to read today tells you how to index rows and columns. Further reading: the official NumPy documentation on array creation at numpy.org/doc/stable/user/basics.creation.html and on data types at numpy.org/doc/stable/user/basics.types.html.</aside>
+</section>
+</div><p class="notes"><b>Notes · 13</b> Recap the four takeaways, then point to notebook 02, where the shape you learned to read today tells you how to index rows and columns. Further reading: the official NumPy documentation on array creation at numpy.org/doc/stable/user/basics.creation.html and on data types at numpy.org/doc/stable/user/basics.types.html.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

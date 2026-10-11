@@ -1,0 +1,44 @@
+<section id="lstsq-fit" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · See the fit</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">The line that minimizes squared gaps</h2>
+<div style="display:flex;gap:56px;flex:1;align-items:center">
+<div style="position:relative;width:1000px;height:560px">
+<svg aria-label="Scatter of the five observed points with the fitted line y = 1.06 + 1.97x passing very close to each point; short orange segments mark the residuals" width="1000" height="560" viewBox="0 0 1000 560" style="position:absolute;left:0px;top:0px;width:1000px;height:560px"><line x1="88" y1="60" x2="940" y2="60" stroke="#E2DED3" stroke-width="2"/><line x1="88" y1="280" x2="940" y2="280" stroke="#E2DED3" stroke-width="2"/><line x1="88" y1="500" x2="940" y2="500" stroke="#9AA3AE" stroke-width="2"/><line x1="100" y1="453.36" x2="900" y2="106.64" stroke="#2F6FB0" stroke-width="6" stroke-linecap="round"/><line x1="100" y1="451.6" x2="100" y2="453.36" stroke="#E8813A" stroke-width="6"/><line x1="300" y1="372.4" x2="300" y2="366.68" stroke="#E8813A" stroke-width="6"/><line x1="500" y1="271.2" x2="500" y2="280" stroke="#E8813A" stroke-width="6"/><line x1="700" y1="200.8" x2="700" y2="193.32" stroke="#E8813A" stroke-width="6"/><line x1="900" y1="104" x2="900" y2="106.64" stroke="#E8813A" stroke-width="6"/><circle cx="100" cy="451.6" r="14" fill="#13233A"/><circle cx="300" cy="372.4" r="14" fill="#13233A"/><circle cx="500" cy="271.2" r="14" fill="#13233A"/><circle cx="700" cy="200.8" r="14" fill="#13233A"/><circle cx="900" cy="104" r="14" fill="#13233A"/></svg>
+<p style="position:absolute;left:0px;top:483px;width:72px;font-size:24px;color:#6B7280;text-align:right">0</p>
+<p style="position:absolute;left:0px;top:263px;width:72px;font-size:24px;color:#6B7280;text-align:right">5</p>
+<p style="position:absolute;left:0px;top:43px;width:72px;font-size:24px;color:#6B7280;text-align:right">10</p>
+<p style="position:absolute;left:70px;top:516px;width:60px;font-size:24px;color:#6B7280;text-align:center">0</p>
+<p style="position:absolute;left:270px;top:516px;width:60px;font-size:24px;color:#6B7280;text-align:center">1</p>
+<p style="position:absolute;left:470px;top:516px;width:60px;font-size:24px;color:#6B7280;text-align:center">2</p>
+<p style="position:absolute;left:670px;top:516px;width:60px;font-size:24px;color:#6B7280;text-align:center">3</p>
+<p style="position:absolute;left:870px;top:516px;width:60px;font-size:24px;color:#6B7280;text-align:center">4</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;gap:16px;align-items:center"><div style="width:28px;height:28px;background:#13233A;border-radius:14px"></div><p style="font-size:24px;color:#4A5568">observed y_data</p></div>
+<div style="display:flex;gap:16px;align-items:center"><div style="width:28px;height:6px;background:#2F6FB0"></div><p style="font-size:24px;color:#4A5568">fit: 1.06 + 1.97·x</p></div>
+<div style="display:flex;gap:16px;align-items:center"><div style="width:6px;height:28px;background:#E8813A"></div><p style="font-size:24px;color:#4A5568">residual (gap to the line)</p></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">design @ coefficients</p>
+<div style="display:flex;gap:20px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(2, 72px);gap:6px">
+<div style="height:52px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:52px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">0</p></div>
+<div style="height:52px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:52px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">1</p></div>
+<div style="height:52px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:52px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">2</p></div>
+<div style="height:52px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:52px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">3</p></div>
+<div style="height:52px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:52px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">4</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">@</p>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="width:96px;height:52px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1.06</p></div>
+<div style="width:96px;height:52px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">1.97</p></div>
+</div>
+</div>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Ones pair with the intercept, x with the slope. RMSE 0.1349.</p>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>This chart draws the notebook's five points, x from 0 to 4 and y_data 1.1, 2.9, 5.2, 6.8 and 9.0, with the fitted line y = 1.06 + 1.97 x. The orange segments are the residuals, the vertical gaps between each point and the line. Least squares chooses the intercept and slope that make the sum of the squared gaps as small as possible; any other line would have a larger total. On the right, the design matrix shows why the column of ones matters: every row multiplies 1 by the intercept and x by the slope, so design @ coefficients is the prediction for every point at once. Try it: plot the observed points and the fitted line yourself, then change one y value to something extreme and refit. A single outlier pulls the line towards it, because squaring makes large gaps very expensive.</aside>
+</section>

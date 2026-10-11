@@ -1,0 +1,35 @@
+<section id="axis-drop" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Indexing and slicing</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Integers drop axes; slices keep them</h2>
+<div style="display:flex;gap:80px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">scores[:, 1] <span style="color:#6B7280">→ integer column</span></p>
+<div style="display:flex;gap:12px">
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">80</p></div>
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">60</p></div>
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">88</p></div>
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">70</p></div>
+</div>
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#B5541A">shape (4,)</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">One axis left. A 1D array has no rows or columns, so NumPy prints it flat.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">scores[:, 1:2] <span style="color:#6B7280">→ slice of width 1</span></p>
+<div style="display:flex;gap:40px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">80</p></div>
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">60</p></div>
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">88</p></div>
+<div style="width:120px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">70</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#B5541A">shape (4, 1)</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Both axes kept: 4 rows and 1 column. Still a table.</p>
+</div>
+</div>
+</div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">Shapes: (4,) (4, 1)</p>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 02 Indexing and filtering</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>Both expressions select the same four values, the second subject's scores, but they return different shapes, as the notebook's output line Shapes: (4,) (4, 1) proves. A single integer in an axis position removes that axis entirely, so scores[:, 1] is a 1D array with shape (4,). A slice, even one of width 1 like 1:2, preserves the axis, so scores[:, 1:2] is still 2D with shape (4, 1): a column. This matters later when you combine arrays, because a (4,) array and a (4, 1) array broadcast differently. Rule: use an integer when you want a value or a lower-dimensional result, and a slice when you want to keep the table shape.</aside>
+</section>

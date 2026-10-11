@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 08 — Cleaning and File I/O</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 08 — Cleaning and File I/O</h1><span>13 slides · <a href="https://claude.ai/artifact/K8xsqnP4LB3zrixFBWD1o6">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative grid of array cells with some cells missing" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="161" y="1" width="130" height="130" rx="16" fill="none" stroke="#F2A35E" stroke-width="3" stroke-dasharray="12 10"/><rect x="320" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="480" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="160" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="160" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="160" width="132" height="132" rx="16" fill="#E8813A"/><rect x="480" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="320" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="320" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="481" y="321" width="130" height="130" rx="16" fill="none" stroke="#F2A35E" stroke-width="3" stroke-dasharray="12 10"/><rect x="1" y="481" width="130" height="130" rx="16" fill="none" stroke="#F2A35E" stroke-width="3" stroke-dasharray="12 10"/><rect x="160" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="480" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="480" y="480" width="132" height="132" rx="16" fill="#E8813A"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 08</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE;width:1000px">Cleaning and file I/O</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2;width:1000px">Missing values, imputation and saving arrays</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Intermediate</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">30–50 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: notebooks 00–07</p>
+</div>
+<aside>Real data arrives with holes in it. This notebook teaches three habits: detect invalid values such as NaN and infinity, fill them with a policy you state out loud, and save your cleaned arrays so they come back exactly as you left them. The dashed cells in the cover grid are the missing values we will learn to find and fill. As always, the notebook creates its own data and uses temporary files, so it is safe to rerun.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> Real data arrives with holes in it. This notebook teaches three habits: detect invalid values such as NaN and infinity, fill them with a policy you state out loud, and save your cleaned arrays so they come back exactly as you left them. The dashed cells in the cover grid are the missing values we will learn to find and fill. As always, the notebook creates its own data and uses temporary files, so it is safe to rerun.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">From messy data to saved files</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Detect</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Find NaN and infinity with isnan and isfinite.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Impute</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Fill missing values with a policy you state.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Read text</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Parse and write CSV, gaps included.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">4</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Save binary</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Round-trip arrays exactly with .npy and .npz.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>The notebook promises three things: detect invalid values, impute deliberately, and round-trip text and binary data. We split the file work into text and binary because they behave differently: CSV is easy to read and share but loses array details, while NumPy's own formats bring arrays back exactly. Prerequisites are notebooks 00 to 07; Boolean masks and np.where from earlier notebooks do most of the work here.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> The notebook promises three things: detect invalid values, impute deliberately, and round-trip text and binary data. We split the file work into text and binary because they behave differently: CSV is easy to read and share but loses array details, while NumPy's own formats bring arrays back exactly. Prerequisites are notebooks 00 to 07; Boolean masks and np.where from earlier notebooks do most of the work here.</p></div>
+<div class="slide" id="missing"><div class="frame"><section id="missing" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Missing is not zero</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Find what is missing or invalid</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">raw = np.array([[10., np.nan], [12., 20.], [np.inf, 22.]])<br>cleaned = raw.copy()<br>cleaned[~np.isfinite(cleaned)] = np.nan<br>print("Missing mask:\n", np.isnan(cleaned))<br>print("Column means ignoring missing:",<br>&#160;&#160;&#160;&#160;&#160;&#160;np.nanmean(cleaned, axis=0))<br>assert np.isnan(cleaned).sum() == 2</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Missing mask:<br>&#160;[[False&#160;&#160;True]<br>&#160;[False False]<br>&#160;[&#160;True False]]<br>Column means ignoring missing: [11. 21.]</p></div>
+</div>
+<div style="width:480px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">NaN ≠ NaN</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Never test with ==. Use np.isnan.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">isfinite is stricter</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">It rejects NaN and infinities alike.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">nan-functions skip</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">nanmean ignores the holes in each column.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>NaN, not a number, marks a missing or undefined floating-point value. It has a strange property: NaN does not equal itself, so value == np.nan is always False and you must use np.isnan instead. np.isfinite is stricter still: it is False for NaN and for plus or minus infinity. Here we decide, as a data policy rather than a universal rule, that infinity is invalid too, so we copy the data and turn every non-finite entry into NaN. Then np.nanmean computes column means while skipping the holes: 10 and 12 give 11, 20 and 22 give 21. Try it: count missing entries by row and by column with np.isnan(cleaned).sum(axis=1) and sum(axis=0). You should get [1 0 1] for rows and [1 1] for columns.</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> NaN, not a number, marks a missing or undefined floating-point value. It has a strange property: NaN does not equal itself, so value == np.nan is always False and you must use np.isnan instead. np.isfinite is stricter still: it is False for NaN and for plus or minus infinity. Here we decide, as a data policy rather than a universal rule, that infinity is invalid too, so we copy the data and turn every non-finite entry into NaN. Then np.nanmean computes column means while skipping the holes: 10 and 12 give 11, 20 and 22 give 21. Try it: count missing entries by row and by column with np.isnan(cleaned).sum(axis=1) and sum(axis=0). You should get [1 0 1] for rows and [1 1] for columns.</p></div>
+<div class="slide" id="nan-grid"><div class="frame"><section id="nan-grid" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Missing is not zero</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Raw, cleaned, masked</h2>
+<div style="display:flex;flex-direction:column;gap:48px;flex:1;justify-content:center">
+<div style="display:flex;gap:40px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">raw</p>
+<div style="display:grid;grid-template-columns:160px 160px;gap:12px">
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">nan</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">12.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">inf</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">22.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center;width:220px">
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:96px;height:48px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#B5541A"/></svg>
+<p style="font-size:24px;color:#4A5568;text-align:center">non-finite → nan</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">cleaned</p>
+<div style="display:grid;grid-template-columns:160px 160px;gap:12px">
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #B5541A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#B5541A">nan</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">12.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #B5541A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#B5541A">nan</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">22.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center;width:220px">
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:96px;height:48px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#B5541A"/></svg>
+<p style="font-size:24px;color:#4A5568;text-align:center">np.isnan</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">missing mask</p>
+<div style="display:grid;grid-template-columns:160px 160px;gap:12px">
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">False</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">True</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">False</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">False</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">True</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">False</p></div>
+</div>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;background:#13233A;padding:24px 40px;border-radius:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">np.nanmean(cleaned, axis=0) <span style="color:#F2A35E">→ [11. 21.]</span></p></div>
+<div style="flex:1;background:#13233A;padding:24px 40px;border-radius:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">np.nan == np.nan <span style="color:#F2A35E">→ False</span></p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>Walk through the three grids left to right. The raw 3 by 2 array has two problem cells, dashed: a NaN in row 0 and an infinity in row 2. The policy step uses the mask ~np.isfinite to turn both into NaN, so now there is a single kind of missing value. np.isnan then gives a Boolean grid of the same shape, True exactly where data is missing; that is the printed missing mask. Because the mask is just an array, everything from notebook 02 works on it: its sum counts missing cells, sum along an axis counts them per row or column. The bottom-left panel shows nanmean skipping the holes. The bottom-right panel is why we need isnan at all: comparing NaN with itself returns False.</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> Walk through the three grids left to right. The raw 3 by 2 array has two problem cells, dashed: a NaN in row 0 and an infinity in row 2. The policy step uses the mask ~np.isfinite to turn both into NaN, so now there is a single kind of missing value. np.isnan then gives a Boolean grid of the same shape, True exactly where data is missing; that is the printed missing mask. Because the mask is just an array, everything from notebook 02 works on it: its sum counts missing cells, sum along an axis counts them per row or column. The bottom-left panel shows nanmean skipping the holes. The bottom-right panel is why we need isnan at all: comparing NaN with itself returns False.</p></div>
+<div class="slide" id="impute"><div class="frame"><section id="impute" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Imputation with a stated assumption</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Fill the gaps on purpose</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">if np.any(np.all(np.isnan(cleaned), axis=0)):<br>&#160;&#160;&#160;&#160;raise ValueError("A column has no observed values")<br>column_means = np.nanmean(cleaned, axis=0)<br>imputed = np.where(np.isnan(cleaned), column_means, cleaned)<br>print(imputed)<br>assert np.isfinite(imputed).all()<br>np.testing.assert_allclose(imputed.mean(axis=0), column_means)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[[10. 21.]<br>&#160;[12. 20.]<br>&#160;[11. 22.]]</p></div>
+</div>
+<div style="width:480px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Guard first</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">An all-missing column has no mean, so stop with an error.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">where picks per cell</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Missing: take the column mean. Else: keep the value.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">State the policy</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Mean filling keeps the mean but shrinks the spread.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>Imputation means replacing missing values, and every imputation is an assumption you should state. Column-mean imputation is simple: it preserves each column's observed mean, which the final assert_allclose checks, but it changes the distribution and makes the data look less variable than it is. First we guard against a column that is entirely missing, because it has no observed mean to use; np.all along axis 0 detects that and we raise a clear error instead of silently producing NaN. np.where then works cell by cell: where the mask is True it takes the column mean, broadcast across rows, otherwise it keeps the original value. Try it: compare the standard deviation before and after filling. np.nanstd(cleaned, axis=0) gives [1. 1.], while imputed.std(axis=0) gives [0.8165 0.8165]: the filled values sit exactly at the mean, so the spread shrinks.</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> Imputation means replacing missing values, and every imputation is an assumption you should state. Column-mean imputation is simple: it preserves each column's observed mean, which the final assert_allclose checks, but it changes the distribution and makes the data look less variable than it is. First we guard against a column that is entirely missing, because it has no observed mean to use; np.all along axis 0 detects that and we raise a clear error instead of silently producing NaN. np.where then works cell by cell: where the mask is True it takes the column mean, broadcast across rows, otherwise it keeps the original value. Try it: compare the standard deviation before and after filling. np.nanstd(cleaned, axis=0) gives [1. 1.], while imputed.std(axis=0) gives [0.8165 0.8165]: the filled values sit exactly at the mean, so the spread shrinks.</p></div>
+<div class="slide" id="fill-grid"><div class="frame"><section id="fill-grid" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Imputation with a stated assumption</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Each hole takes its column mean</h2>
+<div style="display:flex;flex-direction:column;gap:48px;flex:1;justify-content:center">
+<div style="display:flex;gap:32px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">cleaned</p>
+<div style="display:grid;grid-template-columns:160px 160px;gap:12px">
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #B5541A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#B5541A">nan</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">12.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #B5541A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#B5541A">nan</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">22.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">column_means</p>
+<div style="display:grid;grid-template-columns:160px 160px;gap:12px">
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">11.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">21.</p></div>
+</div>
+<p style="font-size:24px;color:#4A5568">nanmean(axis=0)</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center;width:240px">
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:96px;height:48px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#B5541A"/></svg>
+<p style="font-size:24px;color:#4A5568;text-align:center">np.where(mask, means, cleaned)</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">imputed</p>
+<div style="display:grid;grid-template-columns:160px 160px;gap:12px">
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">21.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">12.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">11.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">22.</p></div>
+</div>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:24px 32px"><p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Column means · kept</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">[11. 21.] → [11. 21.]</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:24px 32px"><p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Column std · shrinks</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">[1. 1.] → [0.8165 0.8165]</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>Here np.where is drawn as a merge of two sources. The dashed cells are the missing mask from the previous slide. The blue row holds the two column means, which broadcasts down all three rows. For each cell, np.where asks: is this cell missing? If yes, it takes the mean of that cell's column, shown in orange; if not, it keeps the observed value. So the NaN in column 1 becomes 21 and the NaN in column 0 becomes 11, exactly the printed output. The two cards answer the Try it. The column means are unchanged, which the notebook asserts. The standard deviation, computed ignoring NaN before and on the filled array after, drops from 1.0 to 0.8165 in each column, because each filled value sits exactly at the mean and adds no spread. That is why the policy must be stated: it quietly makes data look more certain.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> Here np.where is drawn as a merge of two sources. The dashed cells are the missing mask from the previous slide. The blue row holds the two column means, which broadcasts down all three rows. For each cell, np.where asks: is this cell missing? If yes, it takes the mean of that cell's column, shown in orange; if not, it keeps the observed value. So the NaN in column 1 becomes 21 and the NaN in column 0 becomes 11, exactly the printed output. The two cards answer the Try it. The column means are unchanged, which the notebook asserts. The standard deviation, computed ignoring NaN before and on the filled array after, drops from 1.0 to 0.8165 in each column, because each filled value sits exactly at the mean and adds no spread. That is why the policy must be stated: it quietly makes data look more certain.</p></div>
+<div class="slide" id="parse-csv"><div class="frame"><section id="parse-csv" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · CSV and NumPy binary formats</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Parse text with gaps</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">from io import StringIO<br>parsed = np.genfromtxt(<br>&#160;&#160;&#160;&#160;StringIO("temperature,humidity\n20,50\n22,\n"),<br>&#160;&#160;&#160;&#160;delimiter=",", skip_header=1)<br>print("Parsed CSV:\n", parsed)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Parsed CSV:<br>&#160;[[20. 50.]<br>&#160;[22. nan]]</p></div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:20px;align-items:center">
+<div style="width:560px;display:flex;flex-direction:column;gap:4px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:24px 32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#9AA3AE;text-decoration:line-through">temperature,humidity</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#13233A">20,50</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#13233A">22,<span style="color:#B5541A">&#160;&#160;← empty field</span></p>
+</div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:48px;height:72px" aria-hidden="true"><polygon points="30,0 30,60 0,60 50,100 100,60 70,60 70,0" fill="#B5541A"/></svg>
+<div style="display:grid;grid-template-columns:160px 160px;gap:12px">
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">50.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">22.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #B5541A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#B5541A">nan</p></div>
+</div>
+<p style="font-size:24px;color:#4A5568;text-align:center">Header skipped; the empty field becomes nan.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>CSV, comma-separated values, is the most common way data arrives. np.genfromtxt parses simple numeric text and, unlike np.loadtxt, tolerates missing entries. StringIO lets us treat a Python string as if it were a file, so the example needs no file on disk. The right side shows what happens to the three lines of text: skip_header=1 drops the header line, delimiter="," splits each line into fields, and the empty field after 22 becomes nan. So genfromtxt hands you a float array with NaN already in place, ready for the detection and imputation steps you just learned.</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> CSV, comma-separated values, is the most common way data arrives. np.genfromtxt parses simple numeric text and, unlike np.loadtxt, tolerates missing entries. StringIO lets us treat a Python string as if it were a file, so the example needs no file on disk. The right side shows what happens to the three lines of text: skip_header=1 drops the header line, delimiter="," splits each line into fields, and the empty field after 22 becomes nan. So genfromtxt hands you a float array with NaN already in place, ready for the detection and imputation steps you just learned.</p></div>
+<div class="slide" id="save-load"><div class="frame"><section id="save-load" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · CSV and NumPy binary formats</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Save, load, and prove the round trip</h2>
+<div style="display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">with TemporaryDirectory() as folder:<br>&#160;&#160;&#160;&#160;folder = Path(folder)<br>&#160;&#160;&#160;&#160;np.savetxt(folder / "clean.csv", imputed, delimiter=",", header="a,b", comments="")<br>&#160;&#160;&#160;&#160;from_csv = np.loadtxt(folder / "clean.csv", delimiter=",", skiprows=1)<br>&#160;&#160;&#160;&#160;np.save(folder / "clean.npy", imputed)<br>&#160;&#160;&#160;&#160;from_npy = np.load(folder / "clean.npy", allow_pickle=False)<br>&#160;&#160;&#160;&#160;np.savez_compressed(folder / "bundle.npz", data=imputed, means=column_means)<br>&#160;&#160;&#160;&#160;with np.load(folder / "bundle.npz", allow_pickle=False) as archive:<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;print("Saved names:", archive.files)<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;np.testing.assert_allclose(archive["data"], imputed)<br>&#160;&#160;&#160;&#160;np.testing.assert_allclose(from_csv, imputed)<br>&#160;&#160;&#160;&#160;np.testing.assert_array_equal(from_npy, imputed)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Saved names: ['data', 'means']</p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>This cell writes the imputed array three ways and reads each one back. TemporaryDirectory gives a throwaway folder that is deleted when the with block ends, so the example is safe to rerun; swap in a Path of your choosing when you want files that persist. np.savetxt writes CSV text, with the header a,b and comments="" so the header line is not prefixed with a hash; np.loadtxt reads it back, skipping that header. np.save writes one array to a .npy file and np.load reads it; allow_pickle=False is a safety habit, so loading never runs arbitrary Python objects. np.savez_compressed stores several arrays by name in one .npz archive, and archive.files lists those names. Notice the checks: the CSV copy is compared with assert_allclose, because text can round, while the .npy copy passes the stricter assert_array_equal. The only printed line is the archive's names; silence from the asserts means every round trip worked.</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> This cell writes the imputed array three ways and reads each one back. TemporaryDirectory gives a throwaway folder that is deleted when the with block ends, so the example is safe to rerun; swap in a Path of your choosing when you want files that persist. np.savetxt writes CSV text, with the header a,b and comments="" so the header line is not prefixed with a hash; np.loadtxt reads it back, skipping that header. np.save writes one array to a .npy file and np.load reads it; allow_pickle=False is a safety habit, so loading never runs arbitrary Python objects. np.savez_compressed stores several arrays by name in one .npz archive, and archive.files lists those names. Notice the checks: the CSV copy is compared with assert_allclose, because text can round, while the .npy copy passes the stricter assert_array_equal. The only printed line is the archive's names; silence from the asserts means every round trip worked.</p></div>
+<div class="slide" id="formats"><div class="frame"><section id="formats" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · CSV and NumPy binary formats</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">CSV vs .npy vs .npz</h2>
+<div style="display:flex;gap:32px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Text</p>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#13233A">CSV</p>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Readable anywhere, but the array's dtype is not stored.</p>
+<div style="background:#13233A;padding:20px 28px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">np.savetxt<br>np.loadtxt, np.genfromtxt</p></div>
+<div style="flex:1"></div>
+<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#B5541A;width:40px;height:40px" role="img" aria-label="Warning"><path d="M12 3 22 20H2Z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">int64 in → float64 out</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Binary · one array</p>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#13233A">.npy</p>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Exact values, with dtype and shape saved alongside.</p>
+<div style="background:#13233A;padding:20px 28px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">np.save<br>np.load</p></div>
+<div style="flex:1"></div>
+<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="CheckCircle"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">int64 in → int64 out</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Binary · many arrays</p>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#13233A">.npz</p>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Several named arrays in one zip archive.</p>
+<div style="background:#13233A;padding:20px 28px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">np.savez_compressed<br>np.load(...)["data"]</p></div>
+<div style="flex:1"></div>
+<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="CheckCircle"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">['data', 'means']</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">9</p></div>
+<aside>Choose the format by who reads the file next. CSV is plain text: people, spreadsheets and other languages can open it, but it stores only digits and commas. The array's dtype is not kept, and floats are written as long decimal text such as 1.000000000000000000e+01. NumPy's .npy format stores one array in binary together with its dtype and shape, so it comes back exactly. .npz bundles several arrays under names, like data and means here, and savez_compressed zips them. The bottom row of each card is the Try it experiment: save the integer array [1, 2, 3] as .npy and np.load returns int64 again, while the same array written with savetxt and read back with loadtxt comes back as float64. Use CSV to share, .npy or .npz to resume work.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> Choose the format by who reads the file next. CSV is plain text: people, spreadsheets and other languages can open it, but it stores only digits and commas. The array's dtype is not kept, and floats are written as long decimal text such as 1.000000000000000000e+01. NumPy's .npy format stores one array in binary together with its dtype and shape, so it comes back exactly. .npz bundles several arrays under names, like data and means here, and savez_compressed zips them. The bottom row of each card is the Try it experiment: save the integer array [1, 2, 3] as .npy and np.load returns int64 again, while the same array written with savetxt and read back with loadtxt comes back as float64. Use CSV to share, .npy or .npz to resume work.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Missing is not zero.<br>Say how you fill it.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">Detect gaps with isnan, fill them with a stated policy, and save arrays in a format that brings them back exactly.</p>
+<aside>Pause here. Treating a missing value as zero silently drags means down and invents data. The professional habit is a short chain: detect invalid values with isnan and isfinite, decide and write down a policy such as column-mean or median filling, check the result with asserts, and save the cleaned array as .npy or .npz so the next session starts from exactly the same numbers.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> Pause here. Treating a missing value as zero silently drags means down and invents data. The professional habit is a short chain: detect invalid values with isnan and isfinite, decide and write down a policy such as column-mean or median filling, check the result with asserts, and save the cleaned array as .npy or .npz so the next session starts from exactly the same numbers.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two cleaning exercises</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Keep only rows where every value is finite</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">From [[1, 2], [nan, 3], [4, 5], [6, inf]]. Expected: [[1, 2], [4, 5]].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">valid_rows = measurements[np.isfinite(<br>&#160;&#160;&#160;&#160;measurements).all(axis=1)]</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Replace NaN with the median of observed values</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">From [1, nan, 3, 9]. Expected: [1, 3, 3, 9].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">filled_values = np.where(<br>&#160;&#160;&#160;&#160;np.isnan(values),<br>&#160;&#160;&#160;&#160;np.nanmedian(values), values)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>Give the audience time to attempt both before revealing the code, which matches the reference solutions. Exercise 1: np.isfinite builds an element mask, and all(axis=1) requires every entry in a row to be valid before that row is selected; the NaN row and the infinity row both drop out, leaving [[1, 2], [4, 5]]. This is dropping rather than filling, which is the other common policy. Exercise 2: np.nanmedian ignores the NaN and finds the median of 1, 3 and 9, which is 3; np.where then replaces only the missing entry, giving [1, 3, 3, 9]. The median is a sensible choice when a column may have outliers like 9.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> Give the audience time to attempt both before revealing the code, which matches the reference solutions. Exercise 1: np.isfinite builds an element mask, and all(axis=1) requires every entry in a row to be valid before that row is selected; the NaN row and the infinity row both drop out, leaving [[1, 2], [4, 5]]. This is dropping rather than filling, which is the other common policy. Exercise 2: np.nanmedian ignores the NaN and finds the median of 1, 3 and 9, which is 3; np.where then replaces only the missing entry, giving [1, 3, 3, 9]. The median is a sensible choice when a column may have outliers like 9.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Clean a CSV, end to end</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Write a numeric CSV with a header and two missing values</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Load it, report missing counts, apply a documented filling policy, and save a verified .npy copy.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain the main idea without reading the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a changed input or edge case and explain it</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">12</p></div>
+<aside>The challenge strings the whole notebook together. Write the CSV text yourself, so you know exactly where the two gaps are, then load it with np.genfromtxt and skip_header=1. Report missing counts per column with np.isnan(data).sum(axis=0) and check they total 2. Choose a filling policy, mean or median per column, and write it down in a markdown cell. Save the result with np.save, load it back with allow_pickle=False, and prove it with np.testing.assert_array_equal. There is no supplied check, so decide the expected filled values before you run anything. Then restart the kernel and run all cells once more.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> The challenge strings the whole notebook together. Write the CSV text yourself, so you know exactly where the two gaps are, then load it with np.genfromtxt and skip_header=1. Report missing counts per column with np.isnan(data).sum(axis=0) and check they total 2. Choose a filling policy, mean or median per column, and write it down in a markdown cell. Save the result with np.save, load it back with allow_pickle=False, and prove it with np.testing.assert_array_equal. There is no supplied check, so decide the expected filled values before you run anything. Then restart the kernel and run all cells once more.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Detect</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">isnan and isfinite, never == nan.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Impute</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">np.where with a policy you state.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">CSV</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Readable text that loses the dtype.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">.npy, .npz</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Exact round trips, one or many arrays.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 09</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Sort, search and group</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Sort related arrays together, find insertion points, and reduce by group.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 09, where clean arrays get ordered, searched and summarised by group. Further reading: the official NumPy how-to on reading and writing files at numpy.org/doc/stable/user/how-to-io.html.</aside>
+</section>
+</div><p class="notes"><b>Notes · 13</b> Recap the four takeaways, then point to notebook 09, where clean arrays get ordered, searched and summarised by group. Further reading: the official NumPy how-to on reading and writing files at numpy.org/doc/stable/user/how-to-io.html.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

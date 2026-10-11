@@ -1,0 +1,17 @@
+<section id="strides-code" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Advanced indexing and strides</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Fancy indexing copies</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">a = np.arange(12, dtype=np.int64).reshape(3, 4)<br>selected = a[[0, 2]]<br>selected[0, 0] = -100<br>assert a[0, 0] == 0<br>print("Original strides:", a.strides)<br>print("Transpose strides:", a.T.strides)<br>print("C contiguous:", a.flags.c_contiguous,<br>&#160;&#160;&#160;&#160;&#160;&#160;a.T.flags.c_contiguous)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Original strides: (32, 8)<br>Transpose strides: (8, 32)<br>C contiguous: True False</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">a[[0, 2]] is new data</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Integer-array and Boolean reads copy, so a[0, 0] stays 0.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Strides are byte jumps</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">(32, 8): 32 bytes to the next row, 8 to the next column.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">.T swaps the strides</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Same bytes, new steps (8, 32), and no longer C-contiguous.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 11 Copies and views</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>Advanced indexing, meaning an integer array like a[[0, 2]] or a Boolean mask, cannot be described as a regular step through memory, so reading it returns a copy. Changing selected therefore leaves a untouched, which the assert proves. Assignment is different: a[mask] = value writes directly into a. That is why chained indexing such as a[mask][0] = 5 silently does nothing to a: the first indexing step already made a copy. Strides are the number of bytes to jump to move one step along each axis. Each int64 is 8 bytes and each row has 4 of them, so moving down a row jumps 32 bytes. The transpose simply swaps the strides to (8, 32) without moving any values, which is why it is no longer C-contiguous.</aside>
+</section>

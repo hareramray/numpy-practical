@@ -1,0 +1,31 @@
+<section id="variance" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Explained variance</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two directions hold almost all</h2>
+<div style="display:flex;gap:96px;flex:1;align-items:end">
+<div style="display:flex;gap:64px;align-items:end;border-bottom:2px solid #9AA3AE;padding:0px 32px">
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">0.6245</p>
+<div style="width:200px;height:437px;background:#2F6FB0;border-radius:12px 12px 0px 0px"></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">0.3675</p>
+<div style="width:200px;height:257px;background:#2F6FB0;border-radius:12px 12px 0px 0px"></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">0.008</p>
+<div style="width:200px;height:6px;background:#E8813A;border-radius:3px 3px 0px 0px"></div>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:8px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">0.992</p><p style="font-size:28px;line-height:1.4;color:#4A5568">kept by PC1 and PC2 together</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:8px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">0.008</p><p style="font-size:28px;line-height:1.4;color:#4A5568">reconstruction MSE: exactly the share PC3 held</p></div>
+</div>
+</div>
+<div style="display:flex;gap:64px;padding:0px 32px">
+<p style="width:200px;font-size:24px;font-weight:600;text-align:center;color:#13233A">PC1 · kept</p>
+<p style="width:200px;font-size:24px;font-weight:600;text-align:center;color:#13233A">PC2 · kept</p>
+<p style="width:200px;font-size:24px;font-weight:600;text-align:center;color:#B5541A">PC3 · dropped</p>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>These bars are the real explained variance ratios from the notebook: 0.6245, 0.3675 and 0.008. The first two directions carry 99.2 percent of the variation, so a 2-D picture loses almost nothing; the third is essentially the 0.55 noise within each group. There is a neat identity here: because every standardised column has variance 1, the mean squared reconstruction error equals the share of variance you dropped, and the notebook prints 0.0079999 against a ratio of 0.008. Read a chart like this whenever you choose how many components to keep: look for the point where the bars collapse.</aside>
+</section>

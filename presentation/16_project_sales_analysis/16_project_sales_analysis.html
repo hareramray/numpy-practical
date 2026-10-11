@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 16 — Sales Analysis Project</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 16 — Sales Analysis Project</h1><span>15 slides · <a href="https://claude.ai/artifact/5W1EvuFRqn4DEfbyWTSnBA">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative data cube: three stacked layers of store by product cells, two cells marked as missing" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><g opacity="0.5"><rect x="96" y="50" width="110" height="110" rx="14" fill="#22344F"/><rect x="226" y="50" width="110" height="110" rx="14" fill="#22344F"/><rect x="356" y="50" width="110" height="110" rx="14" fill="#22344F"/><rect x="486" y="50" width="110" height="110" rx="14" fill="#22344F"/><rect x="486" y="180" width="110" height="110" rx="14" fill="#22344F"/><rect x="486" y="310" width="110" height="110" rx="14" fill="#22344F"/></g><rect x="48" y="98" width="110" height="110" rx="14" fill="#22344F"/><rect x="178" y="98" width="110" height="110" rx="14" fill="#22344F"/><rect x="308" y="98" width="110" height="110" rx="14" fill="#22344F"/><rect x="438" y="98" width="110" height="110" rx="14" fill="#22344F"/><rect x="438" y="228" width="110" height="110" rx="14" fill="#22344F"/><rect x="438" y="358" width="110" height="110" rx="14" fill="#22344F"/><rect x="0" y="146" width="110" height="110" rx="14" fill="#2F6FB0"/><rect x="130" y="146" width="110" height="110" rx="14" fill="#E8813A"/><rect x="260" y="146" width="110" height="110" rx="14" fill="#2F6FB0"/><rect x="390" y="146" width="110" height="110" rx="14" fill="#2F6FB0"/><rect x="0" y="276" width="110" height="110" rx="14" fill="#2F6FB0"/><rect x="130" y="276" width="110" height="110" rx="14" fill="#2F6FB0"/><rect x="260" y="276" width="110" height="110" rx="14" fill="#2F6FB0"/><rect x="390" y="276" width="110" height="110" rx="14" fill="#2F6FB0"/><rect x="0" y="406" width="110" height="110" rx="14" fill="#2F6FB0"/><rect x="130" y="406" width="110" height="110" rx="14" fill="#2F6FB0"/><rect x="260" y="406" width="110" height="110" rx="14" fill="#2F6FB0"/><rect x="390" y="406" width="110" height="110" rx="14" fill="#E8813A"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 16</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE;width:1000px">Sales analysis project</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2;width:1000px">A month of store sales, end to end</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Capstone project</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">60–90 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: 00–09; revisit 11–13</p>
+</div>
+<aside>This is the first of two capstone projects. You manage three stores selling four products over 30 days, and you build a small report: revenue per store, the top product and the daily trend. Nothing here is new syntax. The project combines cleaning, broadcasting, aggregation and plotting from earlier notebooks into one pipeline. The cube at right is the data: days stacked as layers, each a store by product grid, with the two missing counts in orange. The dataset is synthetic and prices are fixed, so treat findings as practice, not business truth.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> This is the first of two capstone projects. You manage three stores selling four products over 30 days, and you build a small report: revenue per store, the top product and the daily trend. Nothing here is new syntax. The project combines cleaning, broadcasting, aggregation and plotting from earlier notebooks into one pipeline. The cube at right is the data: days stacked as layers, each a store by product grid, with the two missing counts in orange. The dataset is synthetic and prices are fixed, so treat findings as practice, not business truth.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One project, four NumPy skills</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Clean</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Fill missing counts with a per-pair average, and keep the mask for auditing.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Broadcast</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Multiply a (30, 3, 4) cube by a price vector of length 4.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Aggregate</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Sum over axis tuples to get revenue per store, product and day.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">4</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Interpret</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Plot with labelled units and state findings with numbers and limits.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>The notebook's goal is to combine cleaning, broadcasting, aggregation, plots and business interpretation. Each of these was a separate notebook earlier: cleaning in 08, broadcasting in 05, statistics in 06 and windows in 14. Here they meet in one workflow, and the hard part is keeping shapes and totals consistent between stages. Before running each stage, sketch the expected output shape on paper. The worked pipeline is a model; the exercises and the challenge ask you to extend it.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> The notebook's goal is to combine cleaning, broadcasting, aggregation, plots and business interpretation. Each of these was a separate notebook earlier: cleaning in 08, broadcasting in 05, statistics in 06 and windows in 14. Here they meet in one workflow, and the hard part is keeping shapes and totals consistent between stages. Before running each stage, sketch the expected output shape on paper. The worked pipeline is a model; the exercises and the challenge ask you to extend it.</p></div>
+<div class="slide" id="pipeline"><div class="frame"><section id="pipeline" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">The workflow</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Five stages, one data cube</h2>
+<div style="display:flex;gap:12px;align-items:center">
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 24px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Generate</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Poisson counts, shape (30, 3, 4), two NaN</p>
+</div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:40px;height:20px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 24px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Clean</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Fill each NaN with its pair's mean</p>
+</div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:40px;height:20px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 24px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Analyse</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Units × prices, then sums by axis</p>
+</div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:40px;height:20px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 24px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Visualise</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Daily trend, 7-day mean, store bars</p>
+</div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:40px;height:20px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:16px;padding:28px 24px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Export</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Save to .npz, reload, verify equality</p>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:56px;height:56px" role="img" aria-label="CheckCircle"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Every stage ends with a check: the expected shape, finite values, and totals that agree however you sum them.</p>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>This is the map for the whole session. The four solid stages are worked in the notebook's three steps; the dashed export stage is yours, in the independent challenge. Every stage passes the same array forward, so a mistake early, such as treating a missing count as zero, silently flows into every later number. That is why each stage ends with an assertion: the cube keeps shape (30, 3, 4), revenue is finite, and store totals, product totals and daily totals all add up to the same grand total.</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> This is the map for the whole session. The four solid stages are worked in the notebook's three steps; the dashed export stage is yours, in the independent challenge. Every stage passes the same array forward, so a mistake early, such as treating a missing count as zero, silently flows into every later number. That is why each stage ends with an assertion: the cube keeps shape (30, 3, 4), revenue is finite, and store totals, product totals and daily totals all add up to the same grand total.</p></div>
+<div class="slide" id="generate"><div class="frame"><section id="generate" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Generate the data</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Reproducible synthetic sales</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">rng = np.random.default_rng(2026)<br>stores = np.array(["North", "Central", "South"])<br>products = np.array(["Tea", "Coffee",<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"Juice", "Water"])<br>prices = np.array([20., 40., 35., 15.])<br>units = rng.poisson(lam=np.array([12, 8, 6, 15]),<br>&#160;&#160;&#160;&#160;size=(30, 3, 4)).astype(float)<br>units[2, 0, 1] = np.nan<br>units[10, 2, 3] = np.nan<br>print("Shape:", units.shape,<br>&#160;&#160;&#160;&#160;&#160;&#160;"missing:", np.isnan(units).sum())</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Shape: (30, 3, 4) missing: 2</p></div>
+</div>
+<div style="width:600px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A seeded generator</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Seed 2026 gives everyone the same month of sales.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">One rate per product</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">lam broadcasts along the last axis: about 12, 8, 6 and 15 units a day.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">NaN is not zero</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">It marks a count we never observed. astype(float) makes room for it.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>The brief: three stores, four products, 30 days. Poisson counts model whole units sold per day, and the rate vector of length 4 broadcasts against the size (30, 3, 4), so each product gets its own average. Poisson returns integers, which cannot hold NaN, so the cube is converted to float before two counts are blanked out. Ask the audience to predict the shape and the missing count before running. Try it: add a fifth product. The rate vector, the price vector and the product names must all grow to length 5, and the shape becomes (30, 3, 5); forget one and broadcasting or the report breaks.</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> The brief: three stores, four products, 30 days. Poisson counts model whole units sold per day, and the rate vector of length 4 broadcasts against the size (30, 3, 4), so each product gets its own average. Poisson returns integers, which cannot hold NaN, so the cube is converted to float before two counts are blanked out. Ask the audience to predict the shape and the missing count before running. Try it: add a fifth product. The rate vector, the price vector and the product names must all grow to length 5, and the shape becomes (30, 3, 5); forget one and broadcasting or the report breaks.</p></div>
+<div class="slide" id="cube"><div class="frame"><section id="cube" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · The data cube</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Day × store × product</h2>
+<div style="display:flex;gap:56px;flex:1;align-items:center">
+<div style="display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;gap:56px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A;padding:0px 0px 8px 0px">units[2] <span style="color:#6B7280">· day 3</span></p>
+<div style="display:flex;gap:8px"><div style="width:150px"></div><p style="width:96px;font-size:24px;text-align:center;color:#4A5568">Tea</p><p style="width:96px;font-size:24px;text-align:center;color:#4A5568">Coffee</p><p style="width:96px;font-size:24px;text-align:center;color:#4A5568">Juice</p><p style="width:96px;font-size:24px;text-align:center;color:#4A5568">Water</p></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:150px;font-size:24px;color:#4A5568">North</p><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#13233A">NaN</p></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:150px;font-size:24px;color:#4A5568">Central</p><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:150px;font-size:24px;color:#4A5568">South</p><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A;padding:0px 0px 8px 0px">units[10] <span style="color:#6B7280">· day 11</span></p>
+<div style="display:flex;gap:8px"><div style="width:150px"></div><p style="width:96px;font-size:24px;text-align:center;color:#4A5568">Tea</p><p style="width:96px;font-size:24px;text-align:center;color:#4A5568">Coffee</p><p style="width:96px;font-size:24px;text-align:center;color:#4A5568">Juice</p><p style="width:96px;font-size:24px;text-align:center;color:#4A5568">Water</p></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:150px;font-size:24px;color:#4A5568">North</p><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:150px;font-size:24px;color:#4A5568">Central</p><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:150px;font-size:24px;color:#4A5568">South</p><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;background:#E2DED3;border-radius:12px"></div><div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#13233A">NaN</p></div></div>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568;width:1188px">units[2, 0, 1] is day 3, North, Coffee. units[10, 2, 3] is day 11, South, Water. Each day is one 3 × 4 layer; 30 layers stack along axis 0.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">axis 0 · 30</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Day: one layer each</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">axis 1 · 3</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Store: the rows</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">axis 2 · 4</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Product: the columns</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>Draw this cube before writing any analysis code. Axis 0 is the day, axis 1 the store and axis 2 the product, so units[2, 0, 1] reads as day index 2 (the third day), store 0 (North), product 1 (Coffee). The two orange cells are the only missing counts in 360 entries. Every later question is a choice of axes: per store means collapse days and products, per product collapses days and stores, per day collapses stores and products. Naming the axes now makes those reductions obvious later.</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> Draw this cube before writing any analysis code. Axis 0 is the day, axis 1 the store and axis 2 the product, so units[2, 0, 1] reads as day index 2 (the third day), store 0 (North), product 1 (Coffee). The two orange cells are the only missing counts in 360 entries. Every later question is a choice of axes: per store means collapse days and products, per product collapses days and stores, per day collapses stores and products. Naming the axes now makes those reductions obvious later.</p></div>
+<div class="slide" id="clean"><div class="frame"><section id="clean" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Clean</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Impute, but keep the audit trail</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:600px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Guard first</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A pair with no observed day has no mean to borrow, so fail loudly.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Fill per pair</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">nanmean over days, one average per store and product.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Measure the guess</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The mask selects exactly the revenue we estimated.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">missing = np.isnan(units)<br>if np.any(missing.all(axis=0)):<br>&#160;&#160;&#160;&#160;raise ValueError("A store/product pair "<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"has no observed counts")<br>mean_units = np.nanmean(units, axis=0,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;keepdims=True)<br>filled_units = np.where(missing, mean_units,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;units)<br>revenue = filled_units * prices<br>print("Revenue from imputed entries:",<br>&#160;&#160;&#160;&#160;&#160;&#160;revenue[missing].sum().round(2))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Revenue from imputed entries: 584.66</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>The cleaning policy: fill a missing count with that store and product pair's average observed count across days. The result is a fractional estimated count, so anything built on it must be reported as an estimate. Notice we never overwrite units: the original array and the missing mask stay available for auditing, and revenue[missing] tells us exactly how much revenue rests on guesses, 584.66 here. Try it: compare the total with np.nansum(units * prices), which simply drops the two missing entries. That total is lower by the imputed revenue, because dropping silently treats the unknown counts as zero sales.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> The cleaning policy: fill a missing count with that store and product pair's average observed count across days. The result is a fractional estimated count, so anything built on it must be reported as an estimate. Notice we never overwrite units: the original array and the missing mask stay available for auditing, and revenue[missing] tells us exactly how much revenue rests on guesses, 584.66 here. Try it: compare the total with np.nansum(units * prices), which simply drops the two missing entries. That total is lower by the imputed revenue, because dropping silently treats the unknown counts as zero sales.</p></div>
+<div class="slide" id="impute"><div class="frame"><section id="impute" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · How the fill broadcasts</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">keepdims makes the means line up</h2>
+<div style="display:flex;flex-direction:column;gap:56px;flex:1;justify-content:center">
+<div style="display:flex;gap:24px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#6B7280">units, missing</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">(30, 3, 4)</h3></div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:56px;height:28px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#2F6FB0;border-radius:16px;padding:28px 32px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#F6F4EE">nanmean(axis=0, keepdims)</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">(1, 3, 4)</h3></div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:56px;height:28px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#6B7280">np.where(...)</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">(30, 3, 4)</h3></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">units[:, 0, 1] <span style="color:#6B7280">→ North · Coffee, all 30 days</span></p>
+<div style="display:flex;gap:12px;align-items:center">
+<div style="width:110px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">d1</p></div>
+<div style="width:110px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">d2</p></div>
+<div style="width:110px;height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#13233A">NaN</p></div>
+<div style="width:110px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">d4</p></div>
+<div style="width:110px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280">…</p></div>
+<div style="width:110px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">d30</p></div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:56px;height:28px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg>
+<div style="width:110px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">d2</p></div>
+<div style="width:200px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#F6F4EE">mean of 29</p></div>
+<div style="width:110px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">d4</p></div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">np.where picks cell by cell: the pair's mean where missing is True, the original count everywhere else.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>This diagram explains why the one-line fill works. nanmean over axis 0 ignores the NaN and averages the 29 observed days for each of the 12 store and product pairs. keepdims=True keeps that collapsed axis as length 1, giving shape (1, 3, 4) instead of (3, 4). np.where then broadcasts the three inputs together: the (30, 3, 4) mask, the (1, 3, 4) means stretched across all 30 days, and the original counts. Without keepdims the shapes would still broadcast here, because (3, 4) aligns from the right, but keepdims makes the intent explicit and stays correct if you reduce a middle axis instead.</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> This diagram explains why the one-line fill works. nanmean over axis 0 ignores the NaN and averages the 29 observed days for each of the 12 store and product pairs. keepdims=True keeps that collapsed axis as length 1, giving shape (1, 3, 4) instead of (3, 4). np.where then broadcasts the three inputs together: the (30, 3, 4) mask, the (1, 3, 4) means stretched across all 30 days, and the original counts. Without keepdims the shapes would still broadcast here, because (3, 4) aligns from the right, but keepdims makes the intent explicit and stays correct if you reduce a middle axis instead.</p></div>
+<div class="slide" id="analyse"><div class="frame"><section id="analyse" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Analyse</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Revenue, then three summaries</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">revenue = filled_units * prices<br>store_revenue = revenue.sum(axis=(0, 2))<br>product_revenue = revenue.sum(axis=(0, 1))<br>daily_revenue = revenue.sum(axis=(1, 2))<br>print("Revenue by store:",<br>&#160;&#160;dict(zip(stores, store_revenue.round(2))))<br>print("Top product:",<br>&#160;&#160;products[product_revenue.argmax()])</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Revenue by store: {np.str_('North'):<br>np.float64(31487.76), np.str_('Central'):<br>np.float64(30220.0), np.str_('South'):<br>np.float64(29411.9)}<br>Top product: Coffee</p></div>
+</div>
+<div style="width:600px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Prices broadcast</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The (4,) vector lines up with the product axis, the last one.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Axis tuples</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Name the axes to collapse; the one left over is the answer.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">NumPy 2 reprs</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Dict values print as np.float64(…); they are ordinary numbers.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>Revenue is units times price for every day, store and product. Because prices has shape (4,), broadcasting aligns it with the last axis of the (30, 3, 4) cube with no loop and no reshape. Each summary is then a single sum over an axis tuple: drop days and products to get one number per store, drop days and stores for one per product, drop stores and products for one per day. argmax returns a position, and indexing the products array with it turns that position into a name. The notebook follows with checks you should keep in your own work: revenue is finite everywhere, and store totals and daily totals reconcile to the same grand total.</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> Revenue is units times price for every day, store and product. Because prices has shape (4,), broadcasting aligns it with the last axis of the (30, 3, 4) cube with no loop and no reshape. Each summary is then a single sum over an axis tuple: drop days and products to get one number per store, drop days and stores for one per product, drop stores and products for one per day. argmax returns a position, and indexing the products array with it turns that position into a name. The notebook follows with checks you should keep in your own work: revenue is finite everywhere, and store totals and daily totals reconcile to the same grand total.</p></div>
+<div class="slide" id="reduce"><div class="frame"><section id="reduce" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Which axes to sum</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Sum away what you don't need</h2>
+<div style="display:flex;flex-direction:column;gap:32px;flex:1;justify-content:center">
+<div style="display:flex;gap:40px;align-items:center">
+<div style="width:520px;display:flex;flex-direction:column;gap:4px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">filled_units * prices</p><p style="font-size:24px;color:#6B7280">broadcast on the last axis</p></div>
+<div style="display:flex;gap:16px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A;background:#E2DED3;padding:16px 24px;border-radius:12px">(30, 3, 4)</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#6B7280">×</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A;background:#E2DED3;padding:16px 24px;border-radius:12px">(4,)</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#6B7280">→</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE;background:#2F6FB0;padding:16px 24px;border-radius:12px">revenue (30, 3, 4)</p>
+</div>
+</div>
+<div style="display:flex;gap:40px;align-items:center">
+<div style="width:520px;display:flex;flex-direction:column;gap:4px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">.sum(axis=(0, 2))</p><p style="font-size:24px;color:#6B7280">→ shape (3,), one per store</p></div>
+<div style="display:flex;gap:12px">
+<div style="width:300px;display:flex;flex-direction:column;gap:4px;align-items:center;background:#E2DED3;border-radius:12px;padding:12px 16px"><p style="font-size:24px;color:#4A5568">North</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">31487.76</p></div>
+<div style="width:300px;display:flex;flex-direction:column;gap:4px;align-items:center;background:#E2DED3;border-radius:12px;padding:12px 16px"><p style="font-size:24px;color:#4A5568">Central</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">30220.0</p></div>
+<div style="width:300px;display:flex;flex-direction:column;gap:4px;align-items:center;background:#E2DED3;border-radius:12px;padding:12px 16px"><p style="font-size:24px;color:#4A5568">South</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">29411.9</p></div>
+</div>
+</div>
+<div style="display:flex;gap:40px;align-items:center">
+<div style="width:520px;display:flex;flex-direction:column;gap:4px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">.sum(axis=(0, 1))</p><p style="font-size:24px;color:#6B7280">→ shape (4,); argmax picks Coffee</p></div>
+<div style="display:flex;gap:12px">
+<div style="width:220px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-size:28px;color:#13233A">Tea</p></div>
+<div style="width:220px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-size:28px;font-weight:600;color:#F6F4EE">Coffee · top</p></div>
+<div style="width:220px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-size:28px;color:#13233A">Juice</p></div>
+<div style="width:220px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-size:28px;color:#13233A">Water</p></div>
+</div>
+</div>
+<div style="display:flex;gap:40px;align-items:center">
+<div style="width:520px;display:flex;flex-direction:column;gap:4px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">.sum(axis=(1, 2))</p><p style="font-size:24px;color:#6B7280">→ shape (30,); day 9 is the best</p></div>
+<div style="display:flex;gap:4px">
+<div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E8813A;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div><div style="width:30px;height:80px;background:#E2DED3;border-radius:6px"></div>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">9</p></div>
+<aside>Read each row as: which axes disappear, and which one survives. The first row is broadcasting: a length 4 price vector stretches across 30 days and 3 stores. The store row keeps axis 1 and shows the real totals; North leads at 31487.76. The product row keeps axis 2, and argmax picks Coffee, the most expensive product at 40 per unit even though Tea and Water sell more units. The daily row keeps axis 0; its argmax is index 8, which is day 9 because days are numbered from 1 in the report. All three rows add up to the same grand total, 91119.66, which is the reconciliation check.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> Read each row as: which axes disappear, and which one survives. The first row is broadcasting: a length 4 price vector stretches across 30 days and 3 stores. The store row keeps axis 1 and shows the real totals; North leads at 31487.76. The product row keeps axis 2, and argmax picks Coffee, the most expensive product at 40 per unit even though Tea and Water sell more units. The daily row keeps axis 0; its argmax is index 8, which is day 9 because days are numbered from 1 in the report. All three rows add up to the same grand total, 91119.66, which is the reconciliation check.</p></div>
+<div class="slide" id="visualise"><div class="frame"><section id="visualise" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Visualise</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">A trend line and store bars</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:600px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A 7-day window</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">30 days give 24 full windows, so the smooth line starts on day 7.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Two views</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Lines show change over time; bars compare totals.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Label units</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Each y-axis says Revenue (currency units).</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">weekly_trend = sliding_window_view(<br>&#160;&#160;&#160;&#160;daily_revenue, 7).mean(axis=-1)<br>fig, axes = plt.subplots(1, 2, figsize=(11, 3.5))<br>axes[0].plot(np.arange(1, 31), daily_revenue,<br>&#160;&#160;&#160;&#160;alpha=0.5, label="Daily")<br>axes[0].plot(np.arange(7, 31), weekly_trend,<br>&#160;&#160;&#160;&#160;linewidth=2, label="7-day mean")<br>axes[1].bar(stores, store_revenue)<br>print("Best day:", daily_revenue.argmax() + 1)<br>print("Estimated total revenue:",<br>&#160;&#160;&#160;&#160;round(revenue.sum(), 2))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Best day: 9<br>Estimated total revenue: 91119.66</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">10</p></div>
+<aside>sliding_window_view from notebook 14 returns a (24, 7) view of the 30 daily totals with no copying; averaging the last axis gives the rolling mean. The x values for the smooth line start at 7 because the first full window ends on day 7: the initial incomplete windows are omitted, not padded. The code is trimmed here; the notebook also sets axis labels, titles and a legend, then calls plt.tight_layout and plt.show. Note the word Estimated in the total: it includes the imputed counts. Try it: write three findings that each quote a number, plus one limitation caused by the missing data, for example that 584.66 of the total rests on two imputed counts.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> sliding_window_view from notebook 14 returns a (24, 7) view of the 30 daily totals with no copying; averaging the last axis gives the rolling mean. The x values for the smooth line start at 7 because the first full window ends on day 7: the initial incomplete windows are omitted, not padded. The code is trimmed here; the notebook also sets axis labels, titles and a legend, then calls plt.tight_layout and plt.show. Note the word Estimated in the total: it includes the imputed counts. Try it: write three findings that each quote a number, plus one limitation caused by the missing data, for example that 584.66 of the total rests on two imputed counts.</p></div>
+<div class="slide" id="plot"><div class="frame"><section id="plot" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Read the chart</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">What the month looked like</h2>
+<div style="display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<img src="images/16_project_sales_analysis_10_0.png" alt="Two matplotlib panels from the notebook. Left: daily revenue for days 1 to 30, ranging roughly 2,460 to 3,660 with a peak on day 9, and an orange 7-day mean from day 7 that rises to about 3,380 around day 15 then settles near 2,900 to 3,000. Right: revenue by store bars, North about 31,500, Central about 30,200, South about 29,400." style="width:1600px;height:480px;object-fit:contain">
+</div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Daily revenue peaks on day 9; North has the largest store total, 31487.76.</p>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>This is the real figure from the notebook run. On the left, the faint blue line is daily revenue and the orange line is the 7-day mean, which starts on day 7 because earlier windows are incomplete. The rolling mean climbs through the second week, peaks around day 15, then settles; single days like the dip around day 16 are smoothed away. On the right, the store bars start at zero, so the small differences between stores look small, which is honest: North, Central and South are within about 7 percent of each other. Remind the audience that this is synthetic data: describe what the chart shows, and keep claims about why separate from what the data can establish.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> This is the real figure from the notebook run. On the left, the faint blue line is daily revenue and the orange line is the 7-day mean, which starts on day 7 because earlier windows are incomplete. The rolling mean climbs through the second week, peaks around day 15, then settles; single days like the dip around day 16 are smoothed away. On the right, the store bars start at zero, so the small differences between stores look small, which is honest: North, Central and South are within about 7 percent of each other. Remind the audience that this is synthetic data: describe what the chart shows, and keep claims about why separate from what the data can establish.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Name the axes.<br>Reconcile the totals.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">A data pipeline is trustworthy when every stage keeps its shape, its missing mask and totals that agree however you sum them.</p>
+<aside>Pause here. The NumPy in this project is short: one broadcast multiply and a few axis sums. What makes the report trustworthy is discipline: knowing which axis is which, keeping the record of what was imputed, and checking that store, product and daily totals all reach the same 91119.66. Carry this habit into notebook 17 and into any real analysis.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> Pause here. The NumPy in this project is short: one broadcast multiply and a few axis sums. What makes the report trustworthy is discipline: knowing which axis is which, keeping the record of what was imputed, and checking that store, product and daily totals all reach the same 91119.66. Carry this habit into notebook 17 and into any real analysis.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two exercises on the revenue cube</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Each store's share of total revenue</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: shape (3,), summing to 1:<br><span style="color:#13233A">[0.3456 0.3317 0.3228]</span></p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">store_share = (<br>&#160;&#160;&#160;&#160;store_revenue / revenue.sum())</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Average daily revenue by store and product</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: shape (3, 4); North row:<br><span style="color:#13233A">[233.3333 362.7586 220.5 233.]</span></p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">average_daily = revenue.mean(axis=0)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">13</p></div>
+<aside>Ask the audience to attempt both before revealing the code lines, which match the reference solutions. Exercise 1: dividing each store total by the grand total gives fractions that sum to one; North earns about 34.6 percent. Exercise 2: a mean over the day axis leaves the store and product axes, shape (3, 4). The check multiplies by 30 to recover revenue.sum(axis=0), which is a neat way to confirm you averaged over the right axis. North's Coffee figure, 362.7586, has odd decimals because one of its days is an imputed estimate, an average over 29 observed days.</aside>
+</section>
+</div><p class="notes"><b>Notes · 13</b> Ask the audience to attempt both before revealing the code lines, which match the reference solutions. Exercise 1: dividing each store total by the grand total gives fractions that sum to one; North earns about 34.6 percent. Exercise 2: a mean over the day axis leaves the store and product axes, shape (3, 4). The check multiplies by 30 to recover revenue.sum(axis=0), which is a neat way to confirm you averaged over the right axis. North's Coffee figure, 362.7586, has odd decimals because one of its days is an imputed estimate, an average over 29 observed days.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Report, export and a scenario</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">One report cell, an .npz export, and a Coffee price rise</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Report total revenue, best store, best product, missing count and imputed revenue share.</p>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Save the cleaned data and summaries to .npz, reload, and verify equality.</p>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Raise Coffee's price 10% with units fixed, and label that fixed-demand assumption.</p>
+</div>
+<div style="width:680px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Success means</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Correct shapes at every stage</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Totals that reconcile, before and after export</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Plots with labelled axes and units</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">A clear explanation of the cleaning policy</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Both exercise checks print passed</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">14</p></div>
+<aside>This is the export stage from the pipeline slide, and it has no supplied check: write your own. np.savez_compressed stores several named arrays in one file; np.load returns them by name, and np.testing.assert_array_equal proves the round trip lost nothing. For the imputed share, divide revenue[missing].sum() by revenue.sum(). For the scenario, copy the price vector, multiply Coffee's entry by 1.1 and recompute; with units fixed, only Coffee revenue changes, by exactly 10 percent. Say plainly that real customers might buy less at a higher price. Decide the expected results before running, then restart the kernel and run all cells.</aside>
+</section>
+</div><p class="notes"><b>Notes · 14</b> This is the export stage from the pipeline slide, and it has no supplied check: write your own. np.savez_compressed stores several named arrays in one file; np.load returns them by name, and np.testing.assert_array_equal proves the round trip lost nothing. For the imputed share, divide revenue[missing].sum() by revenue.sum(). For the scenario, copy the price vector, multiply Coffee's entry by 1.1 and recompute; with units fixed, only Coffee revenue changes, by exactly 10 percent. Say plainly that real customers might buy less at a higher price. Decide the expected results before running, then restart the kernel and run all cells.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Mask</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Impute, but keep the mask to measure the guess.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Broadcast</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Prices align with the last axis.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Reduce</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">The axis tuple decides what survives.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Report</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Label units; state findings with numbers and limits.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 17</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">PCA and clustering</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Standardization, dimensionality reduction and iterative clustering: the course finale.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 17, the second capstone, where the same habits of naming axes and checking results carry a PCA and a k-means loop built from NumPy building blocks. Further reading from the notebook: the official NumPy statistics routines at numpy.org/doc/stable/reference/routines.statistics.html, and numpy.savez_compressed at numpy.org/doc/stable/reference/generated/numpy.savez_compressed.html for the export challenge.</aside>
+</section>
+</div><p class="notes"><b>Notes · 15</b> Recap the four takeaways, then point to notebook 17, the second capstone, where the same habits of naming axes and checking results carry a PCA and a k-means loop built from NumPy building blocks. Further reading from the notebook: the official NumPy statistics routines at numpy.org/doc/stable/reference/routines.statistics.html, and numpy.savez_compressed at numpy.org/doc/stable/reference/generated/numpy.savez_compressed.html for the export challenge.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

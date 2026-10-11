@@ -1,0 +1,32 @@
+<section id="formats" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · CSV and NumPy binary formats</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">CSV vs .npy vs .npz</h2>
+<div style="display:flex;gap:32px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Text</p>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#13233A">CSV</p>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Readable anywhere, but the array's dtype is not stored.</p>
+<div style="background:#13233A;padding:20px 28px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">np.savetxt<br>np.loadtxt, np.genfromtxt</p></div>
+<div style="flex:1"></div>
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Warning" style="color:#B5541A;width:40px;height:40px"></x-icon><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">int64 in → float64 out</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Binary · one array</p>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#13233A">.npy</p>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Exact values, with dtype and shape saved alongside.</p>
+<div style="background:#13233A;padding:20px 28px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">np.save<br>np.load</p></div>
+<div style="flex:1"></div>
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="CheckCircle" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">int64 in → int64 out</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Binary · many arrays</p>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#13233A">.npz</p>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Several named arrays in one zip archive.</p>
+<div style="background:#13233A;padding:20px 28px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">np.savez_compressed<br>np.load(...)["data"]</p></div>
+<div style="flex:1"></div>
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="CheckCircle" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">['data', 'means']</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">9</p></div>
+<aside>Choose the format by who reads the file next. CSV is plain text: people, spreadsheets and other languages can open it, but it stores only digits and commas. The array's dtype is not kept, and floats are written as long decimal text such as 1.000000000000000000e+01. NumPy's .npy format stores one array in binary together with its dtype and shape, so it comes back exactly. .npz bundles several arrays under names, like data and means here, and savez_compressed zips them. The bottom row of each card is the Try it experiment: save the integer array [1, 2, 3] as .npy and np.load returns int64 again, while the same array written with savetxt and read back with loadtxt comes back as float64. Use CSV to share, .npy or .npz to resume work.</aside>
+</section>

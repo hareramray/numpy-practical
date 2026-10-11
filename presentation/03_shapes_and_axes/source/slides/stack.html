@@ -1,0 +1,17 @@
+<section id="stack" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Concatenate versus stack</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two ways to join arrays</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">a, b = np.array([1, 2, 3]), np.array([4, 5, 6])<br>print("Concatenate:", np.concatenate([a, b]))<br>print("Stack rows:\n", np.stack([a, b], axis=0))<br>print("Stack columns:\n", np.stack([a, b], axis=1))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Concatenate: [1 2 3 4 5 6]<br>Stack rows:<br>&#160;[[1 2 3]<br>&#160;[4 5 6]]<br>Stack columns:<br>&#160;[[1 4]<br>&#160;[2 5]<br>&#160;[3 6]]</p></div>
+</div>
+<div style="width:520px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">concatenate</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Joins along an existing axis. Other axis lengths must match.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">stack</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Adds a new axis. Inputs must have equal shapes.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">array_split</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Splits into uneven pieces; split needs equal ones.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>The notebook defines a and b on two lines; they are combined here to save space. concatenate joins arrays along an axis they already have: two length-3 vectors placed end to end give one length-6 vector, so no dimension is added. stack creates a brand-new axis and places the inputs along it: axis=0 makes each input a row, giving shape (2, 3), and axis=1 makes each input a column, giving shape (3, 2). Because stack lines the inputs up element by element, they must have exactly the same shape. Try it: stack three length-4 arrays. Predict first: axis=0 gives shape (3, 4) and axis=1 gives shape (4, 3).</aside>
+</section>

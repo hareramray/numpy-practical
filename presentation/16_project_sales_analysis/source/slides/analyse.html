@@ -1,0 +1,17 @@
+<section id="analyse" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Analyse</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Revenue, then three summaries</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">revenue = filled_units * prices<br>store_revenue = revenue.sum(axis=(0, 2))<br>product_revenue = revenue.sum(axis=(0, 1))<br>daily_revenue = revenue.sum(axis=(1, 2))<br>print("Revenue by store:",<br>&#160;&#160;dict(zip(stores, store_revenue.round(2))))<br>print("Top product:",<br>&#160;&#160;products[product_revenue.argmax()])</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Revenue by store: {np.str_('North'):<br>np.float64(31487.76), np.str_('Central'):<br>np.float64(30220.0), np.str_('South'):<br>np.float64(29411.9)}<br>Top product: Coffee</p></div>
+</div>
+<div style="width:600px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Prices broadcast</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The (4,) vector lines up with the product axis, the last one.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Axis tuples</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Name the axes to collapse; the one left over is the answer.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">NumPy 2 reprs</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Dict values print as np.float64(…); they are ordinary numbers.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>Revenue is units times price for every day, store and product. Because prices has shape (4,), broadcasting aligns it with the last axis of the (30, 3, 4) cube with no loop and no reshape. Each summary is then a single sum over an axis tuple: drop days and products to get one number per store, drop days and stores for one per product, drop stores and products for one per day. argmax returns a position, and indexing the products array with it turns that position into a name. The notebook follows with checks you should keep in your own work: revenue is finite everywhere, and store totals and daily totals reconcile to the same grand total.</aside>
+</section>

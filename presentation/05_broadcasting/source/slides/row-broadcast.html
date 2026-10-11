@@ -1,0 +1,17 @@
+<section id="row-broadcast" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Align dimensions from the right</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One rate per column, every row</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">prices = np.array([[100., 200.],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;[150., 250.], [80., 120.]])<br>tax_rate = np.array([0.05, 0.10])<br>print("Shapes:", prices.shape, tax_rate.shape)<br>print("Taxed prices:\n",<br>&#160;&#160;&#160;&#160;&#160;&#160;prices * (1 + tax_rate))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Shapes: (3, 2) (2,)<br>Taxed prices:<br>&#160;[[105.&#160; 220. ]<br>&#160;[157.5 275. ]<br>&#160;[&#160;84.&#160; 132. ]]</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">(3, 2) times (2,)</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">One tax rate per column, reused on every row.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">No tiling in your code</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">NumPy reuses the row; you never repeat it by hand.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Results still need memory</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Broadcasting avoids repeating inputs, not the output.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 05 Broadcasting</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>Three customers are rows and two products are columns. The tax rates have shape (2,), one per product. Aligned from the right, 2 matches 2 and the missing row axis acts as 1, so the rates are reused for every customer: 100 becomes 105 at 5 percent and 200 becomes 220 at 10 percent. You never build a 3 by 2 array of rates; NumPy behaves as if the row were repeated. The full (3, 2) result is still allocated, so broadcasting saves input copies, not output memory. The notebook also subtracts one discount per customer using discount_by_customer[:, None], which the next slide draws.</aside>
+</section>

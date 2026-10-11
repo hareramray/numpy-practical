@@ -1,0 +1,31 @@
+<section id="insertion" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Search in sorted data</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Insertion points live between cells</h2>
+<div style="display:flex;flex-direction:column;gap:32px;flex:1;justify-content:center;align-items:center">
+<div style="position:relative;width:1232px;height:350px">
+<p style="position:absolute;left:158px;top:0px;width:220px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#B5541A;text-align:center">left = 1</p>
+<x-shape kind="arrow-down" style="position:absolute;left:252px;top:48px;width:32px;height:48px;background:#B5541A"></x-shape>
+<p style="position:absolute;left:622px;top:0px;width:220px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#B5541A;text-align:center">right = 3</p>
+<x-shape kind="arrow-down" style="position:absolute;left:716px;top:48px;width:32px;height:48px;background:#B5541A"></x-shape>
+<div style="position:absolute;left:264px;top:100px;width:8px;height:104px;background:#E8813A;border-radius:4px"></div>
+<div style="position:absolute;left:728px;top:100px;width:8px;height:104px;background:#E8813A;border-radius:4px"></div>
+<div style="position:absolute;left:72px;top:104px;width:160px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10</p></div>
+<div style="position:absolute;left:304px;top:104px;width:160px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">20</p></div>
+<div style="position:absolute;left:536px;top:104px;width:160px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">20</p></div>
+<div style="position:absolute;left:768px;top:104px;width:160px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">30</p></div>
+<div style="position:absolute;left:1000px;top:104px;width:160px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">40</p></div>
+<p style="position:absolute;left:0px;top:216px;width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#6B7280;text-align:center">0</p>
+<p style="position:absolute;left:232px;top:216px;width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#B5541A;text-align:center">1</p>
+<p style="position:absolute;left:464px;top:216px;width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#6B7280;text-align:center">2</p>
+<p style="position:absolute;left:696px;top:216px;width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#B5541A;text-align:center">3</p>
+<p style="position:absolute;left:928px;top:216px;width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#6B7280;text-align:center">4</p>
+<p style="position:absolute;left:1160px;top:216px;width:72px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#6B7280;text-align:center">5</p>
+<div style="position:absolute;left:268px;top:264px;width:464px;height:28px;border:3px solid #B5541A;border-top:none"></div>
+<p style="position:absolute;left:268px;top:304px;width:464px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A;text-align:center">right − left = 2 copies of 20</p>
+</div>
+<p style="font-size:28px;color:#4A5568">The numbers under the gaps are insertion positions 0 to 5, one more than the 5 elements.</p>
+<div style="background:#13233A;padding:24px 40px;border-radius:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">np.searchsorted(sorted_values, 25) <span style="color:#F2A35E">→ 3</span> <span style="color:#C9D4E2">· it would sit before 30, so 25 is not present</span></p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 09 Sort, search and group</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>An insertion position is a gap, not a cell. Five elements have six gaps, numbered 0 to 5, shown under the row. To insert another 20 while keeping order, there are two valid gaps: just before the first 20, gap 1, which side="left" returns, and just after the last 20, gap 3, which side="right" returns. Everything between those two gaps is a run of equal values, so right minus left counts the copies of 20: two. That trick counts occurrences in sorted data without scanning. The bottom panel is the Try it: searchsorted for 25 also returns 3, because 25 belongs between 20 and 30. To test membership you must also check that sorted_values at that position equals the value you searched for; here it is 30, so 25 is absent.</aside>
+</section>

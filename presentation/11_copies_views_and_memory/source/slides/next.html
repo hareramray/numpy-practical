@@ -1,0 +1,17 @@
+<section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Views</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Basic slices share the buffer; writes reach the original.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Copies</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">.copy(), fancy indexing and flatten make new storage.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Strides</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Byte jumps per axis; a transpose just swaps them.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Memory maps</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Read files in slices; outputs still allocate.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 12</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Vectorization and performance</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Replace loops thoughtfully, measure runtime fairly, and limit temporary memory.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 12, where knowing about copies and temporaries pays off: vectorized code is fast, but every intermediate array costs memory. Further reading: the NumPy guide to copies and views at numpy.org/doc/stable/user/basics.copies.html, and the numpy.memmap reference at numpy.org/doc/stable/reference/generated/numpy.memmap.html.</aside>
+</section>

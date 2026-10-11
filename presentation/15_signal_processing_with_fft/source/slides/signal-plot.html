@@ -1,0 +1,14 @@
+<section id="signal-plot" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · The signal in time</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">A slow wave with a fast ripple</h2>
+<div style="display:flex;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:24px">
+<img src="/_blob/85516ffafc12ddc243fb704ff96412db" alt="Line plot titled 5 Hz + 40 Hz signal: amplitude from -1.5 to 1.5 over one second, five large cycles with a small fast ripple on top" style="width:1290px;height:420px;object-fit:contain">
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;gap:16px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:20px 28px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#2F6FB0">5 Hz</p><p style="font-size:28px;line-height:1.4;color:#4A5568">five big cycles</p></div>
+<div style="flex:1;display:flex;gap:16px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:20px 28px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#B5541A">40 Hz</p><p style="font-size:28px;line-height:1.4;color:#4A5568">the small ripple</p></div>
+<div style="flex:1;display:flex;gap:16px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:20px 28px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">256</p><p style="font-size:28px;line-height:1.4;color:#4A5568">samples in 1 s</p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 15 Signal processing with FFT</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>This is the plot the notebook draws in Step 1. Count the large swings: five per second, the 5 Hz component with amplitude 1. On top of each swing sits a fast, smaller wiggle: the 40 Hz component with amplitude 0.4, which completes eight cycles for every one of the slow wave. Because the two add, the peaks reach about 1.4. In the time domain the two ingredients are tangled together, and it is hard to read their exact frequencies or strengths from the curve. That is the motivation for the next step: the FFT separates them.</aside>
+</section>

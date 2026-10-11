@@ -1,0 +1,6 @@
+<section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Compare with tolerance.<br>Compute in a safe range.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">Floats are approximations with fixed limits. Test closeness, keep small changes, and shift or promote before values overflow.</p>
+<aside>Pause here. Every result in this notebook comes from one fact: a number is stored in a fixed number of bits. That is why == fails on 0.1 + 0.2, why 1 + 1e-16 is 1, why int8 wraps, and why exp(1000) overflows. The remedies follow the same pattern: compare with explicit tolerances, use functions like log1p and expm1 that avoid cancellation, promote to a wider dtype, and rearrange formulas, like subtracting the maximum in softmax, so intermediate values stay in range.</aside>
+</section>

@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 17 — PCA and Clustering Project</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 17 — PCA and Clustering Project</h1><span>15 slides · <a href="https://claude.ai/artifact/TqsmCFD2RrrvNfdQtFj5Ui">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative scatter of three point clusters, each with a ring marking its centroid" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="0" width="612" height="612" rx="24" fill="#22344F"/><g fill="#E8813A"><circle cx="110" cy="410" r="14"/><circle cx="160" cy="390" r="14"/><circle cx="195" cy="425" r="14"/><circle cx="95" cy="460" r="14"/><circle cx="150" cy="440" r="14"/><circle cx="185" cy="475" r="14"/><circle cx="130" cy="495" r="14"/><circle cx="215" cy="460" r="14"/><circle cx="120" cy="375" r="14"/></g><g fill="#2F6FB0"><circle cx="290" cy="125" r="14"/><circle cx="340" cy="105" r="14"/><circle cx="375" cy="140" r="14"/><circle cx="275" cy="170" r="14"/><circle cx="330" cy="150" r="14"/><circle cx="365" cy="185" r="14"/><circle cx="310" cy="200" r="14"/><circle cx="395" cy="165" r="14"/><circle cx="300" cy="85" r="14"/></g><g fill="#C9D4E2"><circle cx="440" cy="440" r="14"/><circle cx="490" cy="420" r="14"/><circle cx="525" cy="455" r="14"/><circle cx="425" cy="490" r="14"/><circle cx="480" cy="470" r="14"/><circle cx="515" cy="505" r="14"/><circle cx="460" cy="525" r="14"/><circle cx="545" cy="490" r="14"/><circle cx="455" cy="405" r="14"/></g><g fill="none" stroke="#F6F4EE" stroke-width="5"><circle cx="152" cy="441" r="34"/><circle cx="331" cy="148" r="34"/><circle cx="482" cy="468" r="34"/></g></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 17</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE;width:1000px">PCA and k-means project</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2;width:1000px">From NumPy building blocks: the finale</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Capstone / expert practice</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">60–90 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: 00–14</p>
+</div>
+<aside>The last notebook of the course, and the second capstone. We build two classic data-science tools from scratch with NumPy alone: principal component analysis, which finds the directions in which data varies most, and k-means, which groups nearby observations. No scikit-learn: every step is broadcasting, reductions, linear algebra and indexing you already know. The picture at right is the goal in miniature: three groups of points, each with a centroid ring. By the end you will have a checked, reusable k-means loop and a 2-D view of 3-D data.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> The last notebook of the course, and the second capstone. We build two classic data-science tools from scratch with NumPy alone: principal component analysis, which finds the directions in which data varies most, and k-means, which groups nearby observations. No scikit-learn: every step is broadcasting, reductions, linear algebra and indexing you already know. The picture at right is the goal in miniature: three groups of points, each with a centroid ring. By the end you will have a checked, reusable k-means loop and a 2-D view of 3-D data.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two classic tools, built by hand</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Standardise</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Put every feature on a common scale, safely.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">PCA</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Find the main directions of variation with SVD.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">K-means</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Assign, update, repeat, with broadcasting.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">4</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Check</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Test invariants and edge cases, not lucky signs.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>The notebook's goal: standardise features, implement PCA with SVD, and build a checked k-means loop. PCA finds directions of variation; clustering groups nearby observations. Both draw on almost everything in the course: axis reductions from 03 and 06, broadcasting from 05, SVD from 10, and the numerical care of 13. The fourth card matters as much as the algorithms: a home-made implementation is only trustworthy when its invariants are tested, such as reconstruction error, orthonormal directions, and an objective that never increases.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> The notebook's goal: standardise features, implement PCA with SVD, and build a checked k-means loop. PCA finds directions of variation; clustering groups nearby observations. Both draw on almost everything in the course: axis reductions from 03 and 06, broadcasting from 05, SVD from 10, and the numerical care of 13. The fourth card matters as much as the algorithms: a home-made implementation is only trustworthy when its invariants are tested, such as reconstruction error, orthonormal directions, and an objective that never increases.</p></div>
+<div class="slide" id="pipeline"><div class="frame"><section id="pipeline" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">The workflow</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">From 3 features to 3 clusters</h2>
+<div style="display:flex;gap:8px;align-items:center">
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 20px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Scale</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Standardise: each feature to mean 0, std 1</p>
+</div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:32px;height:16px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 20px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">SVD</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Covariance directions as rows of Vt</p>
+</div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:32px;height:16px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 20px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Project</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Keep two directions: shape (180, 2)</p>
+</div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:32px;height:16px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 20px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">K-means</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Assign, update, repeat until stable</p>
+</div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:32px;height:16px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 20px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Evaluate</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Best of 5 seeds, sizes, tests, plot</p>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:56px;height:56px" role="img" aria-label="CheckCircle"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Each stage asserts an invariant: mean 0 and std 1, exact SVD reconstruction, orthonormal directions, a non-increasing objective.</p>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>This is the map for the session. The data are 180 observations with three numeric features, drawn around three hidden centres. Stage one standardises the features. Stage two takes the SVD of the standardised table; its right singular vectors are the eigenvectors of the covariance matrix, so this is the same PCA you may have seen defined through covariance, computed more stably. Stage three keeps the first two directions, giving a 2-D view. Stage four runs k-means, and stage five chooses the best run, reports cluster sizes, runs edge-case tests and plots the clusters in the PCA view. In the notebook, k-means clusters the standardised 3-D table Z; the 2-D projection is used for the picture.</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> This is the map for the session. The data are 180 observations with three numeric features, drawn around three hidden centres. Stage one standardises the features. Stage two takes the SVD of the standardised table; its right singular vectors are the eigenvectors of the covariance matrix, so this is the same PCA you may have seen defined through covariance, computed more stably. Stage three keeps the first two directions, giving a 2-D view. Stage four runs k-means, and stage five chooses the best run, reports cluster sizes, runs edge-case tests and plots the clusters in the PCA view. In the notebook, k-means clusters the standardised 3-D table Z; the 2-D projection is used for the picture.</p></div>
+<div class="slide" id="standardise"><div class="frame"><section id="standardise" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Standardise</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Put features on one scale</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">rng = np.random.default_rng(21)<br>centers = np.array([[-4., -3., 0.], [0., 4., 4.],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;[4., -2., -3.]])<br>X = np.concatenate([rng.normal(loc=center,<br>&#160;&#160;&#160;&#160;scale=0.55, size=(60, 3))<br>&#160;&#160;&#160;&#160;for center in centers])<br>feature_mean = X.mean(axis=0)<br>feature_std = X.std(axis=0)<br>safe_std = np.where(feature_std == 0, 1, feature_std)<br>Z = (X - feature_mean) / safe_std<br>print("Observations, features:", Z.shape)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Observations, features: (180, 3)</p></div>
+</div>
+<div style="width:600px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Rows and columns</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">180 observations, 3 features: three groups of 60.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">z = (x − mean) / std</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The (3,) mean and std broadcast down every row.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Guard constants</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A zero std would divide by zero, so it becomes 1.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>Each row is an observation and each column a feature. Distances, and therefore both PCA and k-means, are dominated by whichever feature has the largest numbers, so we standardise: subtract each column's mean and divide by its standard deviation. A constant column has standard deviation zero; np.where swaps that zero for one, so the column simply becomes zeros instead of NaN. The notebook asserts that every column of Z has mean 0 (within 1e-12) and standard deviation 1. Note the caveat: here the whole dataset is used for exploration; in a predictive workflow you fit the mean and std on training data only. Try it: multiply one raw feature by 100 and compare distances before and after standardisation; before, that feature swamps the others, after, the distances are unchanged by the rescaling.</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> Each row is an observation and each column a feature. Distances, and therefore both PCA and k-means, are dominated by whichever feature has the largest numbers, so we standardise: subtract each column's mean and divide by its standard deviation. A constant column has standard deviation zero; np.where swaps that zero for one, so the column simply becomes zeros instead of NaN. The notebook asserts that every column of Z has mean 0 (within 1e-12) and standard deviation 1. Note the caveat: here the whole dataset is used for exploration; in a predictive workflow you fit the mean and std on training data only. Try it: multiply one raw feature by 100 and compare distances before and after standardisation; before, that feature swamps the others, after, the distances are unchanged by the rescaling.</p></div>
+<div class="slide" id="svd"><div class="frame"><section id="svd" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · PCA through SVD</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One SVD gives the directions</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:560px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Z = U diag(s) Vt</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Rows of Vt are the principal directions.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">s² is variance</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Squared singular values, normalised, give each share.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Signs are arbitrary</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Test reconstruction and variance, never a sign.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">U, s, Vt = np.linalg.svd(Z, full_matrices=False)<br>components = Vt[:2]<br>embedding = Z @ components.T<br>explained_ratio = s ** 2 / np.sum(s ** 2)<br>reconstructed_Z = embedding @ components<br>print("Explained variance ratios:", explained_ratio)<br>print("Retained fraction:", explained_ratio[:2].sum())<br>print("Reconstruction MSE:",<br>&#160;&#160;&#160;&#160;&#160;&#160;np.mean((Z - reconstructed_Z) ** 2))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Explained variance ratios: [0.6245 0.3675 0.008 ]<br>Retained fraction: 0.9920000540856623<br>Reconstruction MSE: 0.007999945914337746</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>PCA rotates centred data toward the directions of greatest variance. Because Z is already centred, its singular value decomposition does all the work: the rows of Vt are orthonormal principal directions, ordered by singular value, and each squared singular value is proportional to the variance along its direction. Keeping two rows compresses three features into two. The notebook asserts that U times s times Vt rebuilds Z exactly, and that the two kept components are orthonormal, components @ components.T equals the 2 by 2 identity. The sign of each direction is arbitrary, so a different machine may flip one; that is why the tests check reconstruction and variance rather than signs. Try it: keep one component, then all three. With one, the error rises to the dropped share, about 0.376 (0.3675 plus 0.008); with all three it falls to essentially zero.</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> PCA rotates centred data toward the directions of greatest variance. Because Z is already centred, its singular value decomposition does all the work: the rows of Vt are orthonormal principal directions, ordered by singular value, and each squared singular value is proportional to the variance along its direction. Keeping two rows compresses three features into two. The notebook asserts that U times s times Vt rebuilds Z exactly, and that the two kept components are orthonormal, components @ components.T equals the 2 by 2 identity. The sign of each direction is arbitrary, so a different machine may flip one; that is why the tests check reconstruction and variance rather than signs. Try it: keep one component, then all three. With one, the error rises to the dropped share, about 0.376 (0.3675 plus 0.008); with all three it falls to essentially zero.</p></div>
+<div class="slide" id="variance"><div class="frame"><section id="variance" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Explained variance</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two directions hold almost all</h2>
+<div style="display:flex;gap:96px;flex:1;align-items:end">
+<div style="display:flex;gap:64px;align-items:end;border-bottom:2px solid #9AA3AE;padding:0px 32px">
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">0.6245</p>
+<div style="width:200px;height:437px;background:#2F6FB0;border-radius:12px 12px 0px 0px"></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">0.3675</p>
+<div style="width:200px;height:257px;background:#2F6FB0;border-radius:12px 12px 0px 0px"></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">0.008</p>
+<div style="width:200px;height:6px;background:#E8813A;border-radius:3px 3px 0px 0px"></div>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:8px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">0.992</p><p style="font-size:28px;line-height:1.4;color:#4A5568">kept by PC1 and PC2 together</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:8px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">0.008</p><p style="font-size:28px;line-height:1.4;color:#4A5568">reconstruction MSE: exactly the share PC3 held</p></div>
+</div>
+</div>
+<div style="display:flex;gap:64px;padding:0px 32px">
+<p style="width:200px;font-size:24px;font-weight:600;text-align:center;color:#13233A">PC1 · kept</p>
+<p style="width:200px;font-size:24px;font-weight:600;text-align:center;color:#13233A">PC2 · kept</p>
+<p style="width:200px;font-size:24px;font-weight:600;text-align:center;color:#B5541A">PC3 · dropped</p>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>These bars are the real explained variance ratios from the notebook: 0.6245, 0.3675 and 0.008. The first two directions carry 99.2 percent of the variation, so a 2-D picture loses almost nothing; the third is essentially the 0.55 noise within each group. There is a neat identity here: because every standardised column has variance 1, the mean squared reconstruction error equals the share of variance you dropped, and the notebook prints 0.0079999 against a ratio of 0.008. Read a chart like this whenever you choose how many components to keep: look for the point where the bars collapse.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> These bars are the real explained variance ratios from the notebook: 0.6245, 0.3675 and 0.008. The first two directions carry 99.2 percent of the variation, so a 2-D picture loses almost nothing; the third is essentially the 0.55 noise within each group. There is a neat identity here: because every standardised column has variance 1, the mean squared reconstruction error equals the share of variance you dropped, and the notebook prints 0.0079999 against a ratio of 0.008. Read a chart like this whenever you choose how many components to keep: look for the point where the bars collapse.</p></div>
+<div class="slide" id="project"><div class="frame"><section id="project" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Project to 2-D</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Project down, then back up</h2>
+<div style="display:flex;flex-direction:column;gap:48px;flex:1;justify-content:center">
+<div style="display:flex;gap:56px">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">embedding = Z @ components.T</p>
+<div style="display:flex;gap:24px;align-items:end">
+<div style="display:flex;flex-direction:column;gap:8px;align-items:center"><div style="display:flex;gap:4px"><div style="width:44px;height:240px;background:#E2DED3;border-radius:6px"></div><div style="width:44px;height:240px;background:#E2DED3;border-radius:6px"></div><div style="width:44px;height:240px;background:#E2DED3;border-radius:6px"></div></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">(180, 3)</p></div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280;padding:0px 0px 140px 0px">@</p>
+<div style="display:flex;flex-direction:column;gap:8px;align-items:center"><div style="display:flex;gap:4px"><div style="width:44px;height:144px;background:#2F6FB0;border-radius:6px"></div><div style="width:44px;height:144px;background:#2F6FB0;border-radius:6px"></div></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">(3, 2)</p></div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280;padding:0px 0px 140px 0px">=</p>
+<div style="display:flex;flex-direction:column;gap:8px;align-items:center"><div style="display:flex;gap:4px"><div style="width:44px;height:240px;background:#E8813A;border-radius:6px"></div><div style="width:44px;height:240px;background:#E8813A;border-radius:6px"></div></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">(180, 2)</p></div>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">reconstructed_Z = embedding @ components</p>
+<div style="display:flex;gap:24px;align-items:end">
+<div style="display:flex;flex-direction:column;gap:8px;align-items:center"><div style="display:flex;gap:4px"><div style="width:44px;height:240px;background:#E8813A;border-radius:6px"></div><div style="width:44px;height:240px;background:#E8813A;border-radius:6px"></div></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">(180, 2)</p></div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280;padding:0px 0px 140px 0px">@</p>
+<div style="display:flex;flex-direction:column;gap:8px;align-items:center"><div style="display:flex;gap:4px"><div style="width:44px;height:96px;background:#2F6FB0;border-radius:6px"></div><div style="width:44px;height:96px;background:#2F6FB0;border-radius:6px"></div><div style="width:44px;height:96px;background:#2F6FB0;border-radius:6px"></div></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">(2, 3)</p></div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280;padding:0px 0px 140px 0px">=</p>
+<div style="display:flex;flex-direction:column;gap:8px;align-items:center"><div style="display:flex;gap:4px"><div style="width:44px;height:240px;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:6px"></div><div style="width:44px;height:240px;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:6px"></div><div style="width:44px;height:240px;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:6px"></div></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">(180, 3)</p></div>
+</div>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Inner sizes match, 3 with 3 and 2 with 2. Each point becomes two coordinates; the dashed copy is close to Z, but not exact.</p>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>Each bar is one column, so you can see the shapes. Projecting multiplies the 180 by 3 table by the transposed components, a 3 by 2 matrix whose columns are the two kept directions; the result, the orange embedding, gives every observation two coordinates, the ones plotted later. Going back multiplies by the 2 by 3 components and lands in the original feature space, drawn dashed because it is an approximation: the part of each point along the dropped third direction is gone. Because the directions are orthonormal, no inverse is needed: the transpose undoes the rotation. With all three directions the round trip is exact, which is Exercise 1.</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> Each bar is one column, so you can see the shapes. Projecting multiplies the 180 by 3 table by the transposed components, a 3 by 2 matrix whose columns are the two kept directions; the result, the orange embedding, gives every observation two coordinates, the ones plotted later. Going back multiplies by the 2 by 3 components and lands in the original feature space, drawn dashed because it is an approximation: the part of each point along the dropped third direction is gone. Because the directions are orthonormal, no inverse is needed: the transpose undoes the rotation. With all three directions the round trip is exact, which is Exercise 1.</p></div>
+<div class="slide" id="kmeans"><div class="frame"><section id="kmeans" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · K-means</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">The heart of the k-means loop</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">def kmeans(data, k, seed=0, max_iter=100):<br>&#160;&#160;&#160;&#160;rng = np.random.default_rng(seed)<br>&#160;&#160;&#160;&#160;centers = data[rng.choice(len(data), k,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;replace=False)].copy()<br>&#160;&#160;&#160;&#160;for _ in range(max_iter):<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;squared = ((data[:, None, :] -<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;centers[None, :, :]) ** 2).sum(axis=-1)<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;labels = squared.argmin(axis=1)<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#9AA3AE"># ... record inertia; stop if labels repeat</span><br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;for group in range(k):<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;members = data[labels == group]<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;if len(members):<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;centers[group] = members.mean(axis=0)</p></div>
+</div>
+<div style="width:520px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Start from data</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">k distinct rows, chosen by a seeded generator.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Assign</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">One broadcast computes every point-to-center distance.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Update</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Each center moves to its members' mean; an empty group keeps its center.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>This is an excerpt of the notebook's kmeans function; the full version first validates its input (a finite 2-D table, 1 ≤ k ≤ number of rows, max_iter ≥ 1), records the inertia of every pass in a history list, breaks when the labels equal the previous pass, and after the loop reassigns once more so the returned labels always match the returned centers. K-means alternates two steps: assign each observation to its nearest center, then replace each center by the mean of its group. It minimises a local squared-distance objective and depends on where it starts, so the result depends on the seed. The if len(members) guard handles empty clusters by keeping the previous center instead of computing the mean of nothing, which would be NaN. Cluster numbers are arbitrary labels.</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> This is an excerpt of the notebook's kmeans function; the full version first validates its input (a finite 2-D table, 1 ≤ k ≤ number of rows, max_iter ≥ 1), records the inertia of every pass in a history list, breaks when the labels equal the previous pass, and after the loop reassigns once more so the returned labels always match the returned centers. K-means alternates two steps: assign each observation to its nearest center, then replace each center by the mean of its group. It minimises a local squared-distance objective and depends on where it starts, so the result depends on the seed. The if len(members) guard handles empty clusters by keeping the previous center instead of computing the mean of nothing, which would be NaN. Cluster numbers are arbitrary labels.</p></div>
+<div class="slide" id="loop"><div class="frame"><section id="loop" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Assign, update, repeat</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two moves until nothing changes</h2>
+<div style="display:flex;flex-direction:column;gap:24px;flex:1;justify-content:center">
+<div style="display:flex;gap:24px;align-items:center">
+<div style="width:480px;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Once</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Initialise</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">k random rows become the first centers.</p>
+</div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:56px;height:28px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg>
+<div style="width:480px;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#2F6FB0;border-radius:16px;padding:28px 32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F6F4EE">Move 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Assign</h3>
+<p style="font-size:28px;line-height:1.4;color:#F6F4EE">Every point takes the label of its nearest center.</p>
+</div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:56px;height:28px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg>
+<div style="width:480px;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#2F6FB0;border-radius:16px;padding:28px 32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F6F4EE">Move 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Update</h3>
+<p style="font-size:28px;line-height:1.4;color:#F6F4EE">Every center moves to the mean of its points.</p>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="width:560px"></div>
+<div style="width:1040px;display:flex;gap:24px;align-items:center;justify-content:center;border:2px dashed #9AA3AE;border-radius:16px;padding:20px 32px">
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:80px;height:40px" aria-hidden="true"><polygon points="100,30 40,30 40,0 0,50 40,100 40,70 100,70" fill="#E8813A"/></svg>
+<p style="font-size:28px;line-height:1.4;color:#13233A">Repeat with the new centers</p>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;gap:24px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:56px;height:56px" role="img" aria-label="CheckCircle"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Stop</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Labels equal the last pass, or max_iter is reached.</p></div></div>
+<div style="flex:1;display:flex;gap:24px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#B5541A;width:56px;height:56px" role="img" aria-label="Activity"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Inertia only falls</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Each move can only lower the squared distances.</p></div></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">9</p></div>
+<aside>This is the whole algorithm. Inertia is the total squared distance from each point to its assigned center. Assigning each point to its nearest center cannot increase it, because each point picks the smallest available distance. Moving each center to its group's mean cannot increase it either, because the mean is the point that minimises squared distance to a group. So inertia never rises, and since there are finitely many labelings the loop must stop. The notebook turns this argument into a test: np.diff(history) must be at most 1e-9 everywhere. What the loop does not promise is the best answer overall: it finds a local minimum that depends on the starting rows, which is why we try several seeds.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> This is the whole algorithm. Inertia is the total squared distance from each point to its assigned center. Assigning each point to its nearest center cannot increase it, because each point picks the smallest available distance. Moving each center to its group's mean cannot increase it either, because the mean is the point that minimises squared distance to a group. So inertia never rises, and since there are finitely many labelings the loop must stop. The notebook turns this argument into a test: np.diff(history) must be at most 1e-9 everywhere. What the loop does not promise is the best answer overall: it finds a local minimum that depends on the starting rows, which is why we try several seeds.</p></div>
+<div class="slide" id="distances"><div class="frame"><section id="distances" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · The distance tensor</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Every point to every center</h2>
+<div style="display:flex;flex-direction:column;gap:48px;flex:1;justify-content:center">
+<div style="display:flex;gap:24px;align-items:center">
+<div style="width:340px;display:flex;flex-direction:column;gap:8px;background:#E2DED3;border-radius:16px;padding:24px 28px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">data[:, None, :]</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">(180, 1, 3)</h3></div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">−</p>
+<div style="width:340px;display:flex;flex-direction:column;gap:8px;background:#E2DED3;border-radius:16px;padding:24px 28px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">centers[None, :, :]</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">(1, 3, 3)</h3></div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">=</p>
+<div style="width:340px;display:flex;flex-direction:column;gap:8px;background:#E8813A;border-radius:16px;padding:24px 28px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">differences</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">(180, 3, 3)</h3></div>
+<p style="font-size:24px;line-height:1.4;color:#4A5568;width:300px">point × center × feature</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="width:340px;display:flex;flex-direction:column;gap:8px;background:#E8813A;border-radius:16px;padding:24px 28px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">differences</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">(180, 3, 3)</h3></div>
+<div style="display:flex;flex-direction:column;gap:8px;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">** 2 · sum(axis=-1)</p><svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:56px;height:28px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg></div>
+<div style="width:300px;display:flex;flex-direction:column;gap:8px;background:#E2DED3;border-radius:16px;padding:24px 28px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">squared</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">(180, 3)</h3></div>
+<div style="display:flex;flex-direction:column;gap:8px;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">argmin(axis=1)</p><svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:56px;height:28px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#2F6FB0"/></svg></div>
+<div style="width:260px;display:flex;flex-direction:column;gap:8px;background:#2F6FB0;border-radius:16px;padding:24px 28px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">labels</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">(180,)</h3></div>
+</div>
+<div style="display:flex;gap:24px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#B5541A;width:56px;height:56px" role="img" aria-label="Warning"><path d="M12 3 22 20H2Z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">180 × 3 × 3 is only 1,620 numbers. With a million points and many centers, compute in chunks instead.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">10</p></div>
+<aside>This is the broadcasting trick from notebook 05 doing real work. Inserting a new axis with None turns the data into shape (180, 1, 3) and the centers into (1, 3, 3). Aligned from the right, the length 1 axes stretch, so the subtraction produces every point minus every center: shape (180, 3, 3), read as point, center, feature. Squaring and summing the last axis gives a (180, 3) table of squared distances, and argmin along axis 1 picks the nearest center for each point, giving 180 labels. The notebook's own warning applies: this materialises the full three-dimensional tensor, which is fine for small data but needs chunking or a more memory-efficient formula for large datasets.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> This is the broadcasting trick from notebook 05 doing real work. Inserting a new axis with None turns the data into shape (180, 1, 3) and the centers into (1, 3, 3). Aligned from the right, the length 1 axes stretch, so the subtraction produces every point minus every center: shape (180, 3, 3), read as point, center, feature. Squaring and summing the last axis gives a (180, 3) table of squared distances, and argmin along axis 1 picks the nearest center for each point, giving 180 labels. The notebook's own warning applies: this materialises the full three-dimensional tensor, which is fine for small data but needs chunking or a more memory-efficient formula for large datasets.</p></div>
+<div class="slide" id="evaluate"><div class="frame"><section id="evaluate" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Evaluate</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Best of five seeds, then look</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">runs = [kmeans(Z, 3, seed=seed)<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;for seed in range(5)]<br>cluster_centers, labels, inertia, history = min(<br>&#160;&#160;&#160;&#160;runs, key=lambda result: result[2])<br>print("Inertia:", inertia, "cluster sizes:",<br>&#160;&#160;&#160;&#160;&#160;&#160;np.bincount(labels, minlength=3))<br>assert np.all(np.diff(history) &lt;= 1e-9)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Inertia: 14.683571012424357 cluster sizes:<br>[60 60 60]</p></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Tiny test: 4 points, 2 clean pairs, inertia 1.0</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Duplicate points, k = 3: inertia 0, no crash</p></div>
+</div>
+</div>
+<div style="width:720px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<img src="images/clusters.png" alt="Notebook scatter plot titled K-means clusters in PCA view: principal component 1 on the x axis, component 2 on the y axis. Three tight, well separated groups of 60 points each: one near (-1.8, -0.5), one near (0.4, 1.5) and one near (1.5, -1.0), each in its own colour." style="width:656px;height:437px;object-fit:contain">
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>Because k-means finds only a local minimum, the notebook runs it from five seeds and keeps the run with the smallest final inertia. The winner splits the 180 observations into three groups of exactly 60, which matches how the data were generated, and the history assertion confirms inertia never rose. Two small tests probe edge cases: four points forming two tight pairs must split into those pairs with inertia exactly 1.0, and four identical points with k equal to 3 must reach inertia 0, which exercises the empty-cluster guard. The plot colours each point by its label in the 2-D PCA view: three compact, well separated groups. Try it: compare k equal to 2, 3 and 4. Inertia keeps falling as k grows, so a lower inertia alone does not prove a better clustering.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> Because k-means finds only a local minimum, the notebook runs it from five seeds and keeps the run with the smallest final inertia. The winner splits the 180 observations into three groups of exactly 60, which matches how the data were generated, and the history assertion confirms inertia never rose. Two small tests probe edge cases: four points forming two tight pairs must split into those pairs with inertia exactly 1.0, and four identical points with k equal to 3 must reach inertia 0, which exercises the empty-cluster guard. The plot colours each point by its label in the 2-D PCA view: three compact, well separated groups. Try it: compare k equal to 2, 3 and 4. Inertia keeps falling as k grows, so a lower inertia alone does not prove a better clustering.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Test invariants,<br>not lucky outputs.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">Signs flip and cluster numbers shuffle. Reconstruction error, orthonormal directions and a falling inertia do not.</p>
+<aside>Pause here. PCA and k-means each fit in a dozen lines of NumPy; the expertise is in knowing what must always be true of the result. A principal direction may come back with the opposite sign, and cluster 0 on one run may be cluster 2 on another, so tests that compare exact values are fragile. Tests of properties, such as an exact reconstruction with all components, components @ components.T equal to the identity, and a non-increasing history, hold on every machine and every seed.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> Pause here. PCA and k-means each fit in a dozen lines of NumPy; the expertise is in knowing what must always be true of the result. A principal direction may come back with the opposite sign, and cluster 0 on one run may be cluster 2 on another, so tests that compare exact values are fragile. Tests of properties, such as an exact reconstruction with all components, components @ components.T equal to the identity, and a non-increasing history, hold on every machine and every seed.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two exercises on PCA and labels</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Rebuild Z using all PCA components</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: equal to Z within 1e-12. First row:<br><span style="color:#13233A">[-1.1351 -0.5949 -0.4598]</span></p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">full_reconstruction = (Z @ Vt.T) @ Vt</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">One count per cluster, empty ones included</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: shape (3,), summing to 180:<br><span style="color:#13233A">[60 60 60]</span></p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">cluster_counts = np.bincount(<br>&#160;&#160;&#160;&#160;labels, minlength=3)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">13</p></div>
+<aside>Ask the audience to attempt both before revealing the code lines, which match the reference solutions. Exercise 1: all three orthonormal principal directions span the full feature space, so projecting onto them and projecting back reconstructs Z exactly, up to rounding; compare this with the 0.008 error from keeping two. Exercise 2: np.bincount counts how many observations carry each non-negative label. Without minlength=3, an empty last cluster would silently shorten the result to length 2, so minlength keeps a slot for every cluster.</aside>
+</section>
+</div><p class="notes"><b>Notes · 13</b> Ask the audience to attempt both before revealing the code lines, which match the reference solutions. Exercise 1: all three orthonormal principal directions span the full feature space, so projecting onto them and projecting back reconstructs Z exactly, up to rounding; compare this with the 0.008 error from keeping two. Exercise 2: np.bincount counts how many observations carry each non-negative label. Without minlength=3, an empty last cluster would silently shorten the result to length 2, so minlength keeps a slot for every cluster.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Reusable, swept and tested</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Turn the notebook into a small, honest toolkit</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Wrap standardisation and PCA in reusable functions.</p>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Compare k = 2 to 6 across five seeds, plot inertia, and justify a cluster count without using the true labels.</p>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Describe two limits: scaling, initialisation, non-spherical groups or outliers.</p>
+</div>
+<div style="width:600px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Tests to add</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">A constant feature column</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">A single cluster, k = 1</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Duplicate points</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">max_iter = 1</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Both exercise checks print passed</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">14</p></div>
+<aside>The challenge has no supplied check: decide the expected result of every test before you run it. A constant column should standardise to zeros, not NaN. With k = 1 the single center is the overall mean, so the inertia equals the total sum of squares. Duplicate points with more clusters than distinct points leave empty clusters, which must keep their centers. max_iter = 1 must still return labels that match the returned centers. For choosing k, plot the best inertia for each k and look for the elbow where improvement flattens; remember that inertia always falls as k grows. Then restart the kernel and run all cells.</aside>
+</section>
+</div><p class="notes"><b>Notes · 14</b> The challenge has no supplied check: decide the expected result of every test before you run it. A constant column should standardise to zeros, not NaN. With k = 1 the single center is the overall mean, so the inertia equals the total sum of squares. Duplicate points with more clusters than distinct points leave empty clusters, which must keep their centers. max_iter = 1 must still return labels that match the returned centers. For choosing k, plot the best inertia for each k and look for the elbow where improvement flattens; remember that inertia always falls as k grows. Then restart the kernel and run all cells.</p></div>
+<div class="slide" id="complete"><div class="frame"><section id="complete" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Course milestones</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">00–04</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Create a score table, select rows and calculate totals unaided.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">05–09</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Clean a numeric dataset and produce grouped summaries.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">10–15</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Explain correctness, accuracy, shape and memory tradeoffs.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">16–17</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Complete both project extensions and explain their assumptions.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Notebook 17 of 17 · the finale</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Course complete</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2;width:1400px">Next: finish both project extensions, then practise on unfamiliar problems of your own. Expertise grows from repeated work and debugging, not from one course.</p>
+</div>
+<aside>Congratulations: this is the end of the 18-notebook course. Walk through the four milestones from the course guide and ask learners to rate themselves honestly against each one: after 00 to 04, create a score table, select rows and calculate totals unaided; after 05 to 09, clean a numeric dataset and produce grouped summaries; after 10 to 15, explain correctness, numerical accuracy, shape and memory tradeoffs; after 16 and 17, complete both project extensions and explain their assumptions. Where to go next: the official numpy.linalg.svd reference at numpy.org/doc/stable/reference/generated/numpy.linalg.svd.html and the broadcasting guide at numpy.org/doc/stable/user/basics.broadcasting.html, both linked from this notebook; the course guide also recommends the beginner guide, the copies and views guide and the random Generator reference on numpy.org. Areas outside this course include NumPy's C API, custom dtypes, and distributed or GPU computing.</aside>
+</section>
+</div><p class="notes"><b>Notes · 15</b> Congratulations: this is the end of the 18-notebook course. Walk through the four milestones from the course guide and ask learners to rate themselves honestly against each one: after 00 to 04, create a score table, select rows and calculate totals unaided; after 05 to 09, clean a numeric dataset and produce grouped summaries; after 10 to 15, explain correctness, numerical accuracy, shape and memory tradeoffs; after 16 and 17, complete both project extensions and explain their assumptions. Where to go next: the official numpy.linalg.svd reference at numpy.org/doc/stable/reference/generated/numpy.linalg.svd.html and the broadcasting guide at numpy.org/doc/stable/user/basics.broadcasting.html, both linked from this notebook; the course guide also recommends the beginner guide, the copies and views guide and the random Generator reference on numpy.org. Areas outside this course include NumPy's C API, custom dtypes, and distributed or GPU computing.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<section id="slice-grid" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Indexing and slicing</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Four selections on one table</h2>
+<div style="display:flex;justify-content:space-between;flex:1;align-items:center">
+<div style="width:304px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">scores[-1, -1]</p>
+<div style="display:grid;grid-template-columns:repeat(3, 96px);gap:8px">
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">65</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">80</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">90</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">75</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">60</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">85</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">95</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">88</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">92</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">50</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">70</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">68</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">→ 68</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Last row, last column: negatives count from the end.</p>
+</div>
+<div style="width:304px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">scores[:2]</p>
+<div style="display:grid;grid-template-columns:repeat(3, 96px);gap:8px">
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">65</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">80</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">90</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">75</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">60</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">85</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">95</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">88</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">92</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">50</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">70</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">68</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">→ rows 0 and 1</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">A row slice; stop 2 is excluded, all columns come along.</p>
+</div>
+<div style="width:304px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">scores[:, 1]</p>
+<div style="display:grid;grid-template-columns:repeat(3, 96px);gap:8px">
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">65</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">80</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">90</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">75</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">60</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">85</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">95</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">88</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">92</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">50</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">70</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">68</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">→ [80 60 88 70]</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Every row, column 1: the second subject.</p>
+</div>
+<div style="width:304px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">scores[::2]</p>
+<div style="display:grid;grid-template-columns:repeat(3, 96px);gap:8px">
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">65</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">80</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">90</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">75</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">60</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">85</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">95</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">88</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">92</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">50</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">70</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">68</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">→ rows 0 and 2</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Step 2 along axis 0: every other student.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 02 Indexing and filtering</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>The same 4 by 3 scores table four times; blue cells are the ones each expression selects. A single pair of integers picks one cell. A slice in the row position picks a band of rows and keeps every column. A colon in the row position with an integer column picks a vertical strip. A step of 2 skips every other row: the notebook prints rows [65 80 90] and [95 88 92]. Ask the audience to point at the cells before revealing each grid. Try it: shade scores[-2:, :2] yourself: the bottom two rows, left two columns, giving [[95 88] [50 70]].</aside>
+</section>

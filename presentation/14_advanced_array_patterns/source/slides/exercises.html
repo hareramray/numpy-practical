@@ -1,0 +1,22 @@
+<section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two exercises on the patterns</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">One dot product per pair of matching rows, with einsum</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">left = [[1, 2], [3, 4]], right = [[5, 6], [7, 8]]. Expected: [17, 53].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">row_dots = np.einsum("ij,ij-&gt;i",<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;left, right)</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Valid rolling means with window width 2</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">series = [2, 4, 8, 10]. Expected: [3, 6, 9], one mean per complete pair.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">rolling = sliding_window_view(<br>&#160;&#160;&#160;&#160;series, 2).mean(axis=-1)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">10</p></div>
+<aside>Ask the audience to attempt both before revealing the code lines, which match the reference solutions. Exercise 1: the label i survives as the row axis, and the repeated j label is summed, giving a dot product for each corresponding row pair: 1·5 + 2·6 = 17 and 3·7 + 4·8 = 53. The reference run prints [17. 53.]. Exercise 2: the window view exposes adjacent pairs, (2, 4), (4, 8) and (8, 10), and averaging the final axis gives one mean per complete pair; the reference run prints [3. 6. 9.]. Four values with width 2 give 4 - 2 + 1 = 3 windows.</aside>
+</section>

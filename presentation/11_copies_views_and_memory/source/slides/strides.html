@@ -1,0 +1,79 @@
+<section id="strides" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Strides and contiguity</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Same bytes, different steps</h2>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-size:24px;color:#6B7280">One buffer: 12 × int64, 8 bytes each · byte offset under each cell</p>
+<div style="display:flex;gap:8px">
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">0</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">1</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">2</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">3</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">4</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">5</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">6</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">7</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">8</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">9</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">10</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">11</p></div>
+</div>
+<div style="display:flex;gap:8px">
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">0</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2F6FB0;text-align:center">8</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">16</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">24</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#B5541A;text-align:center">32</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">40</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">48</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">56</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">64</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">72</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">80</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">88</p>
+</div>
+</div>
+<div style="display:flex;gap:40px">
+<div style="flex:1;display:flex;gap:32px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px">
+<div style="display:grid;grid-template-columns:repeat(4, 56px);gap:6px">
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">0</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">1</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">2</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">3</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">4</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">5</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">6</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">7</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">8</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">9</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">10</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">11</p></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#13233A">a (3, 4)</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#4A5568">strides (32, 8)<br><span style="color:#B5541A">next row: +32 bytes</span><br><span style="color:#2F6FB0">next column: +8 bytes</span><br>C contiguous: True</p>
+</div>
+</div>
+<div style="flex:1;display:flex;gap:32px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px">
+<div style="display:grid;grid-template-columns:repeat(3, 56px);gap:6px">
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">0</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">4</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">8</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">1</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">5</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">9</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">2</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">6</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">10</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">3</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">7</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">11</p></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#13233A">a.T (4, 3)</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#4A5568">strides (8, 32)<br><span style="color:#2F6FB0">next row: +8 bytes</span><br><span style="color:#B5541A">next column: +32 bytes</span><br>C contiguous: False</p>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-family:'IBM Plex Sans', Arial, sans-serif;font-size:24px;color:#6B7280">NumPy course · 11 Copies and views</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>The top row is the real memory: one flat buffer of twelve 8-byte integers, with each cell's byte offset underneath. Both arrays below are just different ways of walking it. For a, shaped (3, 4), the next column is the next cell, 8 bytes on, shown in blue, and the next row starts 4 cells later, 32 bytes on, shown in orange. So a.strides is (32, 8). The transpose a.T shows the same numbers turned on their side, but no byte moved: NumPy only swapped the strides to (8, 32). Now moving along a row of a.T jumps 32 bytes, so its rows are not laid out one after another, and c_contiguous is False. Try it: compare np.shares_memory(a, a.T.reshape(-1)) with np.shares_memory(a, a.reshape(-1)). The second is True, because a is contiguous and reshape can return a view. The first is False, because flattening a.T in row order needs the bytes in a different order, so reshape must copy.</aside>
+</section>

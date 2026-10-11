@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 13 — Numerical Stability</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 13 — Numerical Stability</h1><span>12 slides · <a href="https://claude.ai/artifact/Rgu6EWzmJpdC2V19dg6W9x">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative grid of array cells, one overflowing" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="320" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="0" width="132" height="132" rx="16" fill="#E8813A"/><rect x="0" y="160" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="160" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="160" width="132" height="132" rx="16" fill="#E8813A"/><rect x="480" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="320" width="132" height="132" rx="16" fill="#E8813A"/><rect x="320" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="320" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="0" y="480" width="132" height="132" rx="16" fill="#E8813A"/><rect x="160" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="480" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="480" y="480" width="132" height="132" rx="16" fill="#22344F"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 13</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE">Numerical<br>stability</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2">Floating-point accuracy you can trust</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Advanced</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">30–50 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: notebooks 00–12</p>
+</div>
+<aside>Welcome to notebook 13. Computers store real numbers as binary floating-point values with a fixed number of bits, so most decimals are approximations and every dtype has limits. This notebook shows how to compare such numbers sensibly, how to keep tiny changes from vanishing, how integers overflow, and how to compute softmax without overflowing. Like every notebook, it imports its own libraries and creates its own data.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> Welcome to notebook 13. Computers store real numbers as binary floating-point values with a fixed number of bits, so most decimals are approximations and every dtype has limits. This notebook shows how to compare such numbers sensibly, how to keep tiny changes from vanishing, how integers overflow, and how to compute softmax without overflowing. Like every notebook, it imports its own libraries and creates its own data.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Four limits of real arithmetic</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Tolerances</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Compare floats with isclose and allclose, not ==.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Precision</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Read machine epsilon for float32 and float64.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Cancellation</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Keep tiny changes with log1p and expm1.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">4</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Overflow</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Promote dtypes and write a softmax that never overflows.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 13 Numerical stability</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>The notebook's goal: use tolerances, avoid overflow and cancellation, and inspect precision limits. Each of these is a place where the computer's arithmetic differs from the arithmetic on paper. None of them is a NumPy bug; they follow from storing numbers in a fixed number of bits. Knowing them lets you write tests that pass for the right reasons and formulas that stay accurate for extreme inputs.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> The notebook's goal: use tolerances, avoid overflow and cancellation, and inspect precision limits. Each of these is a place where the computer's arithmetic differs from the arithmetic on paper. None of them is a NumPy bug; they follow from storing numbers in a fixed number of bits. Knowing them lets you write tests that pass for the right reasons and formulas that stay accurate for extreme inputs.</p></div>
+<div class="slide" id="tolerance"><div class="frame"><section id="tolerance" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Meaningful tolerances</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">0.1 + 0.2 is not exactly 0.3</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">No exact binary form</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">0.1, 0.2 and 0.3 are each stored as the nearest binary fraction.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">== demands identical bits</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The rounding errors do not cancel, so it says False.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Tolerances ask "close enough?"</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">rtol scales with the values; atol matters near zero.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">value = 0.1 + 0.2<br>print("Stored sum:", repr(value))<br>print("Exact equality:", value == 0.3)<br>print("Close:", np.isclose(value, 0.3,<br>&#160;&#160;&#160;&#160;&#160;&#160;rtol=1e-12, atol=1e-15))<br>np.testing.assert_allclose(value, 0.3,<br>&#160;&#160;&#160;&#160;rtol=1e-12, atol=1e-15)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Stored sum: 0.30000000000000004<br>Exact equality: False<br>Close: True</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 13 Numerical stability</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>Many decimal fractions, such as 0.1, have no exact binary representation, so the computer stores the closest value it can. The tiny errors in 0.1 and 0.2 add up to a sum that is not the same double as 0.3, so exact equality fails. np.isclose and np.testing.assert_allclose pass when the difference is at most atol plus rtol times the size of the expected value. Choose the tolerances from the scale and accuracy your problem needs; the defaults are not a universal rule. Try it: compare 1e-12 and 0. With the default atol of 1e-8, np.isclose(1e-12, 0) is True; with atol=0 it is False, because a relative tolerance times zero is zero. Near zero, only the absolute tolerance can help.</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> Many decimal fractions, such as 0.1, have no exact binary representation, so the computer stores the closest value it can. The tiny errors in 0.1 and 0.2 add up to a sum that is not the same double as 0.3, so exact equality fails. np.isclose and np.testing.assert_allclose pass when the difference is at most atol plus rtol times the size of the expected value. Choose the tolerances from the scale and accuracy your problem needs; the defaults are not a universal rule. Try it: compare 1e-12 and 0. With the default atol of 1e-8, np.isclose(1e-12, 0) is True; with atol=0 it is False, because a relative tolerance times zero is zero. Near zero, only the absolute tolerance can help.</p></div>
+<div class="slide" id="tolerance-visual"><div class="frame"><section id="tolerance-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Equality versus closeness</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One digit apart, far down</h2>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;gap:24px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:280px">repr(0.3)</p>
+<div style="display:flex;gap:8px">
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">.</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:280px">repr(0.1 + 0.2)</p>
+<div style="display:flex;gap:8px">
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">.</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:56px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">The sum differs from 0.3 only in its 17th decimal digit (orange), yet it is a different double.</p>
+</div>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#B5541A;width:48px;height:48px" role="img" aria-label="Warning"><path d="M12 3 22 20H2Z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">== → False</h3></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Every bit must match. One rounding step breaks it.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:48px;height:48px" role="img" aria-label="CheckCircle"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">isclose → True</h3></div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#13233A">|a − b| ≤ atol + rtol·|b|</p>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">The gap fits inside the band.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#13233A;border-radius:16px;padding:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Machine epsilon</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#C9D4E2">float32<br><span style="color:#F2A35E">1.1920929e-07</span></p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#C9D4E2">float64<br><span style="color:#F2A35E">2.220446049250313e-16</span></p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 13 Numerical stability</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>This slide shows why exact equality is the wrong question. Python prints the shortest decimal that identifies each double: 0.3 prints as 0.3, but the sum needs seventeen decimals, ending in a 4, so the two are different numbers. The tolerance test instead asks whether the gap is no larger than atol plus rtol times the expected value, which in this example is about 3e-13, far larger than the gap. Machine epsilon, printed by np.finfo, is the spacing between 1 and the next representable number: about 1e-7 for float32 and 2e-16 for float64, roughly 7 and 16 significant digits. Pick rtol a little above the precision your computation can actually deliver.</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> This slide shows why exact equality is the wrong question. Python prints the shortest decimal that identifies each double: 0.3 prints as 0.3, but the sum needs seventeen decimals, ending in a 4, so the two are different numbers. The tolerance test instead asks whether the gap is no larger than atol plus rtol times the expected value, which in this example is about 3e-13, far larger than the gap. Machine epsilon, printed by np.finfo, is the spacing between 1 and the next representable number: about 1e-7 for float32 and 2e-16 for float64, roughly 7 and 16 significant digits. Pick rtol a little above the precision your computation can actually deliver.</p></div>
+<div class="slide" id="cancellation"><div class="frame"><section id="cancellation" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Preserve small changes</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Tiny changes vanish in 1 + x</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">tiny = 1e-16<br>print("Naive log:", np.log(1 + tiny))<br>print("log1p:", np.log1p(tiny))<br>print("Naive exp change:", np.exp(tiny) - 1)<br>print("expm1:", np.expm1(tiny))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Naive log: 0.0<br>log1p: 1e-16<br>Naive exp change: 0.0<br>expm1: 1e-16</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">1 + 1e-16 rounds to 1.0</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">It is below float64 epsilon, so the change is lost before log runs.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">log1p(x) is log(1 + x)</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Computed without ever forming 1 + x.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">expm1(x) is exp(x) − 1</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Avoids subtracting two nearly equal numbers.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 13 Numerical stability</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>Cancellation happens when you subtract nearly equal numbers, or add a tiny number to a large one: the meaningful digits fall off the end of the 53-bit significand. Here 1 + 1e-16 is stored as exactly 1.0, so log gives 0 and exp(tiny) - 1 gives 0, even though the true answers are about 1e-16. np.log1p and np.expm1 are written to work on x directly, so they return 1e-16, accurate to full precision. Use them whenever x can be small, for example in log returns, interest rates or probabilities near zero. Try it: find a value for which float32 rounds 1 + x back to 1 while float64 does not. x = 1e-8 works: np.float32(1) + np.float32(1e-8) equals 1, because float32 epsilon is about 1.2e-7, while 1 + 1e-8 in float64 is still larger than 1.</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> Cancellation happens when you subtract nearly equal numbers, or add a tiny number to a large one: the meaningful digits fall off the end of the 53-bit significand. Here 1 + 1e-16 is stored as exactly 1.0, so log gives 0 and exp(tiny) - 1 gives 0, even though the true answers are about 1e-16. np.log1p and np.expm1 are written to work on x directly, so they return 1e-16, accurate to full precision. Use them whenever x can be small, for example in log returns, interest rates or probabilities near zero. Try it: find a value for which float32 rounds 1 + x back to 1 while float64 does not. x = 1e-8 works: np.float32(1) + np.float32(1e-8) equals 1, because float32 epsilon is about 1.2e-7, while 1 + 1e-8 in float64 is still larger than 1.</p></div>
+<div class="slide" id="overflow"><div class="frame"><section id="overflow" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Integer overflow</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">int8 wraps: 120 + 120 = −16</h2>
+<div style="position:relative;height:200px">
+<div style="position:absolute;left:40px;top:112px;width:1400px;height:80px;border-right:3px dashed #B5541A;border-bottom:3px dashed #B5541A;border-left:3px dashed #B5541A"></div>
+<div style="position:absolute;left:1376px;top:110px;width:64px;height:2px;border-top:3px dashed #B5541A"></div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;position:absolute;left:46px;top:100px;width:48px;height:24px;" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#B5541A"/></svg>
+<div style="position:absolute;left:96px;top:100px;width:1280px;height:24px;background:#E2DED3;border-radius:12px"></div>
+<div style="position:absolute;left:96px;top:100px;width:560px;height:24px;background:#F2A35E;border-radius:12px"></div>
+<div style="position:absolute;left:1336px;top:100px;width:40px;height:24px;background:#F2A35E;border-radius:12px"></div>
+<div style="position:absolute;left:734px;top:92px;width:4px;height:40px;background:#13233A"></div>
+<div style="position:absolute;left:1330px;top:84px;width:12px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="position:absolute;left:650px;top:84px;width:12px;height:56px;background:#B5541A;border-radius:6px"></div>
+<p style="position:absolute;left:1186px;top:36px;width:300px;font-size:24px;font-weight:600;text-align:center;color:#2F6FB0">start: 120</p>
+<p style="position:absolute;left:506px;top:36px;width:300px;font-size:24px;font-weight:600;text-align:center;color:#B5541A">result: −16</p>
+<p style="position:absolute;left:56px;top:140px;width:80px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#4A5568">−128</p>
+<p style="position:absolute;left:696px;top:140px;width:80px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#4A5568">0</p>
+<p style="position:absolute;left:1336px;top:140px;width:80px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#4A5568">127</p>
+<p style="position:absolute;left:1470px;top:96px;width:194px;font-size:24px;color:#B5541A">wraps around</p>
+</div>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">small = np.array([120], dtype=np.int8)<br>print("Overflowed int8 sum:", small + small)<br>print("Promoted sum:", small.astype(np.int64)<br>&#160;&#160;&#160;&#160;&#160;&#160;+ small.astype(np.int64))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Overflowed int8 sum: [-16]<br>Promoted sum: [240]</p></div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">240 − 256 = −16</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">int8 holds 256 values. Past 127 it wraps to −128, silently.</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Promote first</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Cast to int64 before adding.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 13 Numerical stability</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>NumPy integers have a fixed width. An int8 has 8 bits, so it holds 256 values, from -128 to 127. The bar shows that range: starting at 120 (blue), adding 120 runs past 127, wraps around to -128 and keeps counting until it lands on -16 (orange), which is 240 minus 256. NumPy array arithmetic does not raise an error for this; it silently wraps. The fix is to promote the dtype before the arithmetic that might overflow: with int64 the sum is 240. Watch for this with small dtypes such as int8, uint8 image pixels or int16 sensor data, especially when summing or multiplying.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> NumPy integers have a fixed width. An int8 has 8 bits, so it holds 256 values, from -128 to 127. The bar shows that range: starting at 120 (blue), adding 120 runs past 127, wraps around to -128 and keeps counting until it lands on -16 (orange), which is 240 minus 256. NumPy array arithmetic does not raise an error for this; it silently wraps. The fix is to promote the dtype before the arithmetic that might overflow: with int64 the sum is 240. Watch for this with small dtypes such as int8, uint8 image pixels or int16 sensor data, especially when summing or multiplying.</p></div>
+<div class="slide" id="softmax"><div class="frame"><section id="softmax" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Stable softmax</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Subtract the max, then exp</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:1040px;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">def softmax(scores):<br>&#160;&#160;&#160;&#160;scores = np.asarray(scores, dtype=np.float64)<br>&#160;&#160;&#160;&#160;shifted = scores - scores.max(axis=-1, keepdims=True)<br>&#160;&#160;&#160;&#160;exponentials = np.exp(shifted)<br>&#160;&#160;&#160;&#160;return exponentials / exponentials.sum(<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;axis=-1, keepdims=True)<br><br>scores = np.array([[1000., 1001., 1002.],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;[-1000., -1000., -999.]])<br>probabilities = softmax(scores)<br>print(probabilities)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[[0.09&#160;&#160;&#160;0.2447 0.6652]<br>&#160;[0.2119 0.2119 0.5761]]</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Scores to weights</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Positive values that sum to one along each row.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Shift is free</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">softmax(scores + 500) gives the same result.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">keepdims=True</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Keeps the row axis so each max broadcasts.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 13 Numerical stability</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>Softmax turns any finite scores into positive weights that sum to one: exponentiate each score, then divide by the row total. Exponentials grow fast, so scores near 1000 overflow float64. Subtracting the row maximum first changes nothing mathematically, because the same factor cancels in the numerator and denominator, but now the largest exponent is exp(0) = 1. The notebook's asserts confirm that every value is finite, each row sums to 1, and shifting all scores by 500 gives the same probabilities. Very negative shifted scores can still underflow to 0, which is usually harmless. Try it: add a test for equal scores, which should give equal weights such as [1/3, 1/3, 1/3], and one for a row with a single score, which should give [1.0].</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> Softmax turns any finite scores into positive weights that sum to one: exponentiate each score, then divide by the row total. Exponentials grow fast, so scores near 1000 overflow float64. Subtracting the row maximum first changes nothing mathematically, because the same factor cancels in the numerator and denominator, but now the largest exponent is exp(0) = 1. The notebook's asserts confirm that every value is finite, each row sums to 1, and shifting all scores by 500 gives the same probabilities. Very negative shifted scores can still underflow to 0, which is usually harmless. Try it: add a test for equal scores, which should give equal weights such as [1/3, 1/3, 1/3], and one for a row with a single score, which should give [1.0].</p></div>
+<div class="slide" id="softmax-visual"><div class="frame"><section id="softmax-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Naive versus stable</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Same row, two orders of work</h2>
+<div style="display:flex;gap:40px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#B5541A;width:48px;height:48px" role="img" aria-label="Warning"><path d="M12 3 22 20H2Z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Naive: exp first</h3></div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:140px">scores</p>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1000</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1001</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1002</p></div>
+</div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:140px">exp</p>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">inf</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">inf</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">inf</p></div>
+</div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:140px">÷ sum</p>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">nan</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">nan</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">nan</p></div>
+</div>
+<div style="flex:1"></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">exp(1000) overflows float64 to inf, and inf / inf is nan. The answer is lost.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:48px;height:48px" role="img" aria-label="CheckCircle"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Stable: shift first</h3></div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:140px">scores</p>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1000</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1001</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1002</p></div>
+</div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:140px">− max</p>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">−2</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">−1</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+</div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:140px">exp</p>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0.1353</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0.3679</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+</div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:140px">÷ sum</p>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0.09</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0.2447</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0.6652</p></div>
+</div>
+<div style="flex:1"></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">The largest term is exp(0) = 1, so nothing can overflow.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 13 Numerical stability</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>Follow the first row of the example, [1000, 1001, 1002], through both versions. Naively, np.exp(1000) is far beyond the largest float64, about 1.8e308, so NumPy returns inf with an overflow warning; dividing inf by inf gives nan, and every weight is lost. The stable version subtracts the row maximum, 1002, first, giving [-2, -1, 0]. Their exponentials are about 0.1353, 0.3679 and 1, all safe, and dividing by their sum gives exactly the notebook's output, 0.09, 0.2447 and 0.6652. The shift cancels out mathematically, so the result is the true softmax. The same trick appears as log-sum-exp in statistics and machine learning.</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> Follow the first row of the example, [1000, 1001, 1002], through both versions. Naively, np.exp(1000) is far beyond the largest float64, about 1.8e308, so NumPy returns inf with an overflow warning; dividing inf by inf gives nan, and every weight is lost. The stable version subtracts the row maximum, 1002, first, giving [-2, -1, 0]. Their exponentials are about 0.1353, 0.3679 and 1, all safe, and dividing by their sum gives exactly the notebook's output, 0.09, 0.2447 and 0.6652. The shift cancels out mathematically, so the result is the true softmax. The same trick appears as log-sum-exp in statistics and machine learning.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Compare with tolerance.<br>Compute in a safe range.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">Floats are approximations with fixed limits. Test closeness, keep small changes, and shift or promote before values overflow.</p>
+<aside>Pause here. Every result in this notebook comes from one fact: a number is stored in a fixed number of bits. That is why == fails on 0.1 + 0.2, why 1 + 1e-16 is 1, why int8 wraps, and why exp(1000) overflows. The remedies follow the same pattern: compare with explicit tolerances, use functions like log1p and expm1 that avoid cancellation, promote to a wider dtype, and rearrange formulas, like subtracting the maximum in softmax, so intermediate values stay in range.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> Pause here. Every result in this notebook comes from one fact: a number is stored in a fixed number of bits. That is why == fails on 0.1 + 0.2, why 1 + 1e-16 is 1, why int8 wraps, and why exp(1000) overflows. The remedies follow the same pattern: compare with explicit tolerances, use functions like log1p and expm1 that avoid cancellation, promote to a wider dtype, and rearrange formulas, like subtracting the maximum in softmax, so intermediate values stay in range.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two exercises on stability</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Compute log(1 + x) accurately for very small x</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">tiny_values = [1e-16, 1e-12, 1e-8]. Expected: within rtol 1e-12 of the true values, about equal to x itself.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">accurate_logs = np.log1p(tiny_values)</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Softmax of [10000, 10000]</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: [0.5 0.5], all finite. Both shifted scores become 0, and exp(0) = 1.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">weights = softmax(large_scores)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 13 Numerical stability</p><p style="font-size:24px;color:#6B7280">10</p></div>
+<aside>Ask the audience to attempt both before revealing the code lines, which match the reference solutions. Exercise 1: log1p computes the small logarithmic change without first rounding 1 + x to a nearby representable value. Note that the reference run prints [0. 0. 0.] only because the notebook sets np.set_printoptions(suppress=True), which displays tiny numbers as 0; the stored values are about 1e-16, 1e-12 and 1e-8, and the check with rtol 1e-12 passes. Exercise 2: subtracting the maximum makes both shifted scores zero, their exponentials are both 1, and normalizing gives equal weights of 0.5. A naive exp(10000) would be inf and the result nan.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> Ask the audience to attempt both before revealing the code lines, which match the reference solutions. Exercise 1: log1p computes the small logarithmic change without first rounding 1 + x to a nearby representable value. Note that the reference run prints [0. 0. 0.] only because the notebook sets np.set_printoptions(suppress=True), which displays tiny numbers as 0; the stored values are about 1e-16, 1e-12 and 1e-8, and the check with rtol 1e-12 passes. Exercise 2: subtracting the maximum makes both shifted scores zero, their exponentials are both 1, and normalizing gives equal weights of 0.5. A naive exp(10000) would be inf and the result nan.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Where does float32 lose digits?</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Sum float32 values with default accumulation and with dtype=float64</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Build a dataset with very different magnitudes. Predict which sum drifts, then explain any difference.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain the main idea without reading the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a changed input or edge case and explain it</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 13 Numerical stability</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>The challenge has no supplied check: decide what you expect before you run anything. A good dataset mixes one large value, such as 1e8, with many small ones, such as a million values of 1, all stored as float32. With float32 accumulation, small values added to a large running total can be rounded away, because float32 keeps only about 7 significant digits; passing dtype=np.float64 to sum accumulates in double precision and keeps them. NumPy's pairwise summation reduces this error, so the order and grouping of your data affect how big the difference is. Explain your result in terms of machine epsilon, then restart the kernel and run all cells.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> The challenge has no supplied check: decide what you expect before you run anything. A good dataset mixes one large value, such as 1e8, with many small ones, such as a million values of 1, all stored as float32. With float32 accumulation, small values added to a large running total can be rounded away, because float32 keeps only about 7 significant digits; passing dtype=np.float64 to sum accumulates in double precision and keeps them. NumPy's pairwise summation reduces this error, so the order and grouping of your data affect how big the difference is. Explain your result in terms of machine epsilon, then restart the kernel and run all cells.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Tolerances</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Use isclose with rtol and atol, never == on floats.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Cancellation</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">log1p and expm1 keep tiny changes.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Overflow</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Small integer dtypes wrap; promote first.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Softmax</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Subtract the max before exp.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 14</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Advanced array patterns</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Einsum, rolling windows, and repeated indices.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 14, which uses einsum for tensor contractions, sliding_window_view for rolling features, and np.add.at for repeated indices. Further reading: the official NumPy documentation for numpy.allclose at numpy.org/doc/stable/reference/generated/numpy.allclose.html and for numpy.log1p at numpy.org/doc/stable/reference/generated/numpy.log1p.html.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> Recap the four takeaways, then point to notebook 14, which uses einsum for tensor contractions, sliding_window_view for rolling features, and np.add.at for repeated indices. Further reading: the official NumPy documentation for numpy.allclose at numpy.org/doc/stable/reference/generated/numpy.allclose.html and for numpy.log1p at numpy.org/doc/stable/reference/generated/numpy.log1p.html.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

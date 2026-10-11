@@ -1,0 +1,17 @@
+<section id="add-at" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Repeated indices</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">+= can miss repeated indices</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">a[index] += value is buffered</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A repeated position may be updated only once.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">np.add.at is unbuffered</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">It applies every occurrence, one at a time.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">bincount for integer codes</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">With weights=values it gives the same sums, often faster.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">indices = np.array([0, 0, 2])<br>values = np.array([1., 1., 5.])<br>buffered = np.zeros(3)<br>buffered[indices] += values<br>accumulated = np.zeros(3)<br>np.add.at(accumulated, indices, values)<br>print("Buffered:", buffered)<br>print("Accumulated:", accumulated)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Buffered: [1. 0. 5.]<br>Accumulated: [2. 0. 5.]</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 14 Advanced array patterns</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>Fancy-index assignment with += is shorthand for: read buffered[indices], add values, write the result back to buffered[indices]. The read happens once for all indices, so both occurrences of index 0 read the original 0 and add 1, and the second write simply overwrites the first. The result at position 0 is 1, not 2: an update is silently lost. np.add.at is the unbuffered version of the same ufunc and applies each occurrence in turn, giving 2. For sums over nonnegative integer codes, np.bincount(indices, weights=values, minlength=3) is a simpler and often faster equivalent, and the notebook asserts that it matches. Try it: use np.maximum.at(out, groups, values) with out starting as np.full(number_of_groups, -np.inf) to get the largest value per group.</aside>
+</section>

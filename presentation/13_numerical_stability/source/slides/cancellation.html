@@ -1,0 +1,17 @@
+<section id="cancellation" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Preserve small changes</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Tiny changes vanish in 1 + x</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">tiny = 1e-16<br>print("Naive log:", np.log(1 + tiny))<br>print("log1p:", np.log1p(tiny))<br>print("Naive exp change:", np.exp(tiny) - 1)<br>print("expm1:", np.expm1(tiny))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Naive log: 0.0<br>log1p: 1e-16<br>Naive exp change: 0.0<br>expm1: 1e-16</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">1 + 1e-16 rounds to 1.0</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">It is below float64 epsilon, so the change is lost before log runs.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">log1p(x) is log(1 + x)</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Computed without ever forming 1 + x.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">expm1(x) is exp(x) − 1</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Avoids subtracting two nearly equal numbers.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 13 Numerical stability</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>Cancellation happens when you subtract nearly equal numbers, or add a tiny number to a large one: the meaningful digits fall off the end of the 53-bit significand. Here 1 + 1e-16 is stored as exactly 1.0, so log gives 0 and exp(tiny) - 1 gives 0, even though the true answers are about 1e-16. np.log1p and np.expm1 are written to work on x directly, so they return 1e-16, accurate to full precision. Use them whenever x can be small, for example in log returns, interest rates or probabilities near zero. Try it: find a value for which float32 rounds 1 + x back to 1 while float64 does not. x = 1e-8 works: np.float32(1) + np.float32(1e-8) equals 1, because float32 epsilon is about 1.2e-7, while 1 + 1e-8 in float64 is still larger than 1.</aside>
+</section>

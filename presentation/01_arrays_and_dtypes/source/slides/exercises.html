@@ -1,0 +1,22 @@
+<section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two constructor exercises</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">A 3 × 4 array filled with 2.5, using float64</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: shape (3, 4), dtype float64, every value 2.5. full takes the shape and the fill value.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">filled = np.full((3, 4), 2.5,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;dtype=np.float64)</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">An integer array of 5, 10, 15, 20, 25</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: [5, 10, 15, 20, 25] with an integer dtype. arange excludes its stop, so stop at 26 to include 25.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">multiples = np.arange(5, 26, 5)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>Let the audience attempt both before revealing the code, which matches the reference solutions. Exercise 1's check asserts shape (3, 4), dtype float64 and every value close to 2.5; writing the dtype explicitly guarantees the fractional part is preserved. Exercise 2's check compares the values and uses np.issubdtype(multiples.dtype, np.integer), so any integer dtype passes. A common mistake is np.arange(5, 25, 5), which stops at 20 because the stop value is excluded. np.array([5, 10, 15, 20, 25]) would also pass: the check verifies the result, not the method.</aside>
+</section>

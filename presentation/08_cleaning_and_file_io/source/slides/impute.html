@@ -1,0 +1,17 @@
+<section id="impute" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Imputation with a stated assumption</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Fill the gaps on purpose</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">if np.any(np.all(np.isnan(cleaned), axis=0)):<br>&#160;&#160;&#160;&#160;raise ValueError("A column has no observed values")<br>column_means = np.nanmean(cleaned, axis=0)<br>imputed = np.where(np.isnan(cleaned), column_means, cleaned)<br>print(imputed)<br>assert np.isfinite(imputed).all()<br>np.testing.assert_allclose(imputed.mean(axis=0), column_means)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[[10. 21.]<br>&#160;[12. 20.]<br>&#160;[11. 22.]]</p></div>
+</div>
+<div style="width:480px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Guard first</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">An all-missing column has no mean, so stop with an error.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">where picks per cell</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Missing: take the column mean. Else: keep the value.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">State the policy</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Mean filling keeps the mean but shrinks the spread.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>Imputation means replacing missing values, and every imputation is an assumption you should state. Column-mean imputation is simple: it preserves each column's observed mean, which the final assert_allclose checks, but it changes the distribution and makes the data look less variable than it is. First we guard against a column that is entirely missing, because it has no observed mean to use; np.all along axis 0 detects that and we raise a clear error instead of silently producing NaN. np.where then works cell by cell: where the mask is True it takes the column mean, broadcast across rows, otherwise it keeps the original value. Try it: compare the standard deviation before and after filling. np.nanstd(cleaned, axis=0) gives [1. 1.], while imputed.std(axis=0) gives [0.8165 0.8165]: the filled values sit exactly at the mean, so the spread shrinks.</aside>
+</section>

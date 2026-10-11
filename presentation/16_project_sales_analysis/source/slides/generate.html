@@ -1,0 +1,17 @@
+<section id="generate" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Generate the data</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Reproducible synthetic sales</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">rng = np.random.default_rng(2026)<br>stores = np.array(["North", "Central", "South"])<br>products = np.array(["Tea", "Coffee",<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;"Juice", "Water"])<br>prices = np.array([20., 40., 35., 15.])<br>units = rng.poisson(lam=np.array([12, 8, 6, 15]),<br>&#160;&#160;&#160;&#160;size=(30, 3, 4)).astype(float)<br>units[2, 0, 1] = np.nan<br>units[10, 2, 3] = np.nan<br>print("Shape:", units.shape,<br>&#160;&#160;&#160;&#160;&#160;&#160;"missing:", np.isnan(units).sum())</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Shape: (30, 3, 4) missing: 2</p></div>
+</div>
+<div style="width:600px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A seeded generator</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Seed 2026 gives everyone the same month of sales.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">One rate per product</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">lam broadcasts along the last axis: about 12, 8, 6 and 15 units a day.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">NaN is not zero</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">It marks a count we never observed. astype(float) makes room for it.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>The brief: three stores, four products, 30 days. Poisson counts model whole units sold per day, and the rate vector of length 4 broadcasts against the size (30, 3, 4), so each product gets its own average. Poisson returns integers, which cannot hold NaN, so the cube is converted to float before two counts are blanked out. Ask the audience to predict the shape and the missing count before running. Try it: add a fifth product. The rate vector, the price vector and the product names must all grow to length 5, and the shape becomes (30, 3, 5); forget one and broadcasting or the report breaks.</aside>
+</section>

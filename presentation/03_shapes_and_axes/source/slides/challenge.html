@@ -1,0 +1,20 @@
+<section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Totals along every axis</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">An array shaped (2 stores, 7 days, 3 products)</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Compute totals per store, per day, and per product. Explain each axis tuple you pass, and predict each result's shape first.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain axis=0 versus axis=1 without the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a reshape that fails and explain why</p></div>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">12</p></div>
+<aside>The challenge has no supplied check: write your own. With shape (2, 7, 3), a total per store keeps axis 0 and collapses the other two, so pass axis=(1, 2) and expect shape (2,). A total per day keeps axis 1: axis=(0, 2), shape (7,). A total per product keeps axis 2: axis=(0, 1), shape (3,). A good self-check: all three results must add up to the same grand total, sales.sum(). Then restart the kernel and run all cells once more.</aside>
+</section>

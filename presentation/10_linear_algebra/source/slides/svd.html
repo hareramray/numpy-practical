@@ -1,0 +1,55 @@
+<section id="svd" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Factor a matrix</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">SVD splits a matrix into three</h2>
+<div style="display:flex;gap:56px;align-items:center">
+<div style="flex:1;display:flex;gap:20px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(2, 56px);gap:6px">
+<div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">0</p></div>
+<div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div>
+<div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">2</p></div>
+<div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">3</p></div>
+<div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">4</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">design (5, 2)</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">=</p>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(2, 56px);gap:6px">
+<div style="height:48px;background:#2F6FB0;border-radius:8px"></div><div style="height:48px;background:#2F6FB0;border-radius:8px"></div>
+<div style="height:48px;background:#2F6FB0;border-radius:8px"></div><div style="height:48px;background:#2F6FB0;border-radius:8px"></div>
+<div style="height:48px;background:#2F6FB0;border-radius:8px"></div><div style="height:48px;background:#2F6FB0;border-radius:8px"></div>
+<div style="height:48px;background:#2F6FB0;border-radius:8px"></div><div style="height:48px;background:#2F6FB0;border-radius:8px"></div>
+<div style="height:48px;background:#2F6FB0;border-radius:8px"></div><div style="height:48px;background:#2F6FB0;border-radius:8px"></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">U (5, 2)</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">×</p>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(2, 56px);gap:6px">
+<div style="height:48px;background:#E8813A;border-radius:8px"></div><div style="height:48px;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:8px"></div>
+<div style="height:48px;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:8px"></div><div style="height:48px;background:#E8813A;border-radius:8px"></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">diag(s) (2, 2)</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">×</p>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(2, 56px);gap:6px">
+<div style="height:48px;background:#13233A;border-radius:8px"></div><div style="height:48px;background:#13233A;border-radius:8px"></div>
+<div style="height:48px;background:#13233A;border-radius:8px"></div><div style="height:48px;background:#13233A;border-radius:8px"></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">Vt (2, 2)</p>
+</div>
+</div>
+<div style="width:660px;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">U, s, Vt = np.linalg.svd(<br>&#160;&#160;&#160;&#160;design, full_matrices=False)<br>np.testing.assert_allclose(<br>&#160;&#160;&#160;&#160;(U * s) @ Vt, design, atol=1e-12)<br>assert rank == 2</p></div>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#2F6FB0">U</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Orthonormal directions across the 5 rows.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#B5541A">s</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Singular values, largest first. Small = weak direction.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#13233A">Vt</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Orthonormal directions across the 2 columns.</p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">9</p></div>
+<aside>The singular value decomposition factors any matrix into three pieces. Here the 5 by 2 design matrix becomes U, shaped 5 by 2, the singular values s, and Vt, shaped 2 by 2. U and Vt hold orthonormal directions, and s holds one strength per direction, sorted from largest to smallest. A singular value close to zero marks a direction with very little variation, which is exactly when solving or fitting becomes unstable. NumPy returns s as a 1D array, not a diagonal matrix, so the notebook rebuilds design with (U * s) @ Vt: broadcasting scales each column of U by its singular value, which equals U @ np.diag(s). The assert_allclose check, with an absolute tolerance of 1e-12, proves the factorization reproduces the original matrix, and the notebook asserts rank == 2 from the earlier lstsq call.</aside>
+</section>

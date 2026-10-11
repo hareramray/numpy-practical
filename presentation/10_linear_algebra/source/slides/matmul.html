@@ -1,0 +1,17 @@
+<section id="matmul" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Matrix multiplication</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">@ multiplies rows by columns</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A * A is elementwise</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Each entry is squared on its own: 2 becomes 4.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A @ A is a matrix product</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Each entry is one row dotted with one column: multiply matching entries, then add.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A @ v gives a vector</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A (2, 2) matrix times a length-2 vector is a length-2 vector.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">A = np.array([[1., 2.], [3., 4.]])<br>v = np.array([10., 20.])<br>print("Elementwise:\n", A * A)<br>print("Matrix product:\n", A @ A)<br>print("Matrix times vector:", A @ v)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Elementwise:<br>&#160;[[ 1.&#160; 4.]<br>&#160;[ 9. 16.]]<br>Matrix product:<br>&#160;[[ 7. 10.]<br>&#160;[15. 22.]]<br>Matrix times vector: [ 50. 110.]</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>The star operator and the at operator look similar but mean very different things. A * A multiplies matching entries, so 3 becomes 9 and 4 becomes 16. A @ A is the matrix product: every result entry is a dot product of a row from the left matrix with a column from the right matrix. A @ v treats v as a column, giving 1 times 10 plus 2 times 20, which is 50, and 3 times 10 plus 4 times 20, which is 110. The notebook confirms this with np.testing.assert_allclose(A @ v, [50, 110]). Try it: compute the first entry of A @ A by hand before looking at the next slide.</aside>
+</section>

@@ -1,0 +1,35 @@
+<section id="overflow" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Integer overflow</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">int8 wraps: 120 + 120 = −16</h2>
+<div style="position:relative;height:200px">
+<div style="position:absolute;left:40px;top:112px;width:1400px;height:80px;border-right:3px dashed #B5541A;border-bottom:3px dashed #B5541A;border-left:3px dashed #B5541A"></div>
+<div style="position:absolute;left:1376px;top:110px;width:64px;height:2px;border-top:3px dashed #B5541A"></div>
+<x-shape kind="arrow-right" style="position:absolute;left:46px;top:100px;width:48px;height:24px;background:#B5541A"></x-shape>
+<div style="position:absolute;left:96px;top:100px;width:1280px;height:24px;background:#E2DED3;border-radius:12px"></div>
+<div style="position:absolute;left:96px;top:100px;width:560px;height:24px;background:#F2A35E;border-radius:12px"></div>
+<div style="position:absolute;left:1336px;top:100px;width:40px;height:24px;background:#F2A35E;border-radius:12px"></div>
+<div style="position:absolute;left:734px;top:92px;width:4px;height:40px;background:#13233A"></div>
+<div style="position:absolute;left:1330px;top:84px;width:12px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="position:absolute;left:650px;top:84px;width:12px;height:56px;background:#B5541A;border-radius:6px"></div>
+<p style="position:absolute;left:1186px;top:36px;width:300px;font-size:24px;font-weight:600;text-align:center;color:#2F6FB0">start: 120</p>
+<p style="position:absolute;left:506px;top:36px;width:300px;font-size:24px;font-weight:600;text-align:center;color:#B5541A">result: −16</p>
+<p style="position:absolute;left:56px;top:140px;width:80px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#4A5568">−128</p>
+<p style="position:absolute;left:696px;top:140px;width:80px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#4A5568">0</p>
+<p style="position:absolute;left:1336px;top:140px;width:80px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#4A5568">127</p>
+<p style="position:absolute;left:1470px;top:96px;width:194px;font-size:24px;color:#B5541A">wraps around</p>
+</div>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">small = np.array([120], dtype=np.int8)<br>print("Overflowed int8 sum:", small + small)<br>print("Promoted sum:", small.astype(np.int64)<br>&#160;&#160;&#160;&#160;&#160;&#160;+ small.astype(np.int64))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Overflowed int8 sum: [-16]<br>Promoted sum: [240]</p></div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">240 − 256 = −16</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">int8 holds 256 values. Past 127 it wraps to −128, silently.</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Promote first</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Cast to int64 before adding.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 13 Numerical stability</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>NumPy integers have a fixed width. An int8 has 8 bits, so it holds 256 values, from -128 to 127. The bar shows that range: starting at 120 (blue), adding 120 runs past 127, wraps around to -128 and keeps counting until it lands on -16 (orange), which is 240 minus 256. NumPy array arithmetic does not raise an error for this; it silently wraps. The fix is to promote the dtype before the arithmetic that might overflow: with int64 the sum is 240. Watch for this with small dtypes such as int8, uint8 image pixels or int16 sensor data, especially when summing or multiplying.</aside>
+</section>

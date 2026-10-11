@@ -1,0 +1,60 @@
+<section id="softmax-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Naive versus stable</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Same row, two orders of work</h2>
+<div style="display:flex;gap:40px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Warning" style="color:#B5541A;width:48px;height:48px"></x-icon><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Naive: exp first</h3></div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:140px">scores</p>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1000</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1001</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1002</p></div>
+</div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:140px">exp</p>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">inf</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">inf</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">inf</p></div>
+</div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:140px">÷ sum</p>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">nan</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">nan</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">nan</p></div>
+</div>
+<div style="flex:1"></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">exp(1000) overflows float64 to inf, and inf / inf is nan. The answer is lost.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="CheckCircle" style="color:#2F6FB0;width:48px;height:48px"></x-icon><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Stable: shift first</h3></div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:140px">scores</p>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1000</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1001</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1002</p></div>
+</div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:140px">− max</p>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">−2</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">−1</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+</div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:140px">exp</p>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0.1353</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0.3679</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+</div>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;width:140px">÷ sum</p>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0.09</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0.2447</p></div>
+<div style="width:168px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">0.6652</p></div>
+</div>
+<div style="flex:1"></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">The largest term is exp(0) = 1, so nothing can overflow.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 13 Numerical stability</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>Follow the first row of the example, [1000, 1001, 1002], through both versions. Naively, np.exp(1000) is far beyond the largest float64, about 1.8e308, so NumPy returns inf with an overflow warning; dividing inf by inf gives nan, and every weight is lost. The stable version subtracts the row maximum, 1002, first, giving [-2, -1, 0]. Their exponentials are about 0.1353, 0.3679 and 1, all safe, and dividing by their sum gives exactly the notebook's output, 0.09, 0.2447 and 0.6652. The shift cancels out mathematically, so the result is the true softmax. The same trick appears as log-sum-exp in statistics and machine learning.</aside>
+</section>

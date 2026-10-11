@@ -1,0 +1,32 @@
+<section id="chunks" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · See the chunks</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Ten small passes, one small temporary</h2>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:28px;color:#13233A">a and b: 20,000 float64 values, walked 2048 at a time (start index shown)</p>
+<div style="display:flex;gap:4px">
+<div style="width:160px;height:80px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#13233A">0</p></div>
+<div style="width:160px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">2048</p></div>
+<div style="width:160px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">4096</p></div>
+<div style="width:160px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">6144</p></div>
+<div style="width:160px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">8192</p></div>
+<div style="width:160px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">10240</p></div>
+<div style="width:160px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">12288</p></div>
+<div style="width:160px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">14336</p></div>
+<div style="width:160px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">16384</p></div>
+<div style="width:124px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">18432</p></div>
+</div>
+<p style="font-size:24px;color:#6B7280">Orange: the chunk being processed. The dashed last chunk is shorter; slicing stops at the end.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-size:28px;font-weight:600;color:#13233A">Full-size temporary <span style="color:#6B7280">· scratch.nbytes</span></p>
+<div style="display:flex;gap:24px;align-items:center"><div style="width:1300px;height:48px;background:#13233A;border-radius:0px 8px 8px 0px"></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">160000 B</p></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-size:28px;font-weight:600;color:#13233A">One chunk's difference <span style="color:#6B7280">· maximum</span></p>
+<div style="display:flex;gap:24px;align-items:center"><div style="width:133px;height:48px;background:#E8813A;border-radius:0px 8px 8px 0px"></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#B5541A">16384 B</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 12 Vectorization</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>The top strip is the input, split into the slices the loop visits. Each block starts at a multiple of 2048; the orange block is the one currently being processed, and the dashed final block is shorter because 20,000 is not a multiple of 2048. The two bars below compare the memory the temporaries need, drawn to the same scale from the notebook's printed values: a full-size temporary costs 160000 bytes, while one chunk's difference never exceeds 16384 bytes, roughly a tenth. The result is the same within floating-point tolerance. The same pattern scales to data that does not fit in memory, for example combined with the memory-mapped arrays from notebook 11. Pick a chunk size large enough that per-chunk overhead stays small, and small enough that the temporaries fit comfortably.</aside>
+</section>

@@ -1,0 +1,43 @@
+<section id="axis-sums" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Transpose and reductions</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">The axis you name is the one that goes</h2>
+<div style="display:flex;gap:120px;flex:1;align-items:center">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">points.sum(axis=0)</p>
+<div style="display:grid;grid-template-columns:repeat(3, 110px);gap:12px">
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+<p style="text-align:center;font-size:40px;line-height:1;color:#B5541A">↓</p>
+<p style="text-align:center;font-size:40px;line-height:1;color:#B5541A">↓</p>
+<p style="text-align:center;font-size:40px;line-height:1;color:#B5541A">↓</p>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">7</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">9</p></div>
+</div>
+<p style="width:354px;font-size:24px;line-height:1.4;color:#4A5568">Rows are combined: one total per column, shape (2, 3) → (3,).</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">points.sum(axis=1)</p>
+<div style="display:grid;grid-template-columns:repeat(3, 110px) 72px 110px;gap:12px">
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center"><p style="font-size:40px;color:#2F6FB0">→</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">6</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center"><p style="font-size:40px;color:#2F6FB0">→</p></div>
+<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">15</p></div>
+</div>
+<p style="width:560px;font-size:24px;line-height:1.4;color:#4A5568">Columns are combined: one total per row, shape (2, 3) → (2,). With keepdims=True the result stays a column, (2, 1).</p>
+</div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#B5541A">Per-column totals: [5 7 9] · Per-row totals: [&#160;6 15]</p>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 03 Shapes and axes</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>This is the picture to keep in your head for every reduction in the course. On the left, axis=0 runs down the rows, so each column's two values are added: 1+4, 2+5, 3+6 give the orange [5 7 9]. On the right, axis=1 runs across the columns, so each row's three values are added: 1+2+3 and 4+5+6 give the blue [6 15]. In both cases the axis you name disappears from the shape: (2, 3) loses axis 0 to become (3,), or loses axis 1 to become (2,). Try it, as the notebook suggests: draw a 2 by 3 grid on paper and label which entries contribute to each of the five totals.</aside>
+</section>

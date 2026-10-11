@@ -1,0 +1,20 @@
+<section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Clean a CSV, end to end</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Write a numeric CSV with a header and two missing values</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Load it, report missing counts, apply a documented filling policy, and save a verified .npy copy.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain the main idea without reading the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a changed input or edge case and explain it</p></div>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">12</p></div>
+<aside>The challenge strings the whole notebook together. Write the CSV text yourself, so you know exactly where the two gaps are, then load it with np.genfromtxt and skip_header=1. Report missing counts per column with np.isnan(data).sum(axis=0) and check they total 2. Choose a filling policy, mean or median per column, and write it down in a markdown cell. Save the result with np.save, load it back with allow_pickle=False, and prove it with np.testing.assert_array_equal. There is no supplied check, so decide the expected filled values before you run anything. Then restart the kernel and run all cells once more.</aside>
+</section>

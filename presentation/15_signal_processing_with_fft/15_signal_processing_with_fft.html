@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 15 — Signal Processing with FFT</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 15 — Signal Processing with FFT</h1><span>12 slides · <a href="https://claude.ai/artifact/4n5MksHzWHmA1F2GvGFDmJ">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative spectrum bars with a sine wave" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="560" width="56" height="52" rx="12" fill="#22344F"/><rect x="79" y="212" width="56" height="400" rx="12" fill="#E8813A"/><rect x="158" y="560" width="56" height="52" rx="12" fill="#22344F"/><rect x="237" y="560" width="56" height="52" rx="12" fill="#22344F"/><rect x="316" y="560" width="56" height="52" rx="12" fill="#22344F"/><rect x="395" y="452" width="56" height="160" rx="12" fill="#E8813A"/><rect x="474" y="560" width="56" height="52" rx="12" fill="#22344F"/><rect x="553" y="560" width="56" height="52" rx="12" fill="#22344F"/><path d="M6 150 C 82 20, 159 20, 235 150 S 388 280, 464 150 S 540 20, 606 120" fill="none" stroke="#2F6FB0" stroke-width="14" stroke-linecap="round"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 15</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE">Signals and<br>the FFT</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2">From time to frequency and back</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Expert practice</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">30–50 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: notebooks 00–14</p>
+</div>
+<aside>Welcome to notebook 15. A sampled signal is just a 1D array of values recorded at evenly spaced times. The fast Fourier transform, np.fft, rewrites that array as a sum of sine waves of different frequencies, which makes it easy to see which frequencies are present and to remove the ones you do not want. The only extra prerequisite is knowing that a sine wave repeats at a frequency measured in cycles per second, or hertz. The notebook imports its own libraries, including matplotlib for the three plots you will see.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> Welcome to notebook 15. A sampled signal is just a 1D array of values recorded at evenly spaced times. The fast Fourier transform, np.fft, rewrites that array as a sum of sine waves of different frequencies, which makes it easy to see which frequencies are present and to remove the ones you do not want. The only extra prerequisite is knowing that a sine wave repeats at a frequency measured in cycles per second, or hertz. The notebook imports its own libraries, including matplotlib for the three plots you will see.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Sample, transform, filter</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Build a signal</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Sample two known sine waves at a fixed rate and respect the Nyquist limit.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Find the peaks</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Use rfft and rfftfreq to see which frequencies are present, and how strong.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Filter and rebuild</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Zero unwanted frequencies and return to time with irfft.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 15 Signal processing with FFT</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>The notebook's goal: build a sampled signal, identify frequency peaks, and reconstruct a filtered signal. We work with a signal whose ingredients we already know, a 5 Hz sine plus a weaker 40 Hz sine, so every result can be checked against the truth. That is a useful habit with any new tool: test it on input where you know the right answer before trusting it on real data such as audio, vibration or sensor readings.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> The notebook's goal: build a sampled signal, identify frequency peaks, and reconstruct a filtered signal. We work with a signal whose ingredients we already know, a 5 Hz sine plus a weaker 40 Hz sine, so every result can be checked against the truth. That is a useful habit with any new tool: test it on input where you know the right answer before trusting it on real data such as audio, vibration or sensor readings.</p></div>
+<div class="slide" id="sampling"><div class="frame"><section id="sampling" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Build a signal</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">A signal is an array of samples</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Sample rate fs = 256</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">256 evenly spaced samples cover one second.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Nyquist limit fs / 2</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Above 128 Hz, frequencies cannot be uniquely recovered.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Known ingredients</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A 5 Hz sine plus a 40 Hz sine with amplitude 0.4.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">import matplotlib.pyplot as plt<br>sample_rate = 256<br>time = np.arange(sample_rate) / sample_rate<br>signal = (np.sin(2 * np.pi * 5 * time)<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;+ 0.4 * np.sin(2 * np.pi * 40 * time))<br>fig, ax = plt.subplots(figsize=(9, 3))<br>ax.plot(time, signal)<br>plt.show()<br>assert signal.shape == (256,)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 15 Signal processing with FFT</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>Sampling records a continuous signal at evenly spaced times. With a sample rate fs of 256 per second, time is 0, 1/256, 2/256 and so on, up to but not including 1 second, so a one-second record contains exactly fs samples without repeating the endpoint; the notebook calls this the endpoint=False idea. The signal is a NumPy expression evaluated on the whole time array at once: a 5 Hz sine plus a 40 Hz sine scaled by 0.4. The Nyquist frequency, fs / 2 = 128 Hz, is the highest frequency this sampling can represent without ambiguity. The plot is on the next slide. Try it: change the 40 Hz amplitude, say to 0.8, and predict the effect: the fast ripple gets taller in the time plot, and its spike in the spectrum grows to 0.8.</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> Sampling records a continuous signal at evenly spaced times. With a sample rate fs of 256 per second, time is 0, 1/256, 2/256 and so on, up to but not including 1 second, so a one-second record contains exactly fs samples without repeating the endpoint; the notebook calls this the endpoint=False idea. The signal is a NumPy expression evaluated on the whole time array at once: a 5 Hz sine plus a 40 Hz sine scaled by 0.4. The Nyquist frequency, fs / 2 = 128 Hz, is the highest frequency this sampling can represent without ambiguity. The plot is on the next slide. Try it: change the 40 Hz amplitude, say to 0.8, and predict the effect: the fast ripple gets taller in the time plot, and its spike in the spectrum grows to 0.8.</p></div>
+<div class="slide" id="signal-plot"><div class="frame"><section id="signal-plot" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · The signal in time</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">A slow wave with a fast ripple</h2>
+<div style="display:flex;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:24px">
+<img src="images/15_signal_processing_with_fft_4_0.png" alt="Line plot titled 5 Hz + 40 Hz signal: amplitude from -1.5 to 1.5 over one second, five large cycles with a small fast ripple on top" style="width:1290px;height:420px;object-fit:contain">
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;gap:16px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:20px 28px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#2F6FB0">5 Hz</p><p style="font-size:28px;line-height:1.4;color:#4A5568">five big cycles</p></div>
+<div style="flex:1;display:flex;gap:16px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:20px 28px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#B5541A">40 Hz</p><p style="font-size:28px;line-height:1.4;color:#4A5568">the small ripple</p></div>
+<div style="flex:1;display:flex;gap:16px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:20px 28px"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">256</p><p style="font-size:28px;line-height:1.4;color:#4A5568">samples in 1 s</p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 15 Signal processing with FFT</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>This is the plot the notebook draws in Step 1. Count the large swings: five per second, the 5 Hz component with amplitude 1. On top of each swing sits a fast, smaller wiggle: the 40 Hz component with amplitude 0.4, which completes eight cycles for every one of the slow wave. Because the two add, the peaks reach about 1.4. In the time domain the two ingredients are tangled together, and it is hard to read their exact frequencies or strengths from the curve. That is the motivation for the next step: the FFT separates them.</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> This is the plot the notebook draws in Step 1. Count the large swings: five per second, the 5 Hz component with amplitude 1. On top of each swing sits a fast, smaller wiggle: the 40 Hz component with amplitude 0.4, which completes eight cycles for every one of the slow wave. Because the two add, the peaks reach about 1.4. In the time domain the two ingredients are tangled together, and it is hard to read their exact frequencies or strengths from the curve. That is the motivation for the next step: the FFT separates them.</p></div>
+<div class="slide" id="fft"><div class="frame"><section id="fft" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Time into frequency</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">rfft finds the frequency peaks</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:1040px;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">spectrum = np.fft.rfft(signal)<br>frequencies = np.fft.rfftfreq(signal.size,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;d=1 / sample_rate)<br>amplitude = np.abs(spectrum) / signal.size<br># Double only bins with negative-frequency partners<br>amplitude[1:-1] *= 2<br>peak_indices = np.argsort(amplitude)[-2:][::-1]<br>print("Peak frequencies:", frequencies[peak_indices])<br>print("Peak amplitudes:", amplitude[peak_indices])</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Peak frequencies: [ 5. 40.]<br>Peak amplitudes: [1.&#160;&#160;0.4]</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">rfft for real input</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Only the nonnegative frequencies, 0 to fs/2.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Bins are fs/N apart</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">256 / 256 = 1 Hz per bin.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Scale to amplitude</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Divide by N, then double the paired bins.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 15 Signal processing with FFT</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>For a real-valued signal, np.fft.rfft returns one complex coefficient per nonnegative frequency; the negative frequencies would only mirror them. np.fft.rfftfreq gives the frequency of each coefficient when you pass the sample spacing d = 1 / fs, and the spacing between bins is fs / N, here exactly 1 Hz. The magnitude divided by N, with every bin except 0 Hz and the Nyquist bin doubled because each stands for a positive and a negative frequency, recovers the amplitudes of the sines: 1 at 5 Hz and 0.4 at 40 Hz. The record holds whole cycles of both sines, so each lands exactly on one bin. Try it: use 5.5 Hz instead of 5 Hz. Now 5.5 falls between bins, and its energy leaks into nearby bins, so the spike becomes a smaller, wider bump; windowing is the usual remedy.</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> For a real-valued signal, np.fft.rfft returns one complex coefficient per nonnegative frequency; the negative frequencies would only mirror them. np.fft.rfftfreq gives the frequency of each coefficient when you pass the sample spacing d = 1 / fs, and the spacing between bins is fs / N, here exactly 1 Hz. The magnitude divided by N, with every bin except 0 Hz and the Nyquist bin doubled because each stands for a positive and a negative frequency, recovers the amplitudes of the sines: 1 at 5 Hz and 0.4 at 40 Hz. The record holds whole cycles of both sines, so each lands exactly on one bin. Try it: use 5.5 Hz instead of 5 Hz. Now 5.5 falls between bins, and its energy leaks into nearby bins, so the spike becomes a smaller, wider bump; windowing is the usual remedy.</p></div>
+<div class="slide" id="spectrum"><div class="frame"><section id="spectrum" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Two views of one signal</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Tangled in time, clear in frequency</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:16px"><img src="images/15_signal_processing_with_fft_4_0.png" alt="Time plot of the 5 Hz plus 40 Hz signal over one second" style="width:737px;height:240px;object-fit:contain"></div>
+<div style="display:flex;gap:16px;align-items:center;justify-content:center;height:48px">
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:32px;height:48px;" aria-hidden="true"><polygon points="30,0 30,60 0,60 50,100 100,60 70,60 70,0" fill="#E8813A"/></svg>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;font-weight:600;color:#13233A">np.fft.rfft</p>
+</div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:16px"><img src="images/15_signal_processing_with_fft_7_1.png" alt="One-sided spectrum stem plot from 0 to 60 Hz: a spike of height 1.0 at 5 Hz, a spike of 0.4 at 40 Hz, all other bins zero" style="width:737px;height:240px;object-fit:contain"></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;gap:24px;align-items:center"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#2F6FB0;width:200px">5 Hz</p><p style="font-size:28px;line-height:1.4;color:#4A5568">amplitude 1.0: the slow wave</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;gap:24px;align-items:center"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A;width:200px">40 Hz</p><p style="font-size:28px;line-height:1.4;color:#4A5568">amplitude 0.4: the ripple</p></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Every other bin is zero: the spectrum lists exactly the two sines we added, with their strengths.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 15 Signal processing with FFT</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>These are the notebook's two plots, one above the other. The top one is the signal in time: 256 samples whose two ingredients are mixed together. The bottom one is the same information after rfft, shown as a stem plot from 0 to 60 Hz, where each dot is one 1 Hz bin. Two spikes stand out: height 1.0 at 5 Hz and height 0.4 at 40 Hz, matching the printed peak frequencies and amplitudes. Nothing was lost in the transform; it is a change of viewpoint, and the inverse transform can bring the time view back exactly. Frequency is the natural view when you ask what is in a signal, time is the natural view when you ask what happened when.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> These are the notebook's two plots, one above the other. The top one is the signal in time: 256 samples whose two ingredients are mixed together. The bottom one is the same information after rfft, shown as a stem plot from 0 to 60 Hz, where each dot is one 1 Hz bin. Two spikes stand out: height 1.0 at 5 Hz and height 0.4 at 40 Hz, matching the printed peak frequencies and amplitudes. Nothing was lost in the transform; it is a change of viewpoint, and the inverse transform can bring the time view back exactly. Frequency is the natural view when you ask what is in a signal, time is the natural view when you ask what happened when.</p></div>
+<div class="slide" id="filter"><div class="frame"><section id="filter" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Filter and reconstruct</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Zero the bins, then invert</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Copy, then mask</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Bins above 10 Hz become 0; the 5 Hz bin stays.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">irfft returns to time</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Pass n=signal.size to keep the length, even for odd N.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">The asserts pass</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Filtered equals the pure 5 Hz sine within atol 1e-12.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">filtered_spectrum = spectrum.copy()<br>filtered_spectrum[frequencies &gt; 10] = 0<br>filtered = np.fft.irfft(filtered_spectrum,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;n=signal.size)<br>expected = np.sin(2 * np.pi * 5 * time)<br>np.testing.assert_allclose(filtered, expected,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;atol=1e-12)<br>np.testing.assert_allclose(<br>&#160;&#160;&#160;&#160;np.fft.irfft(spectrum, n=signal.size),<br>&#160;&#160;&#160;&#160;signal, atol=1e-12)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 15 Signal processing with FFT</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>Filtering in the frequency domain takes three moves. Copy the spectrum so the original stays intact. Use the boolean mask frequencies &gt; 10 to set every coefficient above 10 Hz to zero, which removes the 40 Hz component. Then np.fft.irfft converts the edited spectrum back into samples; passing n=signal.size guarantees the original length, which matters for odd-length signals. The first assert proves the result is the pure 5 Hz sine, and the second proves that the unedited spectrum round-trips to the original signal. This is an ideal cutoff, fine for a learning example; for other signals an abrupt cutoff can cause ringing, and real filter design also considers boundaries and transients. Try it: set the cutoff to 50 Hz. Both 5 Hz and 40 Hz now survive, so irfft recovers the original signal.</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> Filtering in the frequency domain takes three moves. Copy the spectrum so the original stays intact. Use the boolean mask frequencies &gt; 10 to set every coefficient above 10 Hz to zero, which removes the 40 Hz component. Then np.fft.irfft converts the edited spectrum back into samples; passing n=signal.size guarantees the original length, which matters for odd-length signals. The first assert proves the result is the pure 5 Hz sine, and the second proves that the unedited spectrum round-trips to the original signal. This is an ideal cutoff, fine for a learning example; for other signals an abrupt cutoff can cause ringing, and real filter design also considers boundaries and transients. Try it: set the cutoff to 50 Hz. Both 5 Hz and 40 Hz now survive, so irfft recovers the original signal.</p></div>
+<div class="slide" id="filter-visual"><div class="frame"><section id="filter-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Edit frequencies, get time back</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Remove 40 Hz, keep 5 Hz</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:560px;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-size:24px;color:#6B7280">Spectrum after the cutoff</p>
+<div style="position:relative;width:496px;height:320px">
+<div style="position:absolute;left:88px;top:0px;width:400px;height:260px;background:rgba(232,129,58,0.12)"></div>
+<div style="position:absolute;left:0px;top:259px;width:496px;height:3px;background:#13233A"></div>
+<div style="position:absolute;left:86px;top:0px;width:0px;height:260px;border-left:3px dashed #B5541A"></div>
+<div style="position:absolute;left:45px;top:60px;width:6px;height:200px;background:#2F6FB0"></div>
+<div style="position:absolute;left:36px;top:48px;width:24px;height:24px;border-radius:12px;background:#2F6FB0"></div>
+<div style="position:absolute;left:325px;top:180px;width:0px;height:80px;border-left:3px dashed #B5541A"></div>
+<div style="position:absolute;left:316px;top:168px;width:24px;height:24px;border-radius:12px;border:3px dashed #B5541A"></div>
+<div style="position:absolute;left:319px;top:251px;width:18px;height:18px;border-radius:9px;background:#E8813A"></div>
+<p style="position:absolute;left:104px;top:4px;width:240px;font-size:24px;font-weight:600;color:#B5541A">cutoff 10 Hz</p>
+<p style="position:absolute;left:0px;top:276px;width:40px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">0</p>
+<p style="position:absolute;left:64px;top:276px;width:48px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#4A5568">10</p>
+<p style="position:absolute;left:304px;top:276px;width:48px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#4A5568">40</p>
+<p style="position:absolute;left:396px;top:276px;width:100px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:right;color:#4A5568">60 Hz</p>
+</div>
+<div style="display:flex;gap:16px;align-items:center"><div style="width:24px;height:24px;border-radius:12px;background:#2F6FB0"></div><p style="font-size:28px;line-height:1.4;color:#4A5568">5 Hz, 1.0: kept</p></div>
+<div style="display:flex;gap:16px;align-items:center"><div style="width:24px;height:24px;border-radius:12px;border:3px dashed #B5541A"></div><p style="font-size:28px;line-height:1.4;color:#4A5568">40 Hz, 0.4: set to 0</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:24px"><img src="images/15_signal_processing_with_fft_10_0.png" alt="Plot titled Frequency filtering: the original signal in faint blue and the filtered signal below 10 Hz in orange, a smooth sine with five cycles in one second" style="width:1000px;height:326px;object-fit:contain"></div>
+<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:56px;height:28px;" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#E8813A"/></svg><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;font-weight:600;color:#13233A">np.fft.irfft(filtered_spectrum, n=signal.size)</p></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">The orange curve is the smooth 5 Hz sine alone: the ripple is gone, and the length is still 256 samples.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 15 Signal processing with FFT</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>On the left is the spectrum as the filter sees it. The dashed line marks the 10 Hz cutoff, and everything in the shaded region to its right is set to zero: the 40 Hz spike, drawn dashed, drops to the orange dot on the axis, while the 5 Hz spike, in blue, is untouched. On the right is the notebook's third plot: the inverse transform of that edited spectrum, in orange, over the original signal in faint blue. The ripple has vanished and only the slow wave remains, exactly the pure 5 Hz sine the assert compares against. This works so cleanly because the two components sit on exact bins far apart; with noise or frequencies between bins, the result is approximate.</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> On the left is the spectrum as the filter sees it. The dashed line marks the 10 Hz cutoff, and everything in the shaded region to its right is set to zero: the 40 Hz spike, drawn dashed, drops to the orange dot on the axis, while the 5 Hz spike, in blue, is untouched. On the right is the notebook's third plot: the inverse transform of that edited spectrum, in orange, over the original signal in faint blue. The ripple has vanished and only the slow wave remains, exactly the pure 5 Hz sine the assert compares against. This works so cleanly because the two components sit on exact bins far apart; with noise or frequencies between bins, the result is approximate.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">One signal,<br>two views.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">The FFT rewrites samples as frequencies. Edit the frequencies, invert, and you are back in time.</p>
+<aside>Pause here. A signal can be described by its values over time or by the strength of each frequency it contains, and np.fft moves between the two without losing information. Some questions are easy in one view and hard in the other: which frequencies are present and how strong, or how to remove one of them, are easy in frequency. Remember the practical details: rfft for real input, rfftfreq with d = 1 / fs for the axis, and irfft with n to come back at the right length.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> Pause here. A signal can be described by its values over time or by the strength of each frequency it contains, and np.fft moves between the two without losing information. Some questions are easy in one view and hard in the other: which frequencies are present and how strong, or how to remove one of them, are easy in frequency. Remember the practical details: rfft for real input, rfftfreq with d = 1 / fs for the axis, and irfft with n to come back at the right length.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two exercises with np.fft</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Find the dominant frequency of an 8 Hz wave sampled at 100 Hz</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: 8.0. Take the largest magnitude bin and look up its frequency.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">dominant_hz = np.fft.rfftfreq(<br>&#160;&#160;&#160;&#160;wave.size, d=1/fs)[<br>&#160;&#160;&#160;&#160;np.abs(np.fft.rfft(wave)).argmax()]</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Round-trip wave through rfft and irfft, keeping its length</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: same shape as wave and equal within atol 1e-12.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">reconstructed = np.fft.irfft(<br>&#160;&#160;&#160;&#160;np.fft.rfft(wave), n=wave.size)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 15 Signal processing with FFT</p><p style="font-size:24px;color:#6B7280">10</p></div>
+<aside>Ask the audience to attempt both before revealing the code lines, which match the reference solutions. Exercise 1: the wave has 100 samples at fs = 100, so the bins are 1 Hz apart; find the index of the largest FFT magnitude with argmax, then look up its frequency using the actual sample interval d = 1 / fs. The reference run prints 8.0. Exercise 2: the forward and inverse real transforms round-trip the signal, and n explicitly preserves the original sample count of 100; the reference run prints the 100 reconstructed samples, starting 0, 0.4818, 0.8443, 0.998, which match the original sine.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> Ask the audience to attempt both before revealing the code lines, which match the reference solutions. Exercise 1: the wave has 100 samples at fs = 100, so the bins are 1 Hz apart; find the index of the largest FFT magnitude with argmax, then look up its frequency using the actual sample interval d = 1 / fs. The reference run prints 8.0. Exercise 2: the forward and inverse real transforms round-trip the signal, and n explicitly preserves the original sample count of 100; the reference run prints the 100 reconstructed samples, starting 0, 0.4818, 0.8443, 0.998, which match the original sine.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Denoise a sine wave</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Add seeded Gaussian noise to a sine wave, then compare reconstruction RMSE before and after a frequency cutoff</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Explain why an appropriate cutoff depends on the signal.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain the main idea without reading the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a changed input or edge case and explain it</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 15 Signal processing with FFT</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>The challenge has no supplied check: decide what you expect first. Create the noise with a seeded generator, for example np.random.default_rng(0).normal(0, 0.3, size), so your results are reproducible. RMSE is the square root of the mean squared difference from the clean sine. Before filtering, the RMSE is roughly the noise level; after zeroing bins above a cutoff just above the sine's frequency, most of the broadband noise is removed and the RMSE should drop, while the sine survives. A cutoff below the sine's frequency would remove the signal itself, and a very high cutoff keeps most of the noise, so the right cutoff depends on where the useful frequencies are. Restart the kernel and run all cells when you finish.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> The challenge has no supplied check: decide what you expect first. Create the noise with a seeded generator, for example np.random.default_rng(0).normal(0, 0.3, size), so your results are reproducible. RMSE is the square root of the mean squared difference from the clean sine. Before filtering, the RMSE is roughly the noise level; after zeroing bins above a cutoff just above the sine's frequency, most of the broadband noise is removed and the RMSE should drop, while the sine survives. A cutoff below the sine's frequency would remove the signal itself, and a very high cutoff keeps most of the noise, so the right cutoff depends on where the useful frequencies are. Restart the kernel and run all cells when you finish.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Sampling</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">fs samples per second; Nyquist is fs / 2.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">rfft</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Peaks show which frequencies are present.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">rfftfreq</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Pass d = 1 / fs; bins are fs / N apart.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">irfft</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Zero bins, invert with n, get time back.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 16</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Project: sales analysis</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Analyze a month of store sales: cleaning, broadcasting, aggregation and plots.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 16, the first capstone project, which combines cleaning, broadcasting, aggregation, plots and business interpretation on a month of store sales. Further reading: the official NumPy documentation for the discrete Fourier transform routines, numpy.fft, at numpy.org/doc/stable/reference/routines.fft.html.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> Recap the four takeaways, then point to notebook 16, the first capstone project, which combines cleaning, broadcasting, aggregation, plots and business interpretation on a month of store sales. Further reading: the official NumPy documentation for the discrete Fourier transform routines, numpy.fft, at numpy.org/doc/stable/reference/routines.fft.html.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

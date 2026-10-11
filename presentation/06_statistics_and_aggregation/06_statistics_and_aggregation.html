@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 06 — Statistics and aggregation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 06 — Statistics and aggregation</h1><span>12 slides · <a href="https://claude.ai/artifact/9HKBGJzd4kvnRVvnXy1feh">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative bar chart of four running totals, the tallest in orange" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="472" width="132" height="140" rx="16" fill="#22344F"/><rect x="160" y="332" width="132" height="280" rx="16" fill="#2F6FB0"/><rect x="320" y="196" width="132" height="416" rx="16" fill="#22344F"/><rect x="480" y="0" width="132" height="612" rx="16" fill="#E8813A"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 06</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE">Statistics and<br>aggregation</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2">Summarize and analyze numerical data</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Intermediate</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">30–50 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: notebooks 00–05</p>
+</div>
+<aside>Notebook 06 turns arrays into answers. You will describe the centre and spread of a set of values, choose which axis of a table to reduce, and build weighted averages, running totals and day-to-day changes. The cover's growing bars preview the last idea, a cumulative sum. As always, the notebook imports NumPy and creates its own data.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> Notebook 06 turns arrays into answers. You will describe the centre and spread of a set of values, choose which axis of a table to reduce, and build weighted averages, running totals and day-to-day changes. The cover's growing bars preview the last idea, a cumulative sum. As always, the notebook imports NumPy and creates its own data.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">From many numbers to a few</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Centre and spread</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Mean, median, standard deviation and percentiles, and when each one misleads.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Reduce an axis</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Totals per day or per product from one table, and argmax to name the winner.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Running summaries</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Weighted means, cumulative sums and day-to-day differences.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 06 Statistics and aggregation</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>The notebook's goal: choose reduction axes, summarise distributions, and build cumulative metrics. A reduction turns many values into fewer, such as a whole array into one mean, or a table into one total per row. The three steps go from a single list of values, to a two-dimensional table where you must pick the axis, to summaries that run along the data, such as running totals.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> The notebook's goal: choose reduction axes, summarise distributions, and build cumulative metrics. A reduction turns many values into fewer, such as a whole array into one mean, or a table into one total per row. The three steps go from a single list of values, to a two-dimensional table where you must pick the axis, to summaries that run along the data, such as running totals.</p></div>
+<div class="slide" id="spread"><div class="frame"><section id="spread" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Mean, median, and spread</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Five summaries of five deliveries</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">delivery_minutes = np.array([20., 22., 21., 23., 90.])<br>print("Mean:", delivery_minutes.mean())<br>print("Median:", np.median(delivery_minutes))<br>print("Population std:", delivery_minutes.std(ddof=0))<br>print("Sample std:", delivery_minutes.std(ddof=1))<br>print("Quartiles:", np.percentile(delivery_minutes,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;[25, 50, 75]))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Mean: 35.2<br>Median: 22.0<br>Population std: 27.41824210265859<br>Sample std: 30.65452658254568<br>Quartiles: [21. 22. 23.]</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Mean vs median</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">One 90 lifts the mean to 35.2; the middle value stays 22.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">ddof=0 or ddof=1</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Variance divided by N, or by N − 1 to estimate from a sample.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Percentiles</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The 25th, 50th and 75th are the quartiles: 21, 22, 23.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 06 Statistics and aggregation</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>Four deliveries took about 20 minutes and one took 90. The mean adds everything and divides by five, so the single slow delivery drags it up to 35.2. The median sorts the values and takes the middle one, 22, which ignores how extreme the 90 is. Standard deviation measures typical distance from the mean. NumPy's default ddof=0 divides the variance by N; ddof=1 divides by N minus 1, the usual choice when estimating from a sample, so it is slightly larger: 30.65 versus 27.42. Percentiles mark positions in the sorted data; the quartiles 21, 22 and 23 show that the middle half is tightly packed. Try it: replace 90 with 24. The mean falls from 35.2 to 22.0, while the median stays at 22.0.</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> Four deliveries took about 20 minutes and one took 90. The mean adds everything and divides by five, so the single slow delivery drags it up to 35.2. The median sorts the values and takes the middle one, 22, which ignores how extreme the 90 is. Standard deviation measures typical distance from the mean. NumPy's default ddof=0 divides the variance by N; ddof=1 divides by N minus 1, the usual choice when estimating from a sample, so it is slightly larger: 30.65 versus 27.42. Percentiles mark positions in the sorted data; the quartiles 21, 22 and 23 show that the middle half is tightly packed. Try it: replace 90 with 24. The mean falls from 35.2 to 22.0, while the median stays at 22.0.</p></div>
+<div class="slide" id="spread-visual"><div class="frame"><section id="spread-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Picture it</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One slow delivery pulls the mean</h2>
+<div style="display:flex;flex-direction:column;gap:40px;flex:1;justify-content:center">
+<div style="position:relative;width:1664px;height:420px">
+<svg aria-label="Number line of delivery minutes from 0 to 100: four marks between 20 and 23, one mark at 90, the median line at 22, the mean line at 35.2, a narrow quartile box from 21 to 23, and a wide band of one population standard deviation around the mean from 7.8 to 62.6" width="1664" height="420" viewBox="0 0 1664 420" style="position:absolute;left:0px;top:0px;width:1664px;height:420px"><rect x="181" y="150" width="822" height="150" fill="#E8813A" fill-opacity="0.18"/><rect x="379" y="190" width="30" height="110" fill="#2F6FB0" fill-opacity="0.35"/><line x1="394" y1="56" x2="394" y2="300" stroke="#2F6FB0" stroke-width="4"/><line x1="592" y1="56" x2="592" y2="300" stroke="#E8813A" stroke-width="4" stroke-dasharray="12 8"/><line x1="364" y1="236" x2="364" y2="300" stroke="#13233A" stroke-width="6"/><line x1="379" y1="236" x2="379" y2="300" stroke="#13233A" stroke-width="6"/><line x1="394" y1="236" x2="394" y2="300" stroke="#13233A" stroke-width="6"/><line x1="409" y1="236" x2="409" y2="300" stroke="#13233A" stroke-width="6"/><line x1="1414" y1="236" x2="1414" y2="300" stroke="#13233A" stroke-width="6"/><line x1="64" y1="300" x2="1564" y2="300" stroke="#13233A" stroke-width="3"/><line x1="64" y1="300" x2="64" y2="314" stroke="#13233A" stroke-width="3"/><line x1="364" y1="300" x2="364" y2="314" stroke="#13233A" stroke-width="3"/><line x1="664" y1="300" x2="664" y2="314" stroke="#13233A" stroke-width="3"/><line x1="964" y1="300" x2="964" y2="314" stroke="#13233A" stroke-width="3"/><line x1="1264" y1="300" x2="1264" y2="314" stroke="#13233A" stroke-width="3"/><line x1="1564" y1="300" x2="1564" y2="314" stroke="#13233A" stroke-width="3"/></svg>
+<p style="position:absolute;left:294px;top:8px;width:200px;font-size:24px;font-weight:600;text-align:center;color:#2F6FB0">median 22.0</p>
+<p style="position:absolute;left:492px;top:8px;width:200px;font-size:24px;font-weight:600;text-align:center;color:#B5541A">mean 35.2</p>
+<p style="position:absolute;left:1294px;top:180px;width:240px;font-size:24px;font-weight:600;text-align:center;color:#13233A">slowest: 90</p>
+<p style="position:absolute;left:24px;top:324px;width:80px;font-size:24px;text-align:center;color:#6B7280">0</p>
+<p style="position:absolute;left:324px;top:324px;width:80px;font-size:24px;text-align:center;color:#6B7280">20</p>
+<p style="position:absolute;left:624px;top:324px;width:80px;font-size:24px;text-align:center;color:#6B7280">40</p>
+<p style="position:absolute;left:924px;top:324px;width:80px;font-size:24px;text-align:center;color:#6B7280">60</p>
+<p style="position:absolute;left:1224px;top:324px;width:80px;font-size:24px;text-align:center;color:#6B7280">80</p>
+<p style="position:absolute;left:1484px;top:324px;width:160px;font-size:24px;text-align:center;color:#6B7280">100 min</p>
+<p style="position:absolute;left:64px;top:380px;width:700px;font-size:24px;color:#4A5568">Blue box: the middle half, quartiles 21 to 23</p>
+<p style="position:absolute;left:800px;top:380px;width:800px;font-size:24px;color:#4A5568">Orange band: mean ± population std, 7.8 to 62.6</p>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">The median and quartiles barely notice the 90. The mean and standard deviation are pulled toward it.</p>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 06 Statistics and aggregation</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>This is the same five deliveries on a number line of minutes. The four black marks crowd together between 20 and 23; the fifth sits alone at 90. The blue median line sits inside the crowd at 22, and the blue box, the middle half of the data between the first and third quartiles, is only two minutes wide. The dashed orange mean line has been pulled right to 35.2, where no delivery actually is. The orange band spans one population standard deviation, 27.42 minutes, either side of the mean, from about 7.8 to 62.6: the outlier inflates it too. When data has outliers, report the median and quartiles alongside, or instead of, the mean and standard deviation.</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> This is the same five deliveries on a number line of minutes. The four black marks crowd together between 20 and 23; the fifth sits alone at 90. The blue median line sits inside the crowd at 22, and the blue box, the middle half of the data between the first and third quartiles, is only two minutes wide. The dashed orange mean line has been pulled right to 35.2, where no delivery actually is. The orange band spans one population standard deviation, 27.42 minutes, either side of the mean, from about 7.8 to 62.6: the outlier inflates it too. When data has outliers, report the median and quartiles alongside, or instead of, the mean and standard deviation.</p></div>
+<div class="slide" id="axis-totals"><div class="frame"><section id="axis-totals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Reduce the intended axis</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One table, two different totals</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">sales = np.array([[5, 3, 2], [7, 2, 4],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;[4, 6, 3], [8, 4, 5]])<br>products = np.array(["tea", "coffee", "juice"])<br>daily = sales.sum(axis=1)<br>product_totals = sales.sum(axis=0)<br>print("Daily:", daily)<br>print("Product totals:", product_totals)<br>print("Top product:", products[product_totals.argmax()])<br>assert daily.sum() == product_totals.sum()</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Daily: [10 13 13 17]<br>Product totals: [24 15 14]<br>Top product: tea</p></div>
+</div>
+<div style="width:600px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">axis=1: per day</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Reduces the product axis, leaving one total per row.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">axis=0: per product</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Reduces the day axis, leaving one total per column.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">argmax vs max</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">argmax returns a position, 0, which labels the winner: tea.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 06 Statistics and aggregation</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>The table has four days as rows and three products as columns, so its shape is (4, 3). Two different questions use the same data. Totals per day reduce the product axis, axis=1, giving four numbers. Totals per product reduce the day axis, axis=0, giving three numbers. A helpful phrase: the axis you pass is the axis that disappears. max would tell you the largest total, 24; argmax tells you where it is, position 0, which we use to index the product names. The assert confirms both ways of adding give the same grand total. Try it: sales.argmax(axis=0) finds the best day for each product, giving positions [3 2 3], that is, the fourth day for tea and juice and the third day for coffee.</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> The table has four days as rows and three products as columns, so its shape is (4, 3). Two different questions use the same data. Totals per day reduce the product axis, axis=1, giving four numbers. Totals per product reduce the day axis, axis=0, giving three numbers. A helpful phrase: the axis you pass is the axis that disappears. max would tell you the largest total, 24; argmax tells you where it is, position 0, which we use to index the product names. The assert confirms both ways of adding give the same grand total. Try it: sales.argmax(axis=0) finds the best day for each product, giving positions [3 2 3], that is, the fourth day for tea and juice and the third day for coffee.</p></div>
+<div class="slide" id="axis-visual"><div class="frame"><section id="axis-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Picture it</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">The axis you pass disappears</h2>
+<div style="display:flex;gap:56px;flex:1;align-items:center">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;gap:8px;align-items:center"><div style="width:180px"></div><p style="width:150px;font-size:28px;font-weight:600;text-align:center;color:#13233A">tea</p><p style="width:150px;font-size:28px;font-weight:600;text-align:center;color:#13233A">coffee</p><p style="width:150px;font-size:28px;font-weight:600;text-align:center;color:#13233A">juice</p><div style="width:16px"></div><p style="width:180px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#2F6FB0">sum(axis=1)</p></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:180px;font-size:28px;color:#4A5568">day 1</p><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div><div style="width:16px"></div><div style="width:180px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">10</p></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:180px;font-size:28px;color:#4A5568">day 2</p><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">7</p></div><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div><div style="width:16px"></div><div style="width:180px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">13</p></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:180px;font-size:28px;color:#4A5568">day 3</p><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">6</p></div><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div><div style="width:16px"></div><div style="width:180px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">13</p></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:180px;font-size:28px;color:#4A5568">day 4</p><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">8</p></div><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div><div style="width:16px"></div><div style="width:180px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">17</p></div></div>
+<div style="height:8px"></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:180px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#B5541A">sum(axis=0)</p><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border:4px solid #13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">24</p></div><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">15</p></div><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">14</p></div><div style="width:16px"></div><p style="width:180px;font-size:24px;text-align:center;color:#4A5568">both sum to 53</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:28px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#2F6FB0">axis=1, blue</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Each row collapses: (4, 3) becomes (4,).</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#B5541A">axis=0, orange</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Each column collapses: (4, 3) becomes (3,).</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">argmax → 0 → tea</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The outlined 24 is the largest product total.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 06 Statistics and aggregation</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>Here is the sales table with both reductions drawn around it. Summing along axis=1 walks across each row, so each day collapses to one blue total on the right: 5 + 3 + 2 = 10 for day one. Summing along axis=0 walks down each column, so each product collapses to one orange total underneath: 5 + 7 + 4 + 8 = 24 for tea. Whichever axis you name is the one that vanishes from the shape. The outlined 24 is the maximum; argmax reports its position, 0, and products[0] is tea. Both sets of totals add to the same grand total of 53, which is what the notebook's assert verifies.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> Here is the sales table with both reductions drawn around it. Summing along axis=1 walks across each row, so each day collapses to one blue total on the right: 5 + 3 + 2 = 10 for day one. Summing along axis=0 walks down each column, so each product collapses to one orange total underneath: 5 + 7 + 4 + 8 = 24 for tea. Whichever axis you name is the one that vanishes from the shape. The outlined 24 is the maximum; argmax reports its position, 0, and products[0] is tea. Both sets of totals add to the same grand total of 53, which is what the notebook's assert verifies.</p></div>
+<div class="slide" id="cumulative"><div class="frame"><section id="cumulative" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Weighted and cumulative summaries</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Weights, running totals, changes</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">marks = np.array([70., 80., 90.])<br>weights = np.array([0.2, 0.3, 0.5])<br>print("Weighted grade:",<br>&#160;&#160;&#160;&#160;&#160;&#160;np.average(marks, weights=weights))<br>daily_sales = np.array([100., 150., 120., 180.])<br>print("Running total:", np.cumsum(daily_sales))<br>print("Changes:", np.diff(daily_sales))<br>np.testing.assert_allclose(<br>&#160;&#160;&#160;&#160;np.average(marks, weights=weights), 83.)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Weighted grade: 83.0<br>Running total: [100. 250. 370. 550.]<br>Changes: [&#160;50. -30.&#160; 60.]</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Weighted mean</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">0.2 × 70 + 0.3 × 80 + 0.5 × 90 = 83. Weights need a nonzero sum.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">cumsum: running total</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Each entry is the total so far.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">diff: the changes</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Next minus previous, so the result is one entry shorter.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 06 Statistics and aggregation</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>np.average with weights lets observations count differently. The final exam weighs 0.5, so the grade, 83, sits closer to 90 than the plain mean of 80 would. NumPy divides by the sum of the weights, which therefore must not be zero. np.cumsum keeps a running total: 100, then 100 + 150 = 250, then 370, then 550. np.diff subtracts each value from the next: +50, −30, +60. Four days give three changes, because diff shortens the axis by one. Try it: compute a running mean by dividing np.cumsum(daily_sales) by np.arange(1, n + 1), where n is the number of days. Here that gives 100, 125, about 123.33, and 137.5.</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> np.average with weights lets observations count differently. The final exam weighs 0.5, so the grade, 83, sits closer to 90 than the plain mean of 80 would. NumPy divides by the sum of the weights, which therefore must not be zero. np.cumsum keeps a running total: 100, then 100 + 150 = 250, then 370, then 550. np.diff subtracts each value from the next: +50, −30, +60. Four days give three changes, because diff shortens the axis by one. Try it: compute a running mean by dividing np.cumsum(daily_sales) by np.arange(1, n + 1), where n is the number of days. Here that gives 100, 125, about 123.33, and 137.5.</p></div>
+<div class="slide" id="cumsum-visual"><div class="frame"><section id="cumsum-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Picture it</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Each bar adds one day on top</h2>
+<div style="display:flex;gap:56px;flex:1;align-items:center">
+<div style="position:relative;width:1000px;height:560px">
+<svg aria-label="Stacked bars of the running total of daily sales: 100, 250, 370 and 550. Each bar is the previous total in blue with that day's sales stacked on top in orange." width="1000" height="520" viewBox="0 0 1000 520" style="position:absolute;left:0px;top:0px;width:1000px;height:520px"><rect x="60" y="430" width="160" height="80" fill="#E8813A" stroke="#F6F4EE" stroke-width="2"/><rect x="300" y="430" width="160" height="80" fill="#2F6FB0" stroke="#F6F4EE" stroke-width="2"/><rect x="300" y="310" width="160" height="120" fill="#E8813A" stroke="#F6F4EE" stroke-width="2"/><rect x="540" y="310" width="160" height="200" fill="#2F6FB0" stroke="#F6F4EE" stroke-width="2"/><rect x="540" y="214" width="160" height="96" fill="#E8813A" stroke="#F6F4EE" stroke-width="2"/><rect x="780" y="214" width="160" height="296" fill="#2F6FB0" stroke="#F6F4EE" stroke-width="2"/><rect x="780" y="70" width="160" height="144" fill="#E8813A" stroke="#F6F4EE" stroke-width="2"/><line x1="20" y1="510" x2="980" y2="510" stroke="#13233A" stroke-width="3"/></svg>
+<p style="position:absolute;left:60px;top:374px;width:160px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;text-align:center;color:#13233A">100</p>
+<p style="position:absolute;left:300px;top:254px;width:160px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;text-align:center;color:#13233A">250</p>
+<p style="position:absolute;left:540px;top:158px;width:160px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;text-align:center;color:#13233A">370</p>
+<p style="position:absolute;left:780px;top:14px;width:160px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;text-align:center;color:#13233A">550</p>
+<p style="position:absolute;left:40px;top:524px;width:200px;font-size:24px;text-align:center;color:#4A5568">day 1: +100</p>
+<p style="position:absolute;left:280px;top:524px;width:200px;font-size:24px;text-align:center;color:#4A5568">day 2: +150</p>
+<p style="position:absolute;left:520px;top:524px;width:200px;font-size:24px;text-align:center;color:#4A5568">day 3: +120</p>
+<p style="position:absolute;left:760px;top:524px;width:200px;font-size:24px;text-align:center;color:#4A5568">day 4: +180</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">np.diff: the steps</h3>
+<div style="display:flex;gap:16px;align-items:center"><p style="width:220px;font-size:28px;color:#4A5568">day 1 → 2</p><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">50.</p></div></div>
+<div style="display:flex;gap:16px;align-items:center"><p style="width:220px;font-size:28px;color:#4A5568">day 2 → 3</p><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:3px solid #E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">-30.</p></div></div>
+<div style="display:flex;gap:16px;align-items:center"><p style="width:220px;font-size:28px;color:#4A5568">day 3 → 4</p><div style="width:150px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">60.</p></div></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">4 days give 3 changes; the dip is the outlined −30.</p>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Bars: blue = total so far, orange = that day's sales</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 06 Statistics and aggregation</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>Each bar is one entry of np.cumsum(daily_sales). The blue part is the running total carried over from the previous day, and the orange part is the new day's sales stacked on top, so the bar heights climb 100, 250, 370, 550. A cumulative sum never goes down while the inputs are positive; that is why it suits running revenue. np.diff answers the opposite question, how much each day differs from the one before: 150 minus 100 is 50, 120 minus 150 is −30, 180 minus 120 is 60. Notice diff of the cumulative sum gives back the daily sales from day two onwards: the two operations undo each other.</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> Each bar is one entry of np.cumsum(daily_sales). The blue part is the running total carried over from the previous day, and the orange part is the new day's sales stacked on top, so the bar heights climb 100, 250, 370, 550. A cumulative sum never goes down while the inputs are positive; that is why it suits running revenue. np.diff answers the opposite question, how much each day differs from the one before: 150 minus 100 is 50, 120 minus 150 is −30, 180 minus 120 is 60. Notice diff of the cumulative sum gives back the daily sales from day two onwards: the two operations undo each other.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Name the axis<br>that disappears.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">sum, mean and argmax collapse the axis you pass. Decide the question first, then check the shape that is left.</p>
+<aside>Pause here. Almost every summary in NumPy is a reduction along an axis. Before typing axis=0 or axis=1, say the question out loud, such as "one total per product", and ask which dimension has to vanish to answer it. Then check the result's shape: four days and three products should give (3,) for per-product totals. And when outliers are present, prefer the median and percentiles to the mean and standard deviation.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> Pause here. Almost every summary in NumPy is a reduction along an axis. Before typing axis=0 or axis=1, say the question out loud, such as "one total per product", and ask which dimension has to vanish to answer it. Then check the result's shape: four days and three products should give (3,) for per-product totals. And when outliers are present, prefer the median and percentiles to the mean and standard deviation.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two summary exercises</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Mean temperature per city, one city per column</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">From [[20, 30], [22, 32], [24, 34]], expected [22. 32.]. Rows are days.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">city_means = temperatures.mean(axis=0)</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Running mean of spending, including today</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">From [10, 30, 20, 40], expected [10. 20. 20. 25.]. Total so far ÷ days so far.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">running_mean = (np.cumsum(spending)<br>&#160;&#160;&#160;&#160;/ np.arange(1, spending.size + 1))</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 06 Statistics and aggregation</p><p style="font-size:24px;color:#6B7280">10</p></div>
+<aside>Ask the audience to name the disappearing axis before writing any code. Exercise 1: axis 0 runs over days, so reducing it leaves one mean for each city column, 22 and 32. Exercise 2: the cumulative sum, [10, 40, 60, 100], holds the total so far; dividing by np.arange(1, 5), the number of days included at each position, gives 10, 20, 20 and 25. The code lines match the reference solutions; the parentheses only wrap the long line.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> Ask the audience to name the disappearing axis before writing any code. Exercise 1: axis 0 runs over days, so reducing it leaves one mean for each city column, 22 and 32. Exercise 2: the cumulative sum, [10, 40, 60, 100], holds the total so far; dividing by np.arange(1, 5), the number of days included at each position, gives 10, 20, 20 and 25. The code lines match the reference solutions; the parentheses only wrap the long line.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Write it yourself, then check it</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Analyze 30 days of synthetic sales</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Report the mean, median, standard deviation, 90th percentile, best day, and cumulative revenue.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain the main idea without reading the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a changed input or edge case and explain it</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 06 Statistics and aggregation</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>The challenge uses every tool from this notebook on one array. Create 30 days of sales yourself, for example with a fixed list or a seeded random generator, so the numbers are reproducible. Then compute mean, np.median, std, np.percentile at 90, argmax for the best day (remember to add 1 if you report day numbers starting at 1), and np.cumsum for running revenue. Check that the last cumulative value equals the total from sum, and compare the mean with the median to judge whether outliers are present. Then restart the kernel and run all cells once more.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> The challenge uses every tool from this notebook on one array. Create 30 days of sales yourself, for example with a fixed list or a seeded random generator, so the numbers are reproducible. Then compute mean, np.median, std, np.percentile at 90, argmax for the best day (remember to add 1 if you report day numbers starting at 1), and np.cumsum for running revenue. Check that the last cumulative value equals the total from sum, and compare the mean with the median to judge whether outliers are present. Then restart the kernel and run all cells once more.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Robust centre</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">The median resists outliers; the mean does not.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Spread</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">std with ddof, and percentiles for quartiles.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Axes</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">The axis you pass is the one that vanishes.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Running</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">cumsum adds up; diff takes the steps.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 07</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Randomness and simulation</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Reproducible random numbers, sampling and the bootstrap.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 07, which generates random data reproducibly and uses this notebook's summaries to describe simulated results, including bootstrapping a mean. Further reading: the official NumPy statistics routines at numpy.org/doc/stable/reference/routines.statistics.html.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> Recap the four takeaways, then point to notebook 07, which generates random data reproducibly and uses this notebook's summaries to describe simulated results, including bootstrapping a mean. Further reading: the official NumPy statistics routines at numpy.org/doc/stable/reference/routines.statistics.html.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

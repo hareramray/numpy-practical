@@ -1,0 +1,17 @@
+<section id="cumulative" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Weighted and cumulative summaries</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Weights, running totals, changes</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">marks = np.array([70., 80., 90.])<br>weights = np.array([0.2, 0.3, 0.5])<br>print("Weighted grade:",<br>&#160;&#160;&#160;&#160;&#160;&#160;np.average(marks, weights=weights))<br>daily_sales = np.array([100., 150., 120., 180.])<br>print("Running total:", np.cumsum(daily_sales))<br>print("Changes:", np.diff(daily_sales))<br>np.testing.assert_allclose(<br>&#160;&#160;&#160;&#160;np.average(marks, weights=weights), 83.)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Weighted grade: 83.0<br>Running total: [100. 250. 370. 550.]<br>Changes: [&#160;50. -30.&#160; 60.]</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Weighted mean</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">0.2 × 70 + 0.3 × 80 + 0.5 × 90 = 83. Weights need a nonzero sum.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">cumsum: running total</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Each entry is the total so far.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">diff: the changes</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Next minus previous, so the result is one entry shorter.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 06 Statistics and aggregation</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>np.average with weights lets observations count differently. The final exam weighs 0.5, so the grade, 83, sits closer to 90 than the plain mean of 80 would. NumPy divides by the sum of the weights, which therefore must not be zero. np.cumsum keeps a running total: 100, then 100 + 150 = 250, then 370, then 550. np.diff subtracts each value from the next: +50, −30, +60. Four days give three changes, because diff shortens the axis by one. Try it: compute a running mean by dividing np.cumsum(daily_sales) by np.arange(1, n + 1), where n is the number of days. Here that gives 100, 125, about 123.33, and 137.5.</aside>
+</section>

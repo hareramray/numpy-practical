@@ -1,0 +1,48 @@
+<section id="fill-grid" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Imputation with a stated assumption</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Each hole takes its column mean</h2>
+<div style="display:flex;flex-direction:column;gap:48px;flex:1;justify-content:center">
+<div style="display:flex;gap:32px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">cleaned</p>
+<div style="display:grid;grid-template-columns:160px 160px;gap:12px">
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #B5541A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#B5541A">nan</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">12.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #B5541A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#B5541A">nan</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">22.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">column_means</p>
+<div style="display:grid;grid-template-columns:160px 160px;gap:12px">
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">11.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">21.</p></div>
+</div>
+<p style="font-size:24px;color:#4A5568">nanmean(axis=0)</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center;width:240px">
+<x-shape kind="arrow-right" style="background:#B5541A;width:96px;height:48px"></x-shape>
+<p style="font-size:24px;color:#4A5568;text-align:center">np.where(mask, means, cleaned)</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">imputed</p>
+<div style="display:grid;grid-template-columns:160px 160px;gap:12px">
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">21.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">12.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">11.</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">22.</p></div>
+</div>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:24px 32px"><p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Column means · kept</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">[11. 21.] → [11. 21.]</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:24px 32px"><p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Column std · shrinks</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">[1. 1.] → [0.8165 0.8165]</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>Here np.where is drawn as a merge of two sources. The dashed cells are the missing mask from the previous slide. The blue row holds the two column means, which broadcasts down all three rows. For each cell, np.where asks: is this cell missing? If yes, it takes the mean of that cell's column, shown in orange; if not, it keeps the observed value. So the NaN in column 1 becomes 21 and the NaN in column 0 becomes 11, exactly the printed output. The two cards answer the Try it. The column means are unchanged, which the notebook asserts. The standard deviation, computed ignoring NaN before and on the filled array after, drops from 1.0 to 0.8165 in each column, because each filled value sits exactly at the mean and adds no spread. That is why the policy must be stated: it quietly makes data look more certain.</aside>
+</section>

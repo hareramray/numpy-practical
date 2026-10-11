@@ -1,0 +1,17 @@
+<section id="fill" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Choose a constructor</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Start from known values</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">print("Zeros:\n", np.zeros((2, 3)))<br>print("Full:\n", np.full((2, 2), 7))<br>buffer = np.empty(3)<br>buffer[:] = 4.5<br>print("Filled buffer:", buffer)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Zeros:<br>&#160;[[0. 0. 0.]<br>&#160;[0. 0. 0.]]<br>Full:<br>&#160;[[7 7]<br>&#160;[7 7]]<br>Filled buffer: [4.5 4.5 4.5]</p></div>
+</div>
+<div style="width:640px;display:flex;flex-direction:column;gap:20px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">zeros and ones</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Pass a shape tuple. The default dtype is float64, hence 0.</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">full</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Any fill value. An integer 7 gives an integer array.</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#B5541A">empty</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Storage only, no set values. Fill every entry before reading.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 01 Arrays and dtypes</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>zeros, ones and full create arrays whose every value is known in advance. Their first argument is the shape, written as a tuple, so (2, 3) means 2 rows and 3 columns. Notice the dots in the zeros output: zeros and ones default to float64. full infers the dtype from the fill value, so 7 gives integers. empty is different: it allocates memory without initialising it, so the contents are whatever bytes happened to be there. That is only safe when you overwrite every entry before reading, as buffer[:] = 4.5 does here. Ask: what would print if we removed the assignment? Unpredictable values, which is the point.</aside>
+</section>

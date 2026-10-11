@@ -1,0 +1,23 @@
+<section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Reusable, swept and tested</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Turn the notebook into a small, honest toolkit</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Wrap standardisation and PCA in reusable functions.</p>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Compare k = 2 to 6 across five seeds, plot inertia, and justify a cluster count without using the true labels.</p>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Describe two limits: scaling, initialisation, non-spherical groups or outliers.</p>
+</div>
+<div style="width:600px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Tests to add</h3>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">A constant feature column</p></div>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">A single cluster, k = 1</p></div>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Duplicate points</p></div>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">max_iter = 1</p></div>
+<div style="display:flex;gap:20px;align-items:center"><x-icon name="Check" style="color:#2F6FB0;width:40px;height:40px"></x-icon><p style="font-size:28px;line-height:1.4;color:#4A5568">Both exercise checks print passed</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 17 PCA and clustering project</p><p style="font-size:24px;color:#6B7280">14</p></div>
+<aside>The challenge has no supplied check: decide the expected result of every test before you run it. A constant column should standardise to zeros, not NaN. With k = 1 the single center is the overall mean, so the inertia equals the total sum of squares. Duplicate points with more clusters than distinct points leave empty clusters, which must keep their centers. max_iter = 1 must still return labels that match the returned centers. For choosing k, plot the best inertia for each k and look for the elbow where improvement flattens; remember that inertia always falls as k grows. Then restart the kernel and run all cells.</aside>
+</section>

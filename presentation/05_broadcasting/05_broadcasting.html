@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 05 — Broadcasting</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 05 — Broadcasting</h1><span>13 slides · <a href="https://claude.ai/artifact/7qmRsM8iGnPz3fvbY2iwRa">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative grid: an orange column and a blue row that together span the whole grid" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="0" width="132" height="132" rx="16" fill="#E8813A"/><rect x="160" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="320" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="480" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="0" y="160" width="132" height="132" rx="16" fill="#E8813A"/><rect x="160" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="320" width="132" height="132" rx="16" fill="#E8813A"/><rect x="160" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="480" width="132" height="132" rx="16" fill="#E8813A"/><rect x="160" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="480" width="132" height="132" rx="16" fill="#22344F"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 05</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE">Broadcasting</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2">Calculate across dimensions</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Intermediate</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">30–50 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: notebooks 00–04</p>
+</div>
+<aside>Notebook 05 extends elementwise arithmetic to arrays of different shapes. You will learn to predict whether two shapes are compatible, to centre rows and columns of a table with keepdims, and to build every pairwise difference between two sets of values. The cover grid previews the idea: one orange column and one blue row are enough to describe a whole grid of results.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> Notebook 05 extends elementwise arithmetic to arrays of different shapes. You will learn to predict whether two shapes are compatible, to centre rows and columns of a table with keepdims, and to build every pairwise difference between two sets of values. The cover grid previews the idea: one orange column and one blue row are enough to describe a whole grid of results.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Different shapes, one calculation</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">The shape rule</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Compare shapes right to left: each pair must be equal, or one of them 1.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Centering</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Subtract column or row means, with keepdims=True to keep the axis.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Pairwise</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">A column minus a row gives every pairwise difference at once.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 05 Broadcasting</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>The notebook's goal: predict compatible shapes, and use broadcasting for normalisation and distance. Broadcasting is how NumPy combines arrays whose shapes differ, such as a table and one value per column, without you repeating data by hand. Everything rests on one rule about shapes, which comes first. Then two everyday uses: centring a table by subtracting means, and computing all pairwise differences between two sets of values.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> The notebook's goal: predict compatible shapes, and use broadcasting for normalisation and distance. Broadcasting is how NumPy combines arrays whose shapes differ, such as a table and one value per column, without you repeating data by hand. Everything rests on one rule about shapes, which comes first. Then two everyday uses: centring a table by subtracting means, and computing all pairwise differences between two sets of values.</p></div>
+<div class="slide" id="rule-visual"><div class="frame"><section id="rule-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Align dimensions from the right</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Compare shapes from the right</h2>
+<div style="display:flex;flex-direction:column;gap:32px;flex:1">
+<div style="display:flex;gap:40px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:36px 40px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">(3, 2) with (2,)</h3>
+<div style="display:flex;gap:16px;align-items:center"><p style="width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">prices</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div></div>
+<div style="display:flex;gap:16px;align-items:center"><p style="width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">tax_rate</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">1</p></div><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div></div>
+<div style="display:flex;gap:16px;align-items:center"><p style="width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">result</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">3</p></div><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div></div>
+<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="CheckCircle"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Works: 2 = 2; the missing axis acts as 1</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:36px 40px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">(3, 2) with (3,)</h3>
+<div style="display:flex;gap:16px;align-items:center"><p style="width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">prices</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:3px solid #E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div></div>
+<div style="display:flex;gap:16px;align-items:center"><p style="width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">discount</p><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">1</p></div><div style="width:120px;height:80px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:3px solid #E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div></div>
+<div style="display:flex;gap:16px;align-items:center"><p style="width:240px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">result</p><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#B5541A">no shape</p></div>
+<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#B5541A;width:40px;height:40px" role="img" aria-label="Warning"><path d="M12 3 22 20H2Z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Fails: 2 vs 3, and neither is 1</p></div>
+</div>
+</div>
+<div style="background:#13233A;padding:24px 40px;border-radius:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">discount_by_customer[:, None]&#160;&#160;<span style="color:#9AA3AE"># (3, 1) fits:</span> broadcast_shapes((3, 2), (3, 1)) == (3, 2)</p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 05 Broadcasting</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>This is the whole broadcasting rule. Write the two shapes one above the other, aligned on the right. Compare each column of dimensions: they are compatible if they are equal or one of them is 1, and a missing leading dimension counts as 1. The result takes the larger size in each column. Left: (3, 2) with (2,) compares 2 with 2, then 3 with a missing axis, so the result is (3, 2). Right: (3, 2) with (3,) compares 2 with 3, and neither is 1, so NumPy raises an error. Inserting an axis with [:, None] turns the discounts into a (3, 1) column, which fits. Try it: predict (4, 1, 3) with (2, 3). Aligned right: 3 and 3, then 1 and 2 give 2, then 4 stays, so np.broadcast_shapes returns (4, 2, 3).</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> This is the whole broadcasting rule. Write the two shapes one above the other, aligned on the right. Compare each column of dimensions: they are compatible if they are equal or one of them is 1, and a missing leading dimension counts as 1. The result takes the larger size in each column. Left: (3, 2) with (2,) compares 2 with 2, then 3 with a missing axis, so the result is (3, 2). Right: (3, 2) with (3,) compares 2 with 3, and neither is 1, so NumPy raises an error. Inserting an axis with [:, None] turns the discounts into a (3, 1) column, which fits. Try it: predict (4, 1, 3) with (2, 3). Aligned right: 3 and 3, then 1 and 2 give 2, then 4 stays, so np.broadcast_shapes returns (4, 2, 3).</p></div>
+<div class="slide" id="row-broadcast"><div class="frame"><section id="row-broadcast" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Align dimensions from the right</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One rate per column, every row</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">prices = np.array([[100., 200.],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;[150., 250.], [80., 120.]])<br>tax_rate = np.array([0.05, 0.10])<br>print("Shapes:", prices.shape, tax_rate.shape)<br>print("Taxed prices:\n",<br>&#160;&#160;&#160;&#160;&#160;&#160;prices * (1 + tax_rate))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Shapes: (3, 2) (2,)<br>Taxed prices:<br>&#160;[[105.&#160; 220. ]<br>&#160;[157.5 275. ]<br>&#160;[&#160;84.&#160; 132. ]]</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">(3, 2) times (2,)</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">One tax rate per column, reused on every row.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">No tiling in your code</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">NumPy reuses the row; you never repeat it by hand.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Results still need memory</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Broadcasting avoids repeating inputs, not the output.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 05 Broadcasting</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>Three customers are rows and two products are columns. The tax rates have shape (2,), one per product. Aligned from the right, 2 matches 2 and the missing row axis acts as 1, so the rates are reused for every customer: 100 becomes 105 at 5 percent and 200 becomes 220 at 10 percent. You never build a 3 by 2 array of rates; NumPy behaves as if the row were repeated. The full (3, 2) result is still allocated, so broadcasting saves input copies, not output memory. The notebook also subtracts one discount per customer using discount_by_customer[:, None], which the next slide draws.</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> Three customers are rows and two products are columns. The tax rates have shape (2,), one per product. Aligned from the right, 2 matches 2 and the missing row axis acts as 1, so the rates are reused for every customer: 100 becomes 105 at 5 percent and 200 becomes 220 at 10 percent. You never build a 3 by 2 array of rates; NumPy behaves as if the row were repeated. The full (3, 2) result is still allocated, so broadcasting saves input copies, not output memory. The notebook also subtracts one discount per customer using discount_by_customer[:, None], which the next slide draws.</p></div>
+<div class="slide" id="stretch-visual"><div class="frame"><section id="stretch-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Picture it</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Size-1 axes stretch to fit</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:36px 40px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A row: (2,) → (3, 2)</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">prices * (1 + tax_rate)</p>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:8px"><p style="font-size:24px;color:#4A5568">1 + tax_rate, stretched</p>
+<div style="display:grid;grid-template-columns:140px 140px;gap:8px">
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1.05</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1.10</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">1.05</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">1.10</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">1.05</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">1.10</p></div>
+</div></div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:64px;height:40px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#E8813A"/></svg>
+<div style="display:flex;flex-direction:column;gap:8px"><p style="font-size:24px;color:#4A5568">Taxed prices (3, 2)</p>
+<div style="display:grid;grid-template-columns:140px 140px;gap:8px">
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">105.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">220.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">157.5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">275.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">84.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">132.</p></div>
+</div></div>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:36px 40px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A column: (3, 1) → (3, 2)</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#4A5568">prices - discount[:, None]</p>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:8px"><p style="font-size:24px;color:#4A5568">discounts, stretched</p>
+<div style="display:grid;grid-template-columns:140px 140px;gap:8px">
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">10.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">20.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">5.</p></div>
+</div></div>
+<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:64px;height:40px" aria-hidden="true"><polygon points="0,30 60,30 60,0 100,50 60,100 60,70 0,70" fill="#E8813A"/></svg>
+<div style="display:flex;flex-direction:column;gap:8px"><p style="font-size:24px;color:#4A5568">Discounted (3, 2)</p>
+<div style="display:grid;grid-template-columns:140px 140px;gap:8px">
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">90.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">190.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">130.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">230.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">75.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">115.</p></div>
+</div></div>
+</div>
+</div>
+</div>
+<p style="font-size:24px;color:#4A5568">Solid: the values stored · Dashed: reused by broadcasting, never copied in your code</p>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 05 Broadcasting</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>Both results come from the notebook's Step 1 cell. On the left, the two tax factors are stored once as a row; the dashed rows show how broadcasting reuses that row for each of the three customers, so 150 times 1.05 gives 157.5 in the middle row. On the right, the notebook writes discount_by_customer[:, None] to turn three discounts into a (3, 1) column; the dashed column shows that column reused for both products, so customer two pays 150 minus 20, which is 130, and 250 minus 20, which is 230. A row stretches down; a column stretches across. The direction is decided entirely by where the length-1 axis sits.</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> Both results come from the notebook's Step 1 cell. On the left, the two tax factors are stored once as a row; the dashed rows show how broadcasting reuses that row for each of the three customers, so 150 times 1.05 gives 157.5 in the middle row. On the right, the notebook writes discount_by_customer[:, None] to turn three discounts into a (3, 1) column; the dashed column shows that column reused for both products, so customer two pays 150 minus 20, which is 130, and 250 minus 20, which is 230. A row stretches down; a column stretches across. The direction is decided entirely by where the length-1 axis sits.</p></div>
+<div class="slide" id="centering"><div class="frame"><section id="centering" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Center columns and rows</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Subtract the mean, keep the axis</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">data = np.array([[1., 10.], [3., 20.], [5., 30.]])<br>centered_columns = data - data.mean(axis=0, keepdims=True)<br>centered_rows = data - data.mean(axis=1, keepdims=True)<br>print(centered_columns)<br>print(centered_rows)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[[&#160;-2. -10.]<br>&#160;[&#160;&#160;0.&#160;&#160;&#160;0.]<br>&#160;[&#160;&#160;2.&#160;&#160;10.]]<br>[[&#160;-4.5&#160;&#160;&#160;4.5]<br>&#160;[&#160;-8.5&#160;&#160;&#160;8.5]<br>&#160;[-12.5&#160;&#160;12.5]]</p></div>
+</div>
+<div style="width:520px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">axis=0: per column</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Means have shape (1, 2) and stretch down the rows.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">axis=1: per row</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Means have shape (3, 1) and stretch across the columns.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">keepdims=True</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Keeps the reduced axis as length 1, so alignment is explicit.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 05 Broadcasting</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>Centering means subtracting a mean so the result averages to zero. Column means, axis=0, are 3 and 20; subtracting them centres each feature, giving the first printed table. Row means, axis=1, are 5.5, 11.5 and 17.5; subtracting them gives the second table, where every row is now symmetric around zero. keepdims=True leaves the reduced axis in place with length 1, so the means come back as (1, 2) or (3, 1) and line up with the (3, 2) data. The notebook then asserts that the new column and row means are zero within 1e-12. Try it: remove keepdims from the row calculation. The row means become shape (3,), which aligns against the last axis of length 2, and the subtraction fails. That is the next slide.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> Centering means subtracting a mean so the result averages to zero. Column means, axis=0, are 3 and 20; subtracting them centres each feature, giving the first printed table. Row means, axis=1, are 5.5, 11.5 and 17.5; subtracting them gives the second table, where every row is now symmetric around zero. keepdims=True leaves the reduced axis in place with length 1, so the means come back as (1, 2) or (3, 1) and line up with the (3, 2) data. The notebook then asserts that the new column and row means are zero within 1e-12. Try it: remove keepdims from the row calculation. The row means become shape (3,), which aligns against the last axis of length 2, and the subtraction fails. That is the next slide.</p></div>
+<div class="slide" id="keepdims-visual"><div class="frame"><section id="keepdims-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Picture it</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Row means stretch across</h2>
+<div style="display:flex;gap:48px;flex:1;align-items:center">
+<div style="flex:1;display:flex;gap:16px;align-items:end">
+<div style="display:flex;flex-direction:column;gap:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">data (3, 2)</p>
+<div style="display:grid;grid-template-columns:136px 136px;gap:8px">
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5.</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">30.</p></div>
+</div></div>
+<div style="height:232px;display:flex;align-items:center"><p style="width:40px;font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:700;color:#13233A">−</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">row means (3, 1)</p>
+<div style="display:grid;grid-template-columns:136px 136px;gap:8px">
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5.5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">5.5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">11.5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">11.5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">17.5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">17.5</p></div>
+</div></div>
+<div style="height:232px;display:flex;align-items:center"><p style="width:40px;font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:700;color:#13233A">=</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">centered_rows</p>
+<div style="display:grid;grid-template-columns:136px 136px;gap:8px">
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">-4.5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">4.5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">-8.5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">8.5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">-12.5</p></div>
+<div style="height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">12.5</p></div>
+</div></div>
+</div>
+<div style="width:480px;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:36px 40px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Without keepdims</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">data.mean(axis=1) has shape (3,)</p>
+<div style="display:flex;gap:16px;align-items:center"><p style="width:120px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">data</p><div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div><div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:3px solid #E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div></div>
+<div style="display:flex;gap:16px;align-items:center"><p style="width:120px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">means</p><div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">1</p></div><div style="width:96px;height:72px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:3px solid #E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div></div>
+<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#B5541A;width:40px;height:40px" role="img" aria-label="Warning"><path d="M12 3 22 20H2Z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">2 vs 3: it fails</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 05 Broadcasting</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>The row means, 5.5, 11.5 and 17.5, are the averages of each row: for example (1 + 10) / 2 = 5.5. Thanks to keepdims=True they form a (3, 1) column, so the dashed copies show each mean reused across both columns of its own row, and the blue result matches the notebook output exactly. The card on the right is the Try it: without keepdims the means are a flat (3,) array. Aligned from the right, its 3 meets the data's 2, neither is 1, and NumPy refuses. Column centering does not have this problem, because a (2,) array of column means already aligns with the last axis; keepdims there is simply clearer.</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> The row means, 5.5, 11.5 and 17.5, are the averages of each row: for example (1 + 10) / 2 = 5.5. Thanks to keepdims=True they form a (3, 1) column, so the dashed copies show each mean reused across both columns of its own row, and the blue result matches the notebook output exactly. The card on the right is the Try it: without keepdims the means are a flat (3,) array. Aligned from the right, its 3 meets the data's 2, neither is 1, and NumPy refuses. Column centering does not have this problem, because a (2,) array of column means already aligns with the last axis; keepdims there is simply clearer.</p></div>
+<div class="slide" id="pairwise"><div class="frame"><section id="pairwise" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Pairwise differences</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">A column minus a row: every pair</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">x = np.array([1., 4., 7.])<br>y = np.array([2., 5.])<br>differences = x[:, None] - y[None, :]<br>print(differences)<br>distances = np.abs(differences)<br>assert distances.shape == (3, 2)<br>np.testing.assert_allclose(distances,<br>&#160;&#160;&#160;&#160;[[1, 4], [2, 1], [5, 2]])</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">[[-1. -4.]<br>&#160;[&#160;2. -1.]<br>&#160;[&#160;5.&#160; 2.]]</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">x[:, None] is (3, 1)</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The x values become a column.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">y[None, :] is (1, 2)</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The y values become a row.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">The result is (3, 2)</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Row i, column j holds x[i] − y[j]: an outer operation.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 05 Broadcasting</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>Indexing with None inserts a new axis of length 1. x[:, None] turns the three x values into a (3, 1) column and y[None, :] turns the two y values into a (1, 2) row. Aligned from the right, 1 meets 2 and 3 meets 1, so both stretch and the result is (3, 2): one entry for every combination of an x and a y. For example, row 2, column 0 is 7 minus 2, which is 5. Taking np.abs gives distances. This pattern is called an outer operation. Write the shape beside each intermediate before you scale up, because a large column times a large row can need a lot of memory. Try it: make x and y 2D points, for example shapes (3, 2) and (2, 2), compute x[:, None, :] - y[None, :, :] of shape (3, 2, 2), square it, sum over the last axis, and take the square root to get distances of shape (3, 2).</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> Indexing with None inserts a new axis of length 1. x[:, None] turns the three x values into a (3, 1) column and y[None, :] turns the two y values into a (1, 2) row. Aligned from the right, 1 meets 2 and 3 meets 1, so both stretch and the result is (3, 2): one entry for every combination of an x and a y. For example, row 2, column 0 is 7 minus 2, which is 5. Taking np.abs gives distances. This pattern is called an outer operation. Write the shape beside each intermediate before you scale up, because a large column times a large row can need a lot of memory. Try it: make x and y 2D points, for example shapes (3, 2) and (2, 2), compute x[:, None, :] - y[None, :, :] of shape (3, 2, 2), square it, sum over the last axis, and take the square root to get distances of shape (3, 2).</p></div>
+<div class="slide" id="pairwise-visual"><div class="frame"><section id="pairwise-visual" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Picture it</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">A column plus a row fills a grid</h2>
+<div style="display:flex;flex-direction:column;gap:48px;flex:1;justify-content:center">
+<div style="display:flex;gap:24px;align-items:end;justify-content:center">
+<div style="display:flex;flex-direction:column;gap:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">a: (3, 1) → (3, 4)</p>
+<div style="display:grid;grid-template-columns:repeat(4, 80px);gap:8px">
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">0</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">0</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">0</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">10</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">10</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">10</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">10</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">20</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">20</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">20</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">20</p></div>
+</div></div>
+<div style="height:208px;display:flex;align-items:center"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:700;color:#13233A">+</p></div>
+<div style="display:flex;flex-direction:column;gap:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">b: (1, 4) → (3, 4)</p>
+<div style="display:grid;grid-template-columns:repeat(4, 80px);gap:8px">
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">3</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">4</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">1</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">2</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">3</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">4</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">1</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">2</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">3</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#6B7280">4</p></div>
+</div></div>
+<div style="height:208px;display:flex;align-items:center"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:700;color:#13233A">=</p></div>
+<div style="display:flex;flex-direction:column;gap:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">a + b: (3, 4)</p>
+<div style="display:grid;grid-template-columns:repeat(4, 80px);gap:8px">
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">1</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">3</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">4</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">11</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">12</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">13</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">14</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">21</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">22</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">23</p></div>
+<div style="height:64px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:10px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">24</p></div>
+</div></div>
+</div>
+<div style="display:flex;gap:40px;justify-content:center">
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Orange column and blue row: stored · Dashed: stretched</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">Notebook: (3, 1) − (1, 2) → (3, 2)</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 05 Broadcasting</p><p style="font-size:24px;color:#6B7280">9</p></div>
+<aside>An illustration with simple numbers: a column a = [[0], [10], [20]] of shape (3, 1) plus a row b = [[1, 2, 3, 4]] of shape (1, 4). Aligned from the right, 1 meets 4 and 3 meets 1, so the result is (3, 4). The column is reused across all four columns and the row is reused down all three rows, as the dashed cells show, and each result cell is a[i] + b[j]: row 1, column 2 is 10 + 3 = 13. Twelve results from seven stored numbers. The notebook's pairwise differences are exactly this pattern with subtraction and smaller sizes, (3, 1) minus (1, 2) giving (3, 2). Exercise 2, the multiplication table, is the same pattern again with a (5, 1) column times a (1, 5) row.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> An illustration with simple numbers: a column a = [[0], [10], [20]] of shape (3, 1) plus a row b = [[1, 2, 3, 4]] of shape (1, 4). Aligned from the right, 1 meets 4 and 3 meets 1, so the result is (3, 4). The column is reused across all four columns and the row is reused down all three rows, as the dashed cells show, and each result cell is a[i] + b[j]: row 1, column 2 is 10 + 3 = 13. Twelve results from seven stored numbers. The notebook's pairwise differences are exactly this pattern with subtraction and smaller sizes, (3, 1) minus (1, 2) giving (3, 2). Exercise 2, the multiplication table, is the same pattern again with a (5, 1) column times a (1, 5) row.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Align right.<br>Ones stretch.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">Compare shapes from the last axis: each pair equal, or one of them 1. Write the shape beside every step.</p>
+<aside>Pause here. Every broadcasting question is answered by the same check: line the shapes up on the right, and each pair of dimensions must be equal or contain a 1. A length-1 axis, whether it comes from keepdims, from indexing with None, or from a missing leading dimension, is the axis that stretches. When a calculation surprises you, write the shape of every intermediate array; the mistake is almost always visible there.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> Pause here. Every broadcasting question is answered by the same check: line the shapes up on the right, and each pair of dimensions must be equal or contain a 1. A length-1 axis, whether it comes from keepdims, from indexing with None, or from a missing leading dimension, is the axis that stretches. When a calculation surprises you, write the shape of every intermediate array; the mistake is almost always visible there.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two broadcasting exercises</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Add one offset per row of a (2, 3) matrix</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Offsets [10, 20]. Expected: [[11 12 13] [24 25 26]]. The offsets must become a (2, 1) column.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">shifted = matrix + offsets[:, None]</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">The 1–5 multiplication table, shape (5, 5)</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected first row [1 2 3 4 5], last row [5 10 15 20 25]. A column times a row.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">times_table = (numbers[:, None]<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;* numbers[None, :])</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 05 Broadcasting</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>Ask the audience to write the shapes first, then the code. Exercise 1: matrix is (2, 3) and offsets is (2,). Added directly, 3 would meet 2 and fail; inserting a length-1 column axis makes offsets (2, 1), so each row receives its own offset, 10 for the first row and 20 for the second. Exercise 2: numbers is np.arange(1, 6). A (5, 1) column times a (1, 5) row broadcasts to all 25 products, the same outer pattern as the pairwise differences. The code lines match the reference solutions; the parentheses only wrap the line.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> Ask the audience to write the shapes first, then the code. Exercise 1: matrix is (2, 3) and offsets is (2,). Added directly, 3 would meet 2 and fail; inserting a length-1 column axis makes offsets (2, 1), so each row receives its own offset, 10 for the first row and 20 for the second. Exercise 2: numbers is np.arange(1, 6). A (5, 1) column times a (1, 5) row broadcasts to all 25 products, the same outer pattern as the pairwise differences. The code lines match the reference solutions; the parentheses only wrap the line.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Write it yourself, then check it</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Min-max scale each column of a (4, 3) feature table</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Each column should run from 0 to 1. Handle a constant column by returning zeros there.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain the main idea without reading the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a changed input or edge case and explain it</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 05 Broadcasting</p><p style="font-size:24px;color:#6B7280">12</p></div>
+<aside>The challenge combines broadcasting with notebook 04's safe division. Column minimums and maximums come from min and max with axis=0 and keepdims=True, giving (1, 3) rows that stretch down the four rows. Scaled values are (X - min) divided by (max - min). A constant column has a range of zero, so use np.divide with a zero-filled out buffer and where= set to range != 0; that column then stays at zero. Check your result: every non-constant column should have a minimum of 0 and a maximum of 1. Then restart the kernel and run all cells once more.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> The challenge combines broadcasting with notebook 04's safe division. Column minimums and maximums come from min and max with axis=0 and keepdims=True, giving (1, 3) rows that stretch down the four rows. Scaled values are (X - min) divided by (max - min). A constant column has a range of zero, so use np.divide with a zero-filled out buffer and where= set to range != 0; that column then stays at zero. Check your result: every non-constant column should have a minimum of 0 and a maximum of 1. Then restart the kernel and run all cells once more.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Align right</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Each pair of sizes is equal, or one is 1.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Ones stretch</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Length-1 axes are reused, not copied by you.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">keepdims</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Keeps a reduced axis so means line up.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Outer ops</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">A column with a row gives every pair.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 06</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Statistics and aggregation</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Summarize and analyze numerical data.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 06, where reductions such as mean and sum along an axis produce exactly the kind of row and column summaries that broadcasting combines with the data. Further reading: the official NumPy guide to broadcasting at numpy.org/doc/stable/user/basics.broadcasting.html.</aside>
+</section>
+</div><p class="notes"><b>Notes · 13</b> Recap the four takeaways, then point to notebook 06, where reductions such as mean and sum along an axis produce exactly the kind of row and column summaries that broadcasting combines with the data. Further reading: the official NumPy guide to broadcasting at numpy.org/doc/stable/user/basics.broadcasting.html.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

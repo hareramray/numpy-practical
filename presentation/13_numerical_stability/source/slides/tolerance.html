@@ -1,0 +1,17 @@
+<section id="tolerance" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Meaningful tolerances</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">0.1 + 0.2 is not exactly 0.3</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">No exact binary form</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">0.1, 0.2 and 0.3 are each stored as the nearest binary fraction.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">== demands identical bits</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The rounding errors do not cancel, so it says False.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Tolerances ask "close enough?"</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">rtol scales with the values; atol matters near zero.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">value = 0.1 + 0.2<br>print("Stored sum:", repr(value))<br>print("Exact equality:", value == 0.3)<br>print("Close:", np.isclose(value, 0.3,<br>&#160;&#160;&#160;&#160;&#160;&#160;rtol=1e-12, atol=1e-15))<br>np.testing.assert_allclose(value, 0.3,<br>&#160;&#160;&#160;&#160;rtol=1e-12, atol=1e-15)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Stored sum: 0.30000000000000004<br>Exact equality: False<br>Close: True</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 13 Numerical stability</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>Many decimal fractions, such as 0.1, have no exact binary representation, so the computer stores the closest value it can. The tiny errors in 0.1 and 0.2 add up to a sum that is not the same double as 0.3, so exact equality fails. np.isclose and np.testing.assert_allclose pass when the difference is at most atol plus rtol times the size of the expected value. Choose the tolerances from the scale and accuracy your problem needs; the defaults are not a universal rule. Try it: compare 1e-12 and 0. With the default atol of 1e-8, np.isclose(1e-12, 0) is True; with atol=0 it is False, because a relative tolerance times zero is zero. Near zero, only the absolute tolerance can help.</aside>
+</section>

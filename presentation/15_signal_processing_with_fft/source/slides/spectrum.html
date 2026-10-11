@@ -1,0 +1,21 @@
+<section id="spectrum" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Two views of one signal</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Tangled in time, clear in frequency</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:16px"><img src="/_blob/85516ffafc12ddc243fb704ff96412db" alt="Time plot of the 5 Hz plus 40 Hz signal over one second" style="width:737px;height:240px;object-fit:contain"></div>
+<div style="display:flex;gap:16px;align-items:center;justify-content:center;height:48px">
+<x-shape kind="arrow-down" style="width:32px;height:48px;background:#E8813A"></x-shape>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;font-weight:600;color:#13233A">np.fft.rfft</p>
+</div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:16px"><img src="/_blob/0e82e4ce9e232fdf5be8c1c87c315fc5" alt="One-sided spectrum stem plot from 0 to 60 Hz: a spike of height 1.0 at 5 Hz, a spike of 0.4 at 40 Hz, all other bins zero" style="width:737px;height:240px;object-fit:contain"></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;gap:24px;align-items:center"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#2F6FB0;width:200px">5 Hz</p><p style="font-size:28px;line-height:1.4;color:#4A5568">amplitude 1.0: the slow wave</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;gap:24px;align-items:center"><p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A;width:200px">40 Hz</p><p style="font-size:28px;line-height:1.4;color:#4A5568">amplitude 0.4: the ripple</p></div>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Every other bin is zero: the spectrum lists exactly the two sines we added, with their strengths.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 15 Signal processing with FFT</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>These are the notebook's two plots, one above the other. The top one is the signal in time: 256 samples whose two ingredients are mixed together. The bottom one is the same information after rfft, shown as a stem plot from 0 to 60 Hz, where each dot is one 1 Hz bin. Two spikes stand out: height 1.0 at 5 Hz and height 0.4 at 40 Hz, matching the printed peak frequencies and amplitudes. Nothing was lost in the transform; it is a change of viewpoint, and the inverse transform can bring the time view back exactly. Frequency is the natural view when you ask what is in a signal, time is the natural view when you ask what happened when.</aside>
+</section>

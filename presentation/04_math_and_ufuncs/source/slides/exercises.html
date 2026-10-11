@@ -1,0 +1,22 @@
+<section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two elementwise exercises</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Areas of circles with radii [1., 2., 3.]</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: π × [1, 4, 9], printed as [ 3.1416 12.5664 28.2743]. Squaring is elementwise.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">areas = np.pi * radii ** 2</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Replace negative inventory with zero</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">From [3, -2, 7, -1, 0], expected [3 0 7 0 0]. A lower bound of 0; None leaves the top open.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">clean_inventory = np.clip(<br>&#160;&#160;&#160;&#160;inventory, 0, None)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 04 Math and ufuncs</p><p style="font-size:24px;color:#6B7280">10</p></div>
+<aside>Ask the audience to attempt both before revealing the code lines, which match the reference solutions. Exercise 1: the power operator squares each radius independently, and np.pi is the NumPy constant, so each radius gets its own area. Exercise 2: np.clip with a lower bound of zero raises the negative entries to zero, and passing None as the upper bound leaves large values unbounded. np.where(inventory &lt; 0, 0, inventory) and np.maximum(inventory, 0) also pass the check, because the checks verify the result, not the method.</aside>
+</section>

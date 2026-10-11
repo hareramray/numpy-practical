@@ -1,0 +1,17 @@
+<section id="solve" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Solve equations</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Solve A x = b, then check it</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">A = np.array([[2., 1.], [1., 3.]])<br>b = np.array([5., 7.])<br>x = np.linalg.solve(A, b)<br>print("Solution:", x)<br>print("Residual norm:", np.linalg.norm(A @ x - b))<br>print("Condition number:", np.linalg.cond(A))<br>np.testing.assert_allclose(A @ x, b)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Solution: [1.6 1.8]<br>Residual norm: 0.0<br>Condition number: 2.6180339887498953</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">solve finds x</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">For a square, full-rank A it returns the unknown vector directly.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">The residual checks it</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A @ x − b should be close to zero. Here its norm is 0.0.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Condition number warns</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">About 2.6 is small, so x is stable. Large values mean tiny input changes move x a lot.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>A x = b is two equations with two unknowns: 2 x1 + x2 = 5 and x1 + 3 x2 = 7. np.linalg.solve finds x = [1.6, 1.8]. Never trust a solution blindly: the residual A @ x minus b measures how well the answer satisfies the equations, and its norm here is exactly 0.0. The condition number measures sensitivity. A value near 1 is ideal; nearly dependent columns push it towards infinity, and then tiny changes in b can produce large changes in x. Try it: make both rows of A identical. The matrix becomes singular, and solve raises numpy.linalg.LinAlgError, which you can catch with try and except.</aside>
+</section>

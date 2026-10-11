@@ -1,0 +1,22 @@
+<section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Two cleaning exercises</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Keep only rows where every value is finite</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">From [[1, 2], [nan, 3], [4, 5], [6, inf]]. Expected: [[1, 2], [4, 5]].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">valid_rows = measurements[np.isfinite(<br>&#160;&#160;&#160;&#160;measurements).all(axis=1)]</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Replace NaN with the median of observed values</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">From [1, nan, 3, 9]. Expected: [1, 3, 3, 9].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">filled_values = np.where(<br>&#160;&#160;&#160;&#160;np.isnan(values),<br>&#160;&#160;&#160;&#160;np.nanmedian(values), values)</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 08 Cleaning and file I/O</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>Give the audience time to attempt both before revealing the code, which matches the reference solutions. Exercise 1: np.isfinite builds an element mask, and all(axis=1) requires every entry in a row to be valid before that row is selected; the NaN row and the infinity row both drop out, leaving [[1, 2], [4, 5]]. This is dropping rather than filling, which is the other common policy. Exercise 2: np.nanmedian ignores the NaN and finds the median of 1, 3 and 9, which is 3; np.where then replaces only the missing entry, giving [1, 3, 3, 9]. The median is a sensible choice when a column may have outliers like 9.</aside>
+</section>

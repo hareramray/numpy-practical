@@ -1,0 +1,17 @@
+<section id="cells" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Your first notebook</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Cells run in order; the kernel remembers</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Shift+Enter runs a cell</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The number beside it records the order cells ran in.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Variables live in the kernel</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">The running Python process keeps them, so run top to bottom.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">assert is a check</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">No error means the condition passed.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">name = "NumPy learner"<br>minutes_per_day = 30<br>days = 5<br>print(f"Hello, {name}!")<br>print("Weekly practice minutes:",<br>&#160;&#160;&#160;&#160;&#160;&#160;minutes_per_day * days)<br>assert minutes_per_day * days == 150</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Hello, NumPy learner!<br>Weekly practice minutes: 150</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 00 Start here</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>A notebook mixes text cells and code cells. Ask the audience to predict both printed lines before running. Try it: change days to 7. The print changes to 210, but the assert now fails, because 150 is hard-coded. Update the expected value in the assertion too. Use Kernel, Restart Kernel and Run All Cells to prove your work does not depend on stale variables.</aside>
+</section>

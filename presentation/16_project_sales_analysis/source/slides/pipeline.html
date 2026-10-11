@@ -1,0 +1,41 @@
+<section id="pipeline" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">The workflow</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Five stages, one data cube</h2>
+<div style="display:flex;gap:12px;align-items:center">
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 24px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Generate</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Poisson counts, shape (30, 3, 4), two NaN</p>
+</div>
+<x-shape kind="arrow-right" style="background:#2F6FB0;width:40px;height:20px"></x-shape>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 24px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Clean</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Fill each NaN with its pair's mean</p>
+</div>
+<x-shape kind="arrow-right" style="background:#2F6FB0;width:40px;height:20px"></x-shape>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 24px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Analyse</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Units × prices, then sums by axis</p>
+</div>
+<x-shape kind="arrow-right" style="background:#2F6FB0;width:40px;height:20px"></x-shape>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 24px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Visualise</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Daily trend, 7-day mean, store bars</p>
+</div>
+<x-shape kind="arrow-right" style="background:#2F6FB0;width:40px;height:20px"></x-shape>
+<div style="flex:1;align-self:stretch;display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:16px;padding:28px 24px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Export</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Save to .npz, reload, verify equality</p>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px">
+<x-icon name="CheckCircle" style="color:#2F6FB0;width:56px;height:56px"></x-icon>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Every stage ends with a check: the expected shape, finite values, and totals that agree however you sum them.</p>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 16 Sales analysis project</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>This is the map for the whole session. The four solid stages are worked in the notebook's three steps; the dashed export stage is yours, in the independent challenge. Every stage passes the same array forward, so a mistake early, such as treating a missing count as zero, silently flows into every later number. That is why each stage ends with an assertion: the cube keeps shape (30, 3, 4), revenue is finite, and store totals, product totals and daily totals all add up to the same grand total.</aside>
+</section>

@@ -1,0 +1,48 @@
+<section id="matmul-shapes" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · The shape rule</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Inner sizes match, outer sizes stay</h2>
+<div style="display:flex;gap:56px;flex:1;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;gap:28px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(2, 64px);gap:8px">
+<div style="height:64px;background:#E8813A;border-radius:8px"></div><div style="height:64px;background:#E8813A;border-radius:8px"></div>
+<div style="height:64px;background:#E2DED3;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div>
+<div style="height:64px;background:#E2DED3;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">A (3, 2)</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">@</p>
+<div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(4, 64px);gap:8px">
+<div style="height:64px;background:#2F6FB0;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div>
+<div style="height:64px;background:#2F6FB0;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">B (2, 4)</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">=</p>
+<div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(4, 64px);gap:8px">
+<div style="height:64px;background:#13233A;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div>
+<div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div>
+<div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">A @ B (3, 4)</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">(m, <span style="color:#B5541A">n</span>) @ (<span style="color:#B5541A">n</span>, p) → (m, p)</p>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">The inner sizes must agree (2 and 2). The outer sizes, 3 and 4, become the result's shape. The orange row times the blue column fills the one dark cell.</p>
+</div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Try it · by hand</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">First entry of A @ A</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.5;color:#13233A">row 0: <span style="color:#B5541A">[1, 2]</span><br>col 0: <span style="color:#2F6FB0">[1, 3]</span><br>1×1 + 2×3 = <b>7</b></p>
+<hr style="border-top:1px solid #E2DED3">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.6;color:#4A5568">A @ A → [[7, 10], [15, 22]]<br>A * A → [[1, 4], [9, 16]]</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>This is the one rule to check before any matrix product. For A shaped (m, n) and B shaped (n, p), the inner sizes n must match, because each row of A is paired element by element with each column of B. The result has the outer shape (m, p): one entry for every row of A and every column of B. In the diagram, the orange row of A and the blue column of B produce the single dark cell. On the right is the Try it answer: row 0 of A is [1, 2], column 0 of A is [1, 3], so the first entry is 1 times 1 plus 2 times 3, which is 7, matching the printed output. If the inner sizes disagree, NumPy raises a ValueError instead of guessing.</aside>
+</section>

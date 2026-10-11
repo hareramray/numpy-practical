@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 11 — Copies, Views and Memory</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 11 — Copies, Views and Memory</h1><span>13 slides · <a href="https://claude.ai/artifact/Cg1vD7Jwk1USmjyEkjhAJf">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative grid of array cells: an orange run of cells marks a slice view and alternate blue cells mark a stepped view" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="160" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="160" width="132" height="132" rx="16" fill="#E8813A"/><rect x="320" y="160" width="132" height="132" rx="16" fill="#E8813A"/><rect x="480" y="160" width="132" height="132" rx="16" fill="#E8813A"/><rect x="0" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="480" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="480" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="160" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="480" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="480" y="480" width="132" height="132" rx="16" fill="#22344F"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 11</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE">Copies, views<br>and memory</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2">Strides, shared buffers, and memory-mapped files</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Advanced</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">30–50 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: notebooks 00–10</p>
+</div>
+<aside>Welcome to notebook 11. Up to now we have treated arrays as values. Here we look underneath: an array is a description, made of a shape, a dtype and strides, that points into a block of memory called a buffer. Two arrays can point into the same buffer, so changing one changes the other. By the end you can predict when memory is shared, read strides, and work with a file through a memory map. The orange run on the cover is a slice view; the blue alternate cells are a stepped view of the same buffer.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> Welcome to notebook 11. Up to now we have treated arrays as values. Here we look underneath: an array is a description, made of a shape, a dtype and strides, that points into a block of memory called a buffer. Two arrays can point into the same buffer, so changing one changes the other. By the end you can predict when memory is shared, read strides, and work with a file through a memory map. The orange run on the cover is a slice view; the blue alternate cells are a stepped view of the same buffer.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Know where your data lives</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Views</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Basic slicing shares the original buffer.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Copies</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">.copy() and fancy indexing make new storage.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Strides</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Byte jumps that map an index to memory.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">4</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Memory maps</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Read a file in slices without loading it all.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 11 Copies and views</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>The aim of this notebook is prediction: before you run a line, you should know whether the result shares memory with its source. That matters for correctness, because writing through a view silently changes the original, and for performance, because copies cost time and memory. Strides explain how NumPy can produce views like a transpose without moving any data. Memory maps extend the same idea to files on disk.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> The aim of this notebook is prediction: before you run a line, you should know whether the result shares memory with its source. That matters for correctness, because writing through a view silently changes the original, and for performance, because copies cost time and memory. Strides explain how NumPy can produce views like a transpose without moving any data. Memory maps extend the same idea to files on disk.</p></div>
+<div class="slide" id="views"><div class="frame"><section id="views" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Basic slicing shares data</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Writing to a view edits the original</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">original = np.arange(6)<br>view = original[1:4]<br>independent = original[1:4].copy()<br>view[0] = 99<br>print("Original:", original)<br>print("Independent copy:", independent)<br>assert np.shares_memory(original, view)<br>assert not np.shares_memory(original, independent)<br>assert original[1] == 99</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Original: [ 0 99&#160; 2&#160; 3&#160; 4&#160; 5]<br>Independent copy: [1 2 3]</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A slice is a view</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">original[1:4] points into the same data buffer.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">.copy() is independent</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">New storage, so later writes do not leak across.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">shares_memory checks</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">True when two arrays overlap in memory.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 11 Copies and views</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>A view is a new array object that refers to an existing data buffer. Basic slicing with start, stop and step normally produces a view, so view[0] = 99 writes into the same memory as original[1], and printing original shows 99 in position 1. The .copy() call allocates new storage, so independent still holds [1 2 3]. np.shares_memory answers the question directly and is the right tool when you are unsure. Try it: modify independent, for example independent[0] = -1, and confirm that original stays unchanged.</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> A view is a new array object that refers to an existing data buffer. Basic slicing with start, stop and step normally produces a view, so view[0] = 99 writes into the same memory as original[1], and printing original shows 99 in position 1. The .copy() call allocates new storage, so independent still holds [1 2 3]. np.shares_memory answers the question directly and is the right tool when you are unsure. Try it: modify independent, for example independent[0] = -1, and confirm that original stays unchanged.</p></div>
+<div class="slide" id="view-vs-copy"><div class="frame"><section id="view-vs-copy" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Inside memory</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One buffer, two names</h2>
+<div style="display:flex;gap:56px;flex:1;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">original · shared buffer</p>
+<div style="display:flex;gap:12px">
+<div style="width:140px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">0</p></div>
+<div style="width:140px;height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#13233A">99</p></div>
+<div style="width:140px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">2</p></div>
+<div style="width:140px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">3</p></div>
+<div style="width:140px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">4</p></div>
+<div style="width:140px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">5</p></div>
+</div>
+<div style="display:flex">
+<div style="width:152px"></div>
+<div style="width:444px;border-top:4px solid #2F6FB0;padding:8px 0px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2F6FB0">view = original[1:4]</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">independent · its own buffer</p>
+<div style="display:flex;gap:12px">
+<div style="width:140px"></div>
+<div style="width:140px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="width:140px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+<div style="width:140px;height:96px;display:flex;align-items:center;justify-content:center;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+</div>
+<p style="font-size:24px;color:#6B7280">original[1:4].copy() — untouched by view[0] = 99</p>
+</div>
+</div>
+<div style="width:600px;display:flex;flex-direction:column;gap:20px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#13233A">view[0] = 99</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Writes through the view into the shared cell: original[1] is now 99.</p></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;gap:16px">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#13233A">shares_memory</h3>
+<div style="display:flex;justify-content:space-between;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">original, view</p><p style="font-size:24px;font-weight:600;background:#2F6FB0;color:#F6F4EE;padding:6px 20px;border-radius:999px">True</p></div>
+<div style="display:flex;justify-content:space-between;align-items:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">original, independent</p><p style="font-size:24px;font-weight:600;background:#E2DED3;color:#13233A;padding:6px 20px;border-radius:999px">False</p></div>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 11 Copies and views</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>This is the memory picture behind the previous slide. There is one buffer holding six integers. original describes all six cells; view describes cells 1 to 3 of the same buffer, marked by the blue bracket. When we write view[0] = 99, there is nothing to copy: the orange cell is the one both arrays see, so original[1] becomes 99 too. independent was created with .copy(), so it has its own dashed buffer holding 1, 2 and 3, and the write never reaches it. The two shares_memory checks from the notebook confirm the picture: True for the view, False for the copy. Try it: change independent and check that the top row stays the same.</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> This is the memory picture behind the previous slide. There is one buffer holding six integers. original describes all six cells; view describes cells 1 to 3 of the same buffer, marked by the blue bracket. When we write view[0] = 99, there is nothing to copy: the orange cell is the one both arrays see, so original[1] becomes 99 too. independent was created with .copy(), so it has its own dashed buffer holding 1, 2 and 3, and the write never reaches it. The two shares_memory checks from the notebook confirm the picture: True for the view, False for the copy. Try it: change independent and check that the top row stays the same.</p></div>
+<div class="slide" id="strides-code"><div class="frame"><section id="strides-code" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Advanced indexing and strides</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Fancy indexing copies</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">a = np.arange(12, dtype=np.int64).reshape(3, 4)<br>selected = a[[0, 2]]<br>selected[0, 0] = -100<br>assert a[0, 0] == 0<br>print("Original strides:", a.strides)<br>print("Transpose strides:", a.T.strides)<br>print("C contiguous:", a.flags.c_contiguous,<br>&#160;&#160;&#160;&#160;&#160;&#160;a.T.flags.c_contiguous)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Original strides: (32, 8)<br>Transpose strides: (8, 32)<br>C contiguous: True False</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">a[[0, 2]] is new data</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Integer-array and Boolean reads copy, so a[0, 0] stays 0.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Strides are byte jumps</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">(32, 8): 32 bytes to the next row, 8 to the next column.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">.T swaps the strides</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Same bytes, new steps (8, 32), and no longer C-contiguous.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 11 Copies and views</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>Advanced indexing, meaning an integer array like a[[0, 2]] or a Boolean mask, cannot be described as a regular step through memory, so reading it returns a copy. Changing selected therefore leaves a untouched, which the assert proves. Assignment is different: a[mask] = value writes directly into a. That is why chained indexing such as a[mask][0] = 5 silently does nothing to a: the first indexing step already made a copy. Strides are the number of bytes to jump to move one step along each axis. Each int64 is 8 bytes and each row has 4 of them, so moving down a row jumps 32 bytes. The transpose simply swaps the strides to (8, 32) without moving any values, which is why it is no longer C-contiguous.</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> Advanced indexing, meaning an integer array like a[[0, 2]] or a Boolean mask, cannot be described as a regular step through memory, so reading it returns a copy. Changing selected therefore leaves a untouched, which the assert proves. Assignment is different: a[mask] = value writes directly into a. That is why chained indexing such as a[mask][0] = 5 silently does nothing to a: the first indexing step already made a copy. Strides are the number of bytes to jump to move one step along each axis. Each int64 is 8 bytes and each row has 4 of them, so moving down a row jumps 32 bytes. The transpose simply swaps the strides to (8, 32) without moving any values, which is why it is no longer C-contiguous.</p></div>
+<div class="slide" id="strides"><div class="frame"><section id="strides" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Strides and contiguity</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Same bytes, different steps</h2>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-size:24px;color:#6B7280">One buffer: 12 × int64, 8 bytes each · byte offset under each cell</p>
+<div style="display:flex;gap:8px">
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">0</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F6F4EE">1</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">2</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">3</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">4</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">5</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">6</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">7</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">8</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">9</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">10</p></div>
+<div style="width:112px;height:72px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">11</p></div>
+</div>
+<div style="display:flex;gap:8px">
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">0</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2F6FB0;text-align:center">8</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">16</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">24</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#B5541A;text-align:center">32</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">40</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">48</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">56</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">64</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">72</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">80</p>
+<p style="width:112px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#6B7280;text-align:center">88</p>
+</div>
+</div>
+<div style="display:flex;gap:40px">
+<div style="flex:1;display:flex;gap:32px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px">
+<div style="display:grid;grid-template-columns:repeat(4, 56px);gap:6px">
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">0</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">1</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">2</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">3</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">4</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">5</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">6</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">7</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">8</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">9</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">10</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">11</p></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#13233A">a (3, 4)</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#4A5568">strides (32, 8)<br><span style="color:#B5541A">next row: +32 bytes</span><br><span style="color:#2F6FB0">next column: +8 bytes</span><br>C contiguous: True</p>
+</div>
+</div>
+<div style="flex:1;display:flex;gap:32px;align-items:center;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px">
+<div style="display:grid;grid-template-columns:repeat(3, 56px);gap:6px">
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#13233A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">0</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">4</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">8</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">1</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">5</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">9</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">2</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">6</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">10</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">3</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">7</p></div>
+<div style="height:56px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">11</p></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#13233A">a.T (4, 3)</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#4A5568">strides (8, 32)<br><span style="color:#2F6FB0">next row: +8 bytes</span><br><span style="color:#B5541A">next column: +32 bytes</span><br>C contiguous: False</p>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-family:'IBM Plex Sans', Arial, sans-serif;font-size:24px;color:#6B7280">NumPy course · 11 Copies and views</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>The top row is the real memory: one flat buffer of twelve 8-byte integers, with each cell's byte offset underneath. Both arrays below are just different ways of walking it. For a, shaped (3, 4), the next column is the next cell, 8 bytes on, shown in blue, and the next row starts 4 cells later, 32 bytes on, shown in orange. So a.strides is (32, 8). The transpose a.T shows the same numbers turned on their side, but no byte moved: NumPy only swapped the strides to (8, 32). Now moving along a row of a.T jumps 32 bytes, so its rows are not laid out one after another, and c_contiguous is False. Try it: compare np.shares_memory(a, a.T.reshape(-1)) with np.shares_memory(a, a.reshape(-1)). The second is True, because a is contiguous and reshape can return a view. The first is False, because flattening a.T in row order needs the bytes in a different order, so reshape must copy.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> The top row is the real memory: one flat buffer of twelve 8-byte integers, with each cell's byte offset underneath. Both arrays below are just different ways of walking it. For a, shaped (3, 4), the next column is the next cell, 8 bytes on, shown in blue, and the next row starts 4 cells later, 32 bytes on, shown in orange. So a.strides is (32, 8). The transpose a.T shows the same numbers turned on their side, but no byte moved: NumPy only swapped the strides to (8, 32). Now moving along a row of a.T jumps 32 bytes, so its rows are not laid out one after another, and c_contiguous is False. Try it: compare np.shares_memory(a, a.T.reshape(-1)) with np.shares_memory(a, a.reshape(-1)). The second is True, because a is contiguous and reshape can return a view. The first is False, because flattening a.T in row order needs the bytes in a different order, so reshape must copy.</p></div>
+<div class="slide" id="view-or-copy"><div class="frame"><section id="view-or-copy" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Cheat sheet</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Predict it: view or copy?</h2>
+<div style="display:flex;flex-direction:column;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px">
+<div style="display:flex;gap:24px;padding:12px 32px;border-bottom:2px solid #E2DED3"><p style="width:520px;font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Expression</p><p style="width:300px;font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Result</p><p style="flex:1;font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Evidence</p></div>
+<div style="display:flex;gap:24px;padding:12px 32px;border-bottom:1px solid #E2DED3"><p style="width:520px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">original[1:4]</p><p style="width:300px;font-size:28px;font-weight:600;color:#2F6FB0">view</p><p style="flex:1;font-size:28px;color:#4A5568">shares_memory is True</p></div>
+<div style="display:flex;gap:24px;padding:12px 32px;border-bottom:1px solid #E2DED3"><p style="width:520px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">original[1:4].copy()</p><p style="width:300px;font-size:28px;font-weight:600;color:#B5541A">copy</p><p style="flex:1;font-size:28px;color:#4A5568">shares_memory is False</p></div>
+<div style="display:flex;gap:24px;padding:12px 32px;border-bottom:1px solid #E2DED3"><p style="width:520px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">a[[0, 2]]</p><p style="width:300px;font-size:28px;font-weight:600;color:#B5541A">copy</p><p style="flex:1;font-size:28px;color:#4A5568">editing it leaves a[0, 0] at 0</p></div>
+<div style="display:flex;gap:24px;padding:12px 32px;border-bottom:1px solid #E2DED3"><p style="width:520px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">a[mask] (reading)</p><p style="width:300px;font-size:28px;font-weight:600;color:#B5541A">copy</p><p style="flex:1;font-size:28px;color:#4A5568">Boolean reads return new data</p></div>
+<div style="display:flex;gap:24px;padding:12px 32px;border-bottom:1px solid #E2DED3"><p style="width:520px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">a[mask] = value</p><p style="width:300px;font-size:28px;font-weight:600;color:#13233A">writes into a</p><p style="flex:1;font-size:28px;color:#4A5568">assignment, not a read</p></div>
+<div style="display:flex;gap:24px;padding:12px 32px;border-bottom:1px solid #E2DED3"><p style="width:520px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">a.T</p><p style="width:300px;font-size:28px;font-weight:600;color:#2F6FB0">view</p><p style="flex:1;font-size:28px;color:#4A5568">strides reorder to (8, 32)</p></div>
+<div style="display:flex;gap:24px;padding:12px 32px;border-bottom:1px solid #E2DED3"><p style="width:520px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">a.flatten()</p><p style="width:300px;font-size:28px;font-weight:600;color:#B5541A">always a copy</p><p style="flex:1;font-size:28px;color:#4A5568">shares_memory is False</p></div>
+<div style="display:flex;gap:24px;padding:12px 32px"><p style="width:520px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#13233A">a.ravel()</p><p style="width:300px;font-size:28px;font-weight:600;color:#2F6FB0">view if it can</p><p style="flex:1;font-size:28px;color:#4A5568">shares_memory is True for contiguous a</p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 11 Copies and views</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>Use this table as a prediction checklist. Basic slices and transposes are views because they can be described with new strides over the same buffer. Integer-array and Boolean indexing return copies when reading, but assignment through them, as in a[mask] = value, writes into the original. Avoid chained indexing when you mean to modify the original. flatten always copies; ravel returns a view when the layout allows it, which it does for the contiguous a in the notebook, where shares_memory is True. reshape behaves like ravel: it may need a copy for other layouts, so inspect with np.shares_memory rather than assume.</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> Use this table as a prediction checklist. Basic slices and transposes are views because they can be described with new strides over the same buffer. Integer-array and Boolean indexing return copies when reading, but assignment through them, as in a[mask] = value, writes into the original. Avoid chained indexing when you mean to modify the original. flatten always copies; ravel returns a view when the layout allows it, which it does for the contiguous a in the notebook, where shares_memory is True. reshape behaves like ravel: it may need a copy for other layouts, so inspect with np.shares_memory rather than assume.</p></div>
+<div class="slide" id="memmap"><div class="frame"><section id="memmap" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Memory mapping</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Read a file through a memory map</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">with TemporaryDirectory() as folder:<br>&#160;&#160;&#160;&#160;path = Path(folder) / "values.npy"<br>&#160;&#160;&#160;&#160;np.save(path, np.arange(1000, dtype=np.float64))<br>&#160;&#160;&#160;&#160;mapped = np.load(path, mmap_mode="r",<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;allow_pickle=False)<br>&#160;&#160;&#160;&#160;first_chunk_mean = mapped[:100].mean()<br>&#160;&#160;&#160;&#160;print("Mapped type:", type(mapped).__name__)<br>&#160;&#160;&#160;&#160;print("First chunk mean:", first_chunk_mean)<br>&#160;&#160;&#160;&#160;del mapped&#160;&#160;# release before cleanup on Windows</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Mapped type: memmap<br>First chunk mean: 49.5</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">File-backed storage</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">mmap_mode="r" maps the file read-only instead of loading it all.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Slices read what they need</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">mapped[:100] touches only the first 100 values.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Release the mapping</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">del mapped before the temporary folder is cleaned up.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 11 Copies and views</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>The cell first imports Path from pathlib and TemporaryDirectory from tempfile, then saves 1000 float64 values to a small .npy file. Loading with mmap_mode="r" returns a numpy.memmap: an array whose storage is the file itself, opened read-only. Nothing is read in bulk up front; when we take mapped[:100] and its mean, only that part of the file is needed, and the mean of 0 to 99 is 49.5. allow_pickle=False is a safety habit for loading files. On Windows an open mapping keeps the file locked, so the notebook deletes mapped before the temporary directory is removed. Try it: compute the mean using ten chunks and compare with the full-array result.</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> The cell first imports Path from pathlib and TemporaryDirectory from tempfile, then saves 1000 float64 values to a small .npy file. Loading with mmap_mode="r" returns a numpy.memmap: an array whose storage is the file itself, opened read-only. Nothing is read in bulk up front; when we take mapped[:100] and its mean, only that part of the file is needed, and the mean of 0 to 99 is 49.5. allow_pickle=False is a safety habit for loading files. On Windows an open mapping keeps the file locked, so the notebook deletes mapped before the temporary directory is removed. Try it: compute the mean using ten chunks and compare with the full-array result.</p></div>
+<div class="slide" id="memmap-chunks"><div class="frame"><section id="memmap-chunks" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Work in slices</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Touch only the slice you need</h2>
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;gap:16px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Database"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><p style="font-size:28px;color:#13233A">values.npy on disk · np.arange(1000) as float64</p></div>
+<div style="display:flex;gap:8px">
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#13233A">0–99</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">100–199</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">200–299</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">300–399</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">400–499</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">500–599</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">600–699</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">700–799</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">800–899</p></div>
+<div style="width:148px;height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#4A5568">900–999</p></div>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<div style="width:148px;display:flex;justify-content:center"><svg viewBox="0 0 100 100" preserveAspectRatio="none" style="flex:none;width:40px;height:72px" aria-hidden="true"><polygon points="30,0 30,60 0,60 50,100 100,60 70,60 70,0" fill="#E8813A"/></svg></div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">mapped[:100].mean() → <b>49.5</b></p>
+<p style="font-size:28px;color:#4A5568">The other nine blocks are never read.</p>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#13233A">memmap</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Behaves like an ndarray, but its storage is the file.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Try it · ten chunks</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Average the ten chunk means and compare with the full mean.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Outputs allocate</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A full-size operation makes a full-size array in memory.</p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 11 Copies and views</p><p style="font-size:24px;color:#6B7280">9</p></div>
+<aside>Picture the file as ten blocks of 100 values each. A memory map gives you an array that covers all of them, but the operating system only reads the parts you actually touch. Taking mapped[:100] reads the orange block, and its mean is 49.5. This is how NumPy can work with files larger than your RAM. The catch is in the third card: operations still allocate full-size outputs, so mapped * 2 on a huge file would try to build a huge in-memory array. When data is large, process it slice by slice. Try it: loop over ten chunks of 100, collect each chunk's mean, and average them. Because all chunks are the same size, the average of the chunk means equals the full-array mean, 499.5.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> Picture the file as ten blocks of 100 values each. A memory map gives you an array that covers all of them, but the operating system only reads the parts you actually touch. Taking mapped[:100] reads the orange block, and its mean is 49.5. This is how NumPy can work with files larger than your RAM. The catch is in the third card: operations still allocate full-size outputs, so mapped * 2 on a huge file would try to build a huge in-memory array. When data is large, process it slice by slice. Try it: loop over ten chunks of 100, collect each chunk's mean, and average them. Because all chunks are the same size, the average of the chunk means equals the full-array mean, 499.5.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Slices share.<br>Copy on purpose.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">A basic slice is a view of the same buffer. Call .copy() when you need independent data, and check with np.shares_memory.</p>
+<aside>Pause here. Views are a feature, not a bug: they make slicing, transposing and reshaping almost free, because no data moves. The price is that a write through a view reaches the original. When you need data that can change independently, make the copy explicit, and when you are unsure, ask np.shares_memory instead of guessing.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> Pause here. Views are a feature, not a bug: they make slicing, transposing and reshaping almost free, because no data moves. The price is that a write through a view reaches the original. When you need data that can change independently, make the copy explicit, and when you are unsure, ask np.shares_memory instead of guessing.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">One copy, one view</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">An independent copy of the first two rows of source</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: [[0, 1, 2], [3, 4, 5]], and it must not share memory with source.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">safe_rows = source[:2].copy()</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Every second element, as a view</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Expected: [0, 2, 4, 6, 8], and it must share memory with source_vector.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">every_second = source_vector[::2]</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 11 Copies and views</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>Ask the audience to attempt both before revealing the code, which matches the reference solutions. In Exercise 1, source is np.arange(12).reshape(4, 3). The slice source[:2] chooses the first two rows, and .copy() separates their storage, so the check np.shares_memory(source, safe_rows) is False. Without .copy() the values would match but the memory check would fail. In Exercise 2, source_vector is np.arange(10). A step of 2 skips every other entry, and because this is basic slicing, the result is a view sharing the underlying buffer: in stride terms, its stride is simply twice the original's.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> Ask the audience to attempt both before revealing the code, which matches the reference solutions. In Exercise 1, source is np.arange(12).reshape(4, 3). The slice source[:2] chooses the first two rows, and .copy() separates their storage, so the check np.shares_memory(source, safe_rows) is False. Without .copy() the values would match but the memory check would fail. In Exercise 2, source_vector is np.arange(10). A step of 2 skips every other entry, and because this is basic slicing, the result is a view sharing the underlying buffer: in stride terms, its stride is simply twice the original's.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Write it yourself, then check it</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Compare four arrays: a matrix, its transpose, a stepped slice, and a contiguous copy</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">For each, record shape, strides, contiguity flags and whether it shares memory with the matrix.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain the main idea without reading the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a changed input or edge case and explain it</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 11 Copies and views</p><p style="font-size:24px;color:#6B7280">12</p></div>
+<aside>The challenge has no supplied check: decide the expected results before you print them. A good setup is m = np.arange(12, dtype=np.int64).reshape(3, 4), then m.T, m[:, ::2] and np.ascontiguousarray(m.T). Inspect .shape, .strides, .flags.c_contiguous and .flags.f_contiguous, and np.shares_memory with m. Expect the transpose and the stepped slice to be views with unusual strides that are not C-contiguous, and the explicit contiguous copy to have fresh, regular strides and no shared memory. Write a short explanation for each row of your comparison.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> The challenge has no supplied check: decide the expected results before you print them. A good setup is m = np.arange(12, dtype=np.int64).reshape(3, 4), then m.T, m[:, ::2] and np.ascontiguousarray(m.T). Inspect .shape, .strides, .flags.c_contiguous and .flags.f_contiguous, and np.shares_memory with m. Expect the transpose and the stepped slice to be views with unusual strides that are not C-contiguous, and the explicit contiguous copy to have fresh, regular strides and no shared memory. Write a short explanation for each row of your comparison.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Views</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Basic slices share the buffer; writes reach the original.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Copies</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">.copy(), fancy indexing and flatten make new storage.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Strides</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Byte jumps per axis; a transpose just swaps them.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Memory maps</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Read files in slices; outputs still allocate.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 12</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Vectorization and performance</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Replace loops thoughtfully, measure runtime fairly, and limit temporary memory.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 12, where knowing about copies and temporaries pays off: vectorized code is fast, but every intermediate array costs memory. Further reading: the NumPy guide to copies and views at numpy.org/doc/stable/user/basics.copies.html, and the numpy.memmap reference at numpy.org/doc/stable/reference/generated/numpy.memmap.html.</aside>
+</section>
+</div><p class="notes"><b>Notes · 13</b> Recap the four takeaways, then point to notebook 12, where knowing about copies and temporaries pays off: vectorized code is fast, but every intermediate array costs memory. Further reading: the NumPy guide to copies and views at numpy.org/doc/stable/user/basics.copies.html, and the numpy.memmap reference at numpy.org/doc/stable/reference/generated/numpy.memmap.html.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>

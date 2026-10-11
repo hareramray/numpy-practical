@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NumPy 10 — Linear Algebra</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #0B1522; color: #C9D4E2; font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  header { max-width: 1600px; margin: 0 auto; padding: 24px 16px 0; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 22px; color: #F6F4EE; }
+  header a { color: #F2A35E; }
+  main { max-width: 1600px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 32px; }
+  .slide { display: flex; flex-direction: column; gap: 12px; }
+  .frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+  .frame > section { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; }
+  .frame section ul, .frame section ol { padding-left: 1.2em; }
+  .frame aside { display: none; }
+  .notes { font-size: 15px; line-height: 1.55; color: #9FB0C4; }
+  .notes b { color: #F2A35E; }
+  @media print { body { background: #fff; } .notes, header { display: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<header><h1>NumPy 10 — Linear Algebra</h1><span>13 slides · <a href="https://claude.ai/artifact/HPL5P44C9AF1J2rnxaDvhM">online deck</a> · <a href="../README.md">all decks</a></span></header>
+<main>
+<div class="slide" id="cover"><div class="frame"><section id="cover" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:end;gap:32px">
+<svg aria-label="Decorative grid: one row in orange crossing one column in blue, like a row-times-column product" width="612" height="612" viewBox="0 0 612 612" style="position:absolute;left:1180px;top:128px;width:612px;height:612px"><rect x="0" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="0" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="480" y="0" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="160" width="132" height="132" rx="16" fill="#E8813A"/><rect x="160" y="160" width="132" height="132" rx="16" fill="#E8813A"/><rect x="320" y="160" width="132" height="132" rx="16" fill="#F6F4EE"/><rect x="480" y="160" width="132" height="132" rx="16" fill="#E8813A"/><rect x="0" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="320" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="480" y="320" width="132" height="132" rx="16" fill="#22344F"/><rect x="0" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="160" y="480" width="132" height="132" rx="16" fill="#22344F"/><rect x="320" y="480" width="132" height="132" rx="16" fill="#2F6FB0"/><rect x="480" y="480" width="132" height="132" rx="16" fill="#22344F"/></svg>
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Learn NumPy by doing · Notebook 10</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#F6F4EE">Linear algebra</h1>
+<p style="font-size:40px;line-height:1.3;color:#C9D4E2">Vectors, matrices, and least squares</p>
+<div style="display:flex;gap:16px">
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Advanced</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">30–50 minutes</p>
+<p style="font-size:24px;font-weight:600;background:#22344F;color:#F6F4EE;padding:10px 24px;border-radius:999px">Prerequisites: notebooks 00–09, basic algebra</p>
+</div>
+<aside>Welcome to notebook 10. A matrix is a rectangular table of numbers and a vector is a 1D array. In this notebook we multiply matrices, solve linear systems, fit a straight line with least squares, and look inside a matrix with the singular value decomposition. The motif on this slide is the core move of the whole topic: one row crossing one column to produce a single entry of a matrix product.</aside>
+</section>
+</div><p class="notes"><b>Notes · 1</b> Welcome to notebook 10. A matrix is a rectangular table of numbers and a vector is a 1D array. In this notebook we multiply matrices, solve linear systems, fit a straight line with least squares, and look inside a matrix with the singular value decomposition. The motif on this slide is the core move of the whole topic: one row crossing one column to produce a single entry of a matrix product.</p></div>
+<div class="slide" id="goals"><div class="frame"><section id="goals" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">What you will learn</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Four tools for linear algebra</h2>
+<div style="display:flex;gap:24px;flex:1;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Multiply</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Use @ for matrix products and predict the result's shape.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Solve</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Solve A x = b with linalg.solve, then check the residual.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Fit</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Fit a straight line to noisy points with least squares.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:32px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1;color:#B5541A">4</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Factor</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Split a matrix into U, s and Vt with the SVD.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">2</p></div>
+<aside>These four tools cover most everyday linear algebra in NumPy. Matrix multiplication combines weighted values. Solving finds the unknown vector in a square system. Least squares handles more equations than unknowns, which is the usual case with real data. The SVD reveals the directions and strengths inside a matrix. Every step ends with a check, so we never just trust a printed number.</aside>
+</section>
+</div><p class="notes"><b>Notes · 2</b> These four tools cover most everyday linear algebra in NumPy. Matrix multiplication combines weighted values. Solving finds the unknown vector in a square system. Least squares handles more equations than unknowns, which is the usual case with real data. The SVD reveals the directions and strengths inside a matrix. Every step ends with a check, so we never just trust a printed number.</p></div>
+<div class="slide" id="matmul"><div class="frame"><section id="matmul" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · Matrix multiplication</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">@ multiplies rows by columns</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A * A is elementwise</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Each entry is squared on its own: 2 becomes 4.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A @ A is a matrix product</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Each entry is one row dotted with one column: multiply matching entries, then add.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A @ v gives a vector</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A (2, 2) matrix times a length-2 vector is a length-2 vector.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">A = np.array([[1., 2.], [3., 4.]])<br>v = np.array([10., 20.])<br>print("Elementwise:\n", A * A)<br>print("Matrix product:\n", A @ A)<br>print("Matrix times vector:", A @ v)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Elementwise:<br>&#160;[[ 1.&#160; 4.]<br>&#160;[ 9. 16.]]<br>Matrix product:<br>&#160;[[ 7. 10.]<br>&#160;[15. 22.]]<br>Matrix times vector: [ 50. 110.]</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">3</p></div>
+<aside>The star operator and the at operator look similar but mean very different things. A * A multiplies matching entries, so 3 becomes 9 and 4 becomes 16. A @ A is the matrix product: every result entry is a dot product of a row from the left matrix with a column from the right matrix. A @ v treats v as a column, giving 1 times 10 plus 2 times 20, which is 50, and 3 times 10 plus 4 times 20, which is 110. The notebook confirms this with np.testing.assert_allclose(A @ v, [50, 110]). Try it: compute the first entry of A @ A by hand before looking at the next slide.</aside>
+</section>
+</div><p class="notes"><b>Notes · 3</b> The star operator and the at operator look similar but mean very different things. A * A multiplies matching entries, so 3 becomes 9 and 4 becomes 16. A @ A is the matrix product: every result entry is a dot product of a row from the left matrix with a column from the right matrix. A @ v treats v as a column, giving 1 times 10 plus 2 times 20, which is 50, and 3 times 10 plus 4 times 20, which is 110. The notebook confirms this with np.testing.assert_allclose(A @ v, [50, 110]). Try it: compute the first entry of A @ A by hand before looking at the next slide.</p></div>
+<div class="slide" id="matmul-shapes"><div class="frame"><section id="matmul-shapes" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 1 · The shape rule</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Inner sizes match, outer sizes stay</h2>
+<div style="display:flex;gap:56px;flex:1;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;gap:28px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(2, 64px);gap:8px">
+<div style="height:64px;background:#E8813A;border-radius:8px"></div><div style="height:64px;background:#E8813A;border-radius:8px"></div>
+<div style="height:64px;background:#E2DED3;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div>
+<div style="height:64px;background:#E2DED3;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">A (3, 2)</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">@</p>
+<div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(4, 64px);gap:8px">
+<div style="height:64px;background:#2F6FB0;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div>
+<div style="height:64px;background:#2F6FB0;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div><div style="height:64px;background:#E2DED3;border-radius:8px"></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">B (2, 4)</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">=</p>
+<div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(4, 64px);gap:8px">
+<div style="height:64px;background:#13233A;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div>
+<div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div>
+<div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div><div style="height:64px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:8px"></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">A @ B (3, 4)</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">(m, <span style="color:#B5541A">n</span>) @ (<span style="color:#B5541A">n</span>, p) → (m, p)</p>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">The inner sizes must agree (2 and 2). The outer sizes, 3 and 4, become the result's shape. The orange row times the blue column fills the one dark cell.</p>
+</div>
+</div>
+<div style="width:560px;display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Try it · by hand</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">First entry of A @ A</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.5;color:#13233A">row 0: <span style="color:#B5541A">[1, 2]</span><br>col 0: <span style="color:#2F6FB0">[1, 3]</span><br>1×1 + 2×3 = <b>7</b></p>
+<hr style="border-top:1px solid #E2DED3">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.6;color:#4A5568">A @ A → [[7, 10], [15, 22]]<br>A * A → [[1, 4], [9, 16]]</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">4</p></div>
+<aside>This is the one rule to check before any matrix product. For A shaped (m, n) and B shaped (n, p), the inner sizes n must match, because each row of A is paired element by element with each column of B. The result has the outer shape (m, p): one entry for every row of A and every column of B. In the diagram, the orange row of A and the blue column of B produce the single dark cell. On the right is the Try it answer: row 0 of A is [1, 2], column 0 of A is [1, 3], so the first entry is 1 times 1 plus 2 times 3, which is 7, matching the printed output. If the inner sizes disagree, NumPy raises a ValueError instead of guessing.</aside>
+</section>
+</div><p class="notes"><b>Notes · 4</b> This is the one rule to check before any matrix product. For A shaped (m, n) and B shaped (n, p), the inner sizes n must match, because each row of A is paired element by element with each column of B. The result has the outer shape (m, p): one entry for every row of A and every column of B. In the diagram, the orange row of A and the blue column of B produce the single dark cell. On the right is the Try it answer: row 0 of A is [1, 2], column 0 of A is [1, 3], so the first entry is 1 times 1 plus 2 times 3, which is 7, matching the printed output. If the inner sizes disagree, NumPy raises a ValueError instead of guessing.</p></div>
+<div class="slide" id="solve"><div class="frame"><section id="solve" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Solve equations</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Solve A x = b, then check it</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">A = np.array([[2., 1.], [1., 3.]])<br>b = np.array([5., 7.])<br>x = np.linalg.solve(A, b)<br>print("Solution:", x)<br>print("Residual norm:", np.linalg.norm(A @ x - b))<br>print("Condition number:", np.linalg.cond(A))<br>np.testing.assert_allclose(A @ x, b)</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Solution: [1.6 1.8]<br>Residual norm: 0.0<br>Condition number: 2.6180339887498953</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">solve finds x</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">For a square, full-rank A it returns the unknown vector directly.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">The residual checks it</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">A @ x − b should be close to zero. Here its norm is 0.0.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Condition number warns</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">About 2.6 is small, so x is stable. Large values mean tiny input changes move x a lot.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">5</p></div>
+<aside>A x = b is two equations with two unknowns: 2 x1 + x2 = 5 and x1 + 3 x2 = 7. np.linalg.solve finds x = [1.6, 1.8]. Never trust a solution blindly: the residual A @ x minus b measures how well the answer satisfies the equations, and its norm here is exactly 0.0. The condition number measures sensitivity. A value near 1 is ideal; nearly dependent columns push it towards infinity, and then tiny changes in b can produce large changes in x. Try it: make both rows of A identical. The matrix becomes singular, and solve raises numpy.linalg.LinAlgError, which you can catch with try and except.</aside>
+</section>
+</div><p class="notes"><b>Notes · 5</b> A x = b is two equations with two unknowns: 2 x1 + x2 = 5 and x1 + 3 x2 = 7. np.linalg.solve finds x = [1.6, 1.8]. Never trust a solution blindly: the residual A @ x minus b measures how well the answer satisfies the equations, and its norm here is exactly 0.0. The condition number measures sensitivity. A value near 1 is ideal; nearly dependent columns push it towards infinity, and then tiny changes in b can produce large changes in x. Try it: make both rows of A identical. The matrix becomes singular, and solve raises numpy.linalg.LinAlgError, which you can catch with try and except.</p></div>
+<div class="slide" id="solve-vs-inverse"><div class="frame"><section id="solve-vs-inverse" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 2 · Solve versus inverse</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Solve directly; skip the inverse</h2>
+<div style="display:flex;gap:64px;flex:1;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;gap:24px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(2, 104px);gap:8px">
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">2</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1</p></div>
+<div style="height:96px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">3</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">A</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">@</p>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="width:120px;height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1.6</p></div>
+<div style="width:120px;height:96px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">1.8</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">x (unknown)</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">=</p>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="width:104px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">5</p></div>
+<div style="width:104px;height:96px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#F6F4EE">7</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">b</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">2×<span style="color:#B5541A">1.6</span> + 1×<span style="color:#B5541A">1.8</span> = 5.0</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">1×<span style="color:#B5541A">1.6</span> + 3×<span style="color:#B5541A">1.8</span> = 7.0</p>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Substituting x back gives b: residual norm 0.0.</p>
+</div>
+</div>
+<div style="width:760px;display:flex;flex-direction:column;gap:20px">
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;gap:24px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:56px;height:56px" role="img" aria-label="CheckCircle"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#13233A">solve(A, b)</h3><p style="font-size:28px;color:#4A5568">Use this: one direct solve.</p></div></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;gap:24px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#B5541A;width:56px;height:56px" role="img" aria-label="Warning"><path d="M12 3 22 20H2Z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#13233A">inv(A) @ b</h3><p style="font-size:28px;color:#4A5568">Avoid: inverts all of A first.</p></div></div>
+<div style="background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px;display:flex;gap:24px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#6B7280;width:56px;height:56px" role="img" aria-label="Lock"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Identical rows</h3><p style="font-size:28px;color:#4A5568">Singular A: solve raises LinAlgError.</p></div></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">6</p></div>
+<aside>Picture the system as a matrix A times an unknown column x giving the known column b. Solving means finding the orange cells. Substituting 1.6 and 1.8 back into both rows reproduces 5 and 7, which is exactly what the residual check measures. On paper we write x equals A inverse times b, but in code you should call np.linalg.solve: it factors A once and back-substitutes, which is less work and less rounding error than building the whole inverse and then multiplying. Try it: make both rows of A identical. The rows no longer carry independent information, the matrix is singular, and solve raises LinAlgError instead of returning nonsense. Catch it with try and except so Run All still works.</aside>
+</section>
+</div><p class="notes"><b>Notes · 6</b> Picture the system as a matrix A times an unknown column x giving the known column b. Solving means finding the orange cells. Substituting 1.6 and 1.8 back into both rows reproduces 5 and 7, which is exactly what the residual check measures. On paper we write x equals A inverse times b, but in code you should call np.linalg.solve: it factors A once and back-substitutes, which is less work and less rounding error than building the whole inverse and then multiplying. Try it: make both rows of A identical. The rows no longer carry independent information, the matrix is singular, and solve raises LinAlgError instead of returning nonsense. Catch it with try and except so Run All still works.</p></div>
+<div class="slide" id="lstsq"><div class="frame"><section id="lstsq" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Least squares</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Least squares fits a line</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px 16px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">x_data = np.arange(5, dtype=float)<br>y_data = np.array([1.1, 2.9, 5.2, 6.8, 9.0])<br>design = np.column_stack(<br>&#160;&#160;&#160;&#160;[np.ones(x_data.size), x_data])<br>coefficients, residuals, rank, singular_values = (<br>&#160;&#160;&#160;&#160;np.linalg.lstsq(design, y_data, rcond=None))<br>prediction = design @ coefficients<br>print("Intercept, slope:", coefficients)<br>print("RMSE:", np.sqrt(np.mean(<br>&#160;&#160;&#160;&#160;(prediction - y_data) ** 2)))</p></div>
+<div style="background:#22344F;padding:24px 40px;border-radius:0px 0px 16px 16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F2A35E">Intercept, slope: [1.06 1.97]<br>RMSE: 0.13490737563232053</p></div>
+</div>
+<div style="width:620px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Too many equations</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">5 points, 2 unknowns: no single line passes through them all.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">A column of ones</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">It multiplies the intercept; the x column multiplies the slope.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Smallest squared gaps</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">lstsq returns coefficients first, then residuals, rank and singular values.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">7</p></div>
+<aside>Real data rarely fits a model exactly. Here we have five noisy points and want a line y = intercept + slope times x, which has only two unknowns. Each point gives one equation, so the system is overdetermined and has no exact solution. Least squares picks the coefficients that make the sum of squared residuals as small as possible. The design matrix has a column of ones, so that the first coefficient acts as the intercept, and a column of x values for the slope. The fit gives intercept 1.06 and slope 1.97, and the root mean squared error of about 0.135 says the line misses each point by a small amount on average. The notebook also asserts rank == 2: both columns carry independent information.</aside>
+</section>
+</div><p class="notes"><b>Notes · 7</b> Real data rarely fits a model exactly. Here we have five noisy points and want a line y = intercept + slope times x, which has only two unknowns. Each point gives one equation, so the system is overdetermined and has no exact solution. Least squares picks the coefficients that make the sum of squared residuals as small as possible. The design matrix has a column of ones, so that the first coefficient acts as the intercept, and a column of x values for the slope. The fit gives intercept 1.06 and slope 1.97, and the root mean squared error of about 0.135 says the line misses each point by a small amount on average. The notebook also asserts rank == 2: both columns carry independent information.</p></div>
+<div class="slide" id="lstsq-fit"><div class="frame"><section id="lstsq-fit" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · See the fit</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">The line that minimizes squared gaps</h2>
+<div style="display:flex;gap:56px;flex:1;align-items:center">
+<div style="position:relative;width:1000px;height:560px">
+<svg aria-label="Scatter of the five observed points with the fitted line y = 1.06 + 1.97x passing very close to each point; short orange segments mark the residuals" width="1000" height="560" viewBox="0 0 1000 560" style="position:absolute;left:0px;top:0px;width:1000px;height:560px"><line x1="88" y1="60" x2="940" y2="60" stroke="#E2DED3" stroke-width="2"/><line x1="88" y1="280" x2="940" y2="280" stroke="#E2DED3" stroke-width="2"/><line x1="88" y1="500" x2="940" y2="500" stroke="#9AA3AE" stroke-width="2"/><line x1="100" y1="453.36" x2="900" y2="106.64" stroke="#2F6FB0" stroke-width="6" stroke-linecap="round"/><line x1="100" y1="451.6" x2="100" y2="453.36" stroke="#E8813A" stroke-width="6"/><line x1="300" y1="372.4" x2="300" y2="366.68" stroke="#E8813A" stroke-width="6"/><line x1="500" y1="271.2" x2="500" y2="280" stroke="#E8813A" stroke-width="6"/><line x1="700" y1="200.8" x2="700" y2="193.32" stroke="#E8813A" stroke-width="6"/><line x1="900" y1="104" x2="900" y2="106.64" stroke="#E8813A" stroke-width="6"/><circle cx="100" cy="451.6" r="14" fill="#13233A"/><circle cx="300" cy="372.4" r="14" fill="#13233A"/><circle cx="500" cy="271.2" r="14" fill="#13233A"/><circle cx="700" cy="200.8" r="14" fill="#13233A"/><circle cx="900" cy="104" r="14" fill="#13233A"/></svg>
+<p style="position:absolute;left:0px;top:483px;width:72px;font-size:24px;color:#6B7280;text-align:right">0</p>
+<p style="position:absolute;left:0px;top:263px;width:72px;font-size:24px;color:#6B7280;text-align:right">5</p>
+<p style="position:absolute;left:0px;top:43px;width:72px;font-size:24px;color:#6B7280;text-align:right">10</p>
+<p style="position:absolute;left:70px;top:516px;width:60px;font-size:24px;color:#6B7280;text-align:center">0</p>
+<p style="position:absolute;left:270px;top:516px;width:60px;font-size:24px;color:#6B7280;text-align:center">1</p>
+<p style="position:absolute;left:470px;top:516px;width:60px;font-size:24px;color:#6B7280;text-align:center">2</p>
+<p style="position:absolute;left:670px;top:516px;width:60px;font-size:24px;color:#6B7280;text-align:center">3</p>
+<p style="position:absolute;left:870px;top:516px;width:60px;font-size:24px;color:#6B7280;text-align:center">4</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;gap:16px;align-items:center"><div style="width:28px;height:28px;background:#13233A;border-radius:14px"></div><p style="font-size:24px;color:#4A5568">observed y_data</p></div>
+<div style="display:flex;gap:16px;align-items:center"><div style="width:28px;height:6px;background:#2F6FB0"></div><p style="font-size:24px;color:#4A5568">fit: 1.06 + 1.97·x</p></div>
+<div style="display:flex;gap:16px;align-items:center"><div style="width:6px;height:28px;background:#E8813A"></div><p style="font-size:24px;color:#4A5568">residual (gap to the line)</p></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">design @ coefficients</p>
+<div style="display:flex;gap:20px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(2, 72px);gap:6px">
+<div style="height:52px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:52px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">0</p></div>
+<div style="height:52px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:52px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">1</p></div>
+<div style="height:52px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:52px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">2</p></div>
+<div style="height:52px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:52px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">3</p></div>
+<div style="height:52px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:52px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">4</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#13233A">@</p>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="width:96px;height:52px;display:flex;align-items:center;justify-content:center;background:#E8813A;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1.06</p></div>
+<div style="width:96px;height:52px;display:flex;align-items:center;justify-content:center;background:#2F6FB0;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F6F4EE">1.97</p></div>
+</div>
+</div>
+<p style="font-size:24px;line-height:1.4;color:#4A5568">Ones pair with the intercept, x with the slope. RMSE 0.1349.</p>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">8</p></div>
+<aside>This chart draws the notebook's five points, x from 0 to 4 and y_data 1.1, 2.9, 5.2, 6.8 and 9.0, with the fitted line y = 1.06 + 1.97 x. The orange segments are the residuals, the vertical gaps between each point and the line. Least squares chooses the intercept and slope that make the sum of the squared gaps as small as possible; any other line would have a larger total. On the right, the design matrix shows why the column of ones matters: every row multiplies 1 by the intercept and x by the slope, so design @ coefficients is the prediction for every point at once. Try it: plot the observed points and the fitted line yourself, then change one y value to something extreme and refit. A single outlier pulls the line towards it, because squaring makes large gaps very expensive.</aside>
+</section>
+</div><p class="notes"><b>Notes · 8</b> This chart draws the notebook's five points, x from 0 to 4 and y_data 1.1, 2.9, 5.2, 6.8 and 9.0, with the fitted line y = 1.06 + 1.97 x. The orange segments are the residuals, the vertical gaps between each point and the line. Least squares chooses the intercept and slope that make the sum of the squared gaps as small as possible; any other line would have a larger total. On the right, the design matrix shows why the column of ones matters: every row multiplies 1 by the intercept and x by the slope, so design @ coefficients is the prediction for every point at once. Try it: plot the observed points and the fitted line yourself, then change one y value to something extreme and refit. A single outlier pulls the line towards it, because squaring makes large gaps very expensive.</p></div>
+<div class="slide" id="svd"><div class="frame"><section id="svd" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Step 3 · Factor a matrix</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">SVD splits a matrix into three</h2>
+<div style="display:flex;gap:56px;align-items:center">
+<div style="flex:1;display:flex;gap:20px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(2, 56px);gap:6px">
+<div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">0</p></div>
+<div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div>
+<div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">2</p></div>
+<div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">3</p></div>
+<div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">1</p></div><div style="height:48px;display:flex;align-items:center;justify-content:center;background:#E2DED3;border-radius:8px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">4</p></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">design (5, 2)</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">=</p>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(2, 56px);gap:6px">
+<div style="height:48px;background:#2F6FB0;border-radius:8px"></div><div style="height:48px;background:#2F6FB0;border-radius:8px"></div>
+<div style="height:48px;background:#2F6FB0;border-radius:8px"></div><div style="height:48px;background:#2F6FB0;border-radius:8px"></div>
+<div style="height:48px;background:#2F6FB0;border-radius:8px"></div><div style="height:48px;background:#2F6FB0;border-radius:8px"></div>
+<div style="height:48px;background:#2F6FB0;border-radius:8px"></div><div style="height:48px;background:#2F6FB0;border-radius:8px"></div>
+<div style="height:48px;background:#2F6FB0;border-radius:8px"></div><div style="height:48px;background:#2F6FB0;border-radius:8px"></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">U (5, 2)</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">×</p>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(2, 56px);gap:6px">
+<div style="height:48px;background:#E8813A;border-radius:8px"></div><div style="height:48px;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:8px"></div>
+<div style="height:48px;background:#FFFDF8;border:2px dashed #9AA3AE;border-radius:8px"></div><div style="height:48px;background:#E8813A;border-radius:8px"></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">diag(s) (2, 2)</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;color:#13233A">×</p>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+<div style="display:grid;grid-template-columns:repeat(2, 56px);gap:6px">
+<div style="height:48px;background:#13233A;border-radius:8px"></div><div style="height:48px;background:#13233A;border-radius:8px"></div>
+<div style="height:48px;background:#13233A;border-radius:8px"></div><div style="height:48px;background:#13233A;border-radius:8px"></div>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13233A">Vt (2, 2)</p>
+</div>
+</div>
+<div style="width:660px;display:flex;flex-direction:column">
+<div style="background:#13233A;padding:32px 40px;border-radius:16px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">U, s, Vt = np.linalg.svd(<br>&#160;&#160;&#160;&#160;design, full_matrices=False)<br>np.testing.assert_allclose(<br>&#160;&#160;&#160;&#160;(U * s) @ Vt, design, atol=1e-12)<br>assert rank == 2</p></div>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#2F6FB0">U</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Orthonormal directions across the 5 rows.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#B5541A">s</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Singular values, largest first. Small = weak direction.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DED3;border-radius:16px;padding:28px 32px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:40px;font-weight:600;color:#13233A">Vt</h3><p style="font-size:28px;line-height:1.4;color:#4A5568">Orthonormal directions across the 2 columns.</p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">9</p></div>
+<aside>The singular value decomposition factors any matrix into three pieces. Here the 5 by 2 design matrix becomes U, shaped 5 by 2, the singular values s, and Vt, shaped 2 by 2. U and Vt hold orthonormal directions, and s holds one strength per direction, sorted from largest to smallest. A singular value close to zero marks a direction with very little variation, which is exactly when solving or fitting becomes unstable. NumPy returns s as a 1D array, not a diagonal matrix, so the notebook rebuilds design with (U * s) @ Vt: broadcasting scales each column of U by its singular value, which equals U @ np.diag(s). The assert_allclose check, with an absolute tolerance of 1e-12, proves the factorization reproduces the original matrix, and the notebook asserts rank == 2 from the earlier lstsq call.</aside>
+</section>
+</div><p class="notes"><b>Notes · 9</b> The singular value decomposition factors any matrix into three pieces. Here the 5 by 2 design matrix becomes U, shaped 5 by 2, the singular values s, and Vt, shaped 2 by 2. U and Vt hold orthonormal directions, and s holds one strength per direction, sorted from largest to smallest. A singular value close to zero marks a direction with very little variation, which is exactly when solving or fitting becomes unstable. NumPy returns s as a 1D array, not a diagonal matrix, so the notebook rebuilds design with (U * s) @ Vt: broadcasting scales each column of U by its singular value, which equals U @ np.diag(s). The assert_allclose check, with an absolute tolerance of 1e-12, proves the factorization reproduces the original matrix, and the notebook asserts rank == 2 from the earlier lstsq call.</p></div>
+<div class="slide" id="key-idea"><div class="frame"><section id="key-idea" data-transition="fade" style="background:#E8813A;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#13233A">The idea to remember</p>
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:112px;font-weight:700;line-height:1.05;color:#13233A">Match the shapes.<br>Solve, don't invert.</h1>
+<p style="font-size:40px;line-height:1.3;color:#13233A;width:1300px">Check (m, n) @ (n, p) before you multiply. For A x = b, call solve or lstsq, then check the residual.</p>
+<aside>Pause here. Almost every linear algebra bug in NumPy is either a shape mismatch or trusting a computed answer without checking it. Read the shapes before writing @. Prefer np.linalg.solve for square systems and np.linalg.lstsq when there are more equations than unknowns, and always verify with a residual or an assert_allclose.</aside>
+</section>
+</div><p class="notes"><b>Notes · 10</b> Pause here. Almost every linear algebra bug in NumPy is either a shape mismatch or trusting a computed answer without checking it. Read the shapes before writing @. Prefer np.linalg.solve for square systems and np.linalg.lstsq when there are more equations than unknowns, and always verify with a residual or an assert_allclose.</p></div>
+<div class="slide" id="exercises"><div class="frame"><section id="exercises" data-transition="fade" style="background:#ECE8DE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Exercises</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Solve a system, fit a line</h2>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Solve system @ solution = target</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">system is [[3, 1], [1, 2]] and target is [9, 8]. Expected: [2, 3].</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">solution = np.linalg.solve(<br>&#160;&#160;&#160;&#160;system, target)</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFDF8;border:1px solid #D6D1C4;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Exercise 2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.2;color:#13233A">Fit y = intercept + slope·x by least squares</h3>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">The data follow y = 4 + 3x exactly, so expect [4, 3]. Columns are ones, then x.</p>
+<div style="flex:1"></div>
+<div style="background:#13233A;padding:24px 32px;border-radius:12px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E6EDF5">line_parameters = np.linalg.lstsq(<br>&#160;&#160;&#160;&#160;X_fit, y_fit, rcond=None)[0]</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">11</p></div>
+<aside>Ask the audience to attempt both before revealing the code, which matches the reference solutions. Exercise 1 is a square, full-rank system, so solve finds the unknown vector directly, and substituting [2, 3] back gives 3 times 2 plus 3, which is 9, and 2 plus 2 times 3, which is 8. The check also tests system @ solution against target. In Exercise 2, X_fit already holds a column of ones and a column of x values, so the coefficient order is intercept then slope. lstsq returns a tuple with the coefficients first, which is why the solution takes element [0]. Because the data are noise-free, the fit is exact within 1e-12.</aside>
+</section>
+</div><p class="notes"><b>Notes · 11</b> Ask the audience to attempt both before revealing the code, which matches the reference solutions. Exercise 1 is a square, full-rank system, so solve finds the unknown vector directly, and substituting [2, 3] back gives 3 times 2 plus 3, which is 9, and 2 plus 2 times 3, which is 8. The check also tests system @ solution against target. In Exercise 2, X_fit already holds a column of ones and a column of x values, so the coefficient order is intercept then slope. lstsq returns a tuple with the coefficients first, which is why the solution takes element [0]. Because the data are noise-free, the fit is exact within 1e-12.</p></div>
+<div class="slide" id="challenge"><div class="frame"><section id="challenge" data-transition="fade" style="background:#F6F4EE;color:#13233A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B5541A">Practice · Independent challenge</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#13233A">Write it yourself, then check it</h2>
+<div style="display:flex;gap:56px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#13233A;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Challenge</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;line-height:1.25;color:#F6F4EE">Fit a quadratic y = a + b·x + c·x² to noisy synthetic data</h3>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Compare its training residual with a straight-line model. Explain why lower training error alone is not enough.</p>
+</div>
+<div style="width:720px;display:flex;flex-direction:column;gap:24px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#13233A">Before you move on</h3>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Explain the main idea without reading the examples</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Make both exercise checks print passed</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Try a changed input or edge case and explain it</p></div>
+<div style="display:flex;gap:20px;align-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:#2F6FB0;width:40px;height:40px" role="img" aria-label="Check"><polyline points="20 6 9 17 4 12"/></svg><p style="font-size:28px;line-height:1.4;color:#4A5568">Finish the challenge, or note a question to revisit</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;justify-content:space-between"><p style="font-size:24px;color:#6B7280">NumPy course · 10 Linear algebra</p><p style="font-size:24px;color:#6B7280">12</p></div>
+<aside>The challenge has no supplied check: write your own. Build a design matrix with three columns, ones, x and x squared, using np.column_stack, generate noisy data with a seeded random generator, and fit with lstsq. Then fit the two-column straight-line model to the same data and compare the residuals. The quadratic will never have a higher training error, because it can always set c to zero and reproduce the line. That is exactly why lower training error alone is insufficient: extra flexibility can fit the noise rather than the pattern. A fair comparison uses held-out data the model never saw. Finish by restarting the kernel and running all cells.</aside>
+</section>
+</div><p class="notes"><b>Notes · 12</b> The challenge has no supplied check: write your own. Build a design matrix with three columns, ones, x and x squared, using np.column_stack, generate noisy data with a seeded random generator, and fit with lstsq. Then fit the two-column straight-line model to the same data and compare the residuals. The quadratic will never have a higher training error, because it can always set c to zero and reproduce the line. That is exactly why lower training error alone is insufficient: extra flexibility can fit the noise rather than the pattern. A fair comparison uses held-out data the model never saw. Finish by restarting the kernel and running all cells.</p></div>
+<div class="slide" id="next"><div class="frame"><section id="next" data-transition="fade" style="background:#13233A;color:#F6F4EE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Recap</p>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">@ is not *</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">(m, n) @ (n, p) gives (m, p); * is elementwise.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Solve</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">Use solve, not the inverse; check the residual.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">Least squares</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">lstsq fits more equations than unknowns.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;border-top:4px solid #E8813A;padding:24px 0px 0px 0px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:40px;font-weight:600;color:#F6F4EE">SVD</h3><p style="font-size:28px;line-height:1.4;color:#C9D4E2">U, s and Vt rebuild the matrix; small s is a weak direction.</p></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A35E">Up next · Notebook 11</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#F6F4EE">Copies, views and memory</h2>
+<p style="font-size:28px;line-height:1.4;color:#C9D4E2">Predict shared memory, inspect strides, and use a memory-mapped array.</p>
+</div>
+<aside>Recap the four takeaways, then point to notebook 11, which explains when two arrays share the same memory and why that matters for correctness and speed. Further reading: the official NumPy linear algebra reference at numpy.org/doc/stable/reference/routines.linalg.html.</aside>
+</section>
+</div><p class="notes"><b>Notes · 13</b> Recap the four takeaways, then point to notebook 11, which explains when two arrays share the same memory and why that matters for correctness and speed. Further reading: the official NumPy linear algebra reference at numpy.org/doc/stable/reference/routines.linalg.html.</p></div>
+</main>
+<script>
+  function fit() {
+    document.querySelectorAll('.frame').forEach(function (f) {
+      f.firstElementChild.style.transform = 'scale(' + f.clientWidth / 1920 + ')';
+    });
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+</body>
+</html>
